@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fff7ec"/>
+      <stop offset="60%" stop-color="#ffd5a4"/>
+      <stop offset="100%" stop-color="#ff8a32"/>
+    </linearGradient>
+    <linearGradient id="cartBody" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f3eee0"/>
+    </linearGradient>
+    <linearGradient id="roof" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2f303d"/>
+      <stop offset="100%" stop-color="#1a1b25"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <!-- palme silhouettes -->
+  <g opacity="0.18">
+    <path d="M 80 480 Q 80 360 100 280" stroke="#1a1b25" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M 100 280 Q 60 250 30 270" stroke="#1a1b25" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M 100 280 Q 145 250 175 270" stroke="#1a1b25" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M 100 280 Q 80 230 65 220" stroke="#1a1b25" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M 100 280 Q 130 235 155 230" stroke="#1a1b25" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M 720 480 Q 720 360 700 280" stroke="#1a1b25" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M 700 280 Q 660 245 625 260" stroke="#1a1b25" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M 700 280 Q 745 245 775 260" stroke="#1a1b25" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- ground -->
+  <ellipse cx="400" cy="510" rx="280" ry="14" fill="#1a1b25" opacity="0.18"/>
+  <!-- golf cart -->
+  <g transform="translate(220 230)">
+    <!-- roof -->
+    <rect x="20" y="0" width="320" height="18" rx="4" fill="url(#roof)"/>
+    <!-- roof supports -->
+    <rect x="34" y="0" width="6" height="80" fill="#2f303d"/>
+    <rect x="170" y="0" width="6" height="80" fill="#2f303d"/>
+    <rect x="320" y="0" width="6" height="80" fill="#2f303d"/>
+    <!-- body -->
+    <rect x="10" y="80" width="340" height="100" rx="14" fill="url(#cartBody)" stroke="#2f303d" stroke-width="4"/>
+    <!-- seats -->
+    <rect x="46" y="40" width="100" height="48" rx="6" fill="#2f303d"/>
+    <rect x="190" y="40" width="100" height="48" rx="6" fill="#2f303d"/>
+    <!-- side panel -->
+    <path d="M 10 110 L 60 110 L 60 145 L 10 145 Z" fill="#ff6a0a" opacity="0.85"/>
+    <path d="M 300 110 L 350 110 L 350 145 L 300 145 Z" fill="#ff6a0a" opacity="0.85"/>
+    <!-- wheels -->
+    <circle cx="70" cy="195" r="32" fill="#2f303d"/>
+    <circle cx="70" cy="195" r="14" fill="#737486"/>
+    <circle cx="290" cy="195" r="32" fill="#2f303d"/>
+    <circle cx="290" cy="195" r="14" fill="#737486"/>
+    <!-- headlight -->
+    <circle cx="22" cy="125" r="6" fill="#ffd5a4"/>
+  </g>
+  <text x="400" y="568" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="28" fill="#1a1b25" opacity="0.7">Golf cart</text>
+</svg>

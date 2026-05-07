@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="bge" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fff7ec"/>
+      <stop offset="60%" stop-color="#ffb56c"/>
+      <stop offset="100%" stop-color="#c63a04"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bge)"/>
+  <ellipse cx="400" cy="500" rx="240" ry="14" fill="#0d0e15" opacity="0.18"/>
+  <g transform="translate(280 180)">
+    <!-- handlebar -->
+    <line x1="40" y1="0" x2="100" y2="0" stroke="#2f303d" stroke-width="8" stroke-linecap="round"/>
+    <!-- handgrips -->
+    <rect x="32" y="-6" width="14" height="12" rx="3" fill="#1a1b25"/>
+    <rect x="94" y="-6" width="14" height="12" rx="3" fill="#1a1b25"/>
+    <!-- display -->
+    <rect x="60" y="-22" width="20" height="18" rx="3" fill="#1a1b25"/>
+    <!-- stem -->
+    <rect x="64" y="0" width="12" height="200" fill="#2f303d"/>
+    <!-- folding joint -->
+    <circle cx="70" cy="200" r="14" fill="#1a1b25"/>
+    <!-- deck -->
+    <path d="M 30 210 L 230 210 L 240 245 L 20 245 Z" fill="#2f303d" stroke="#1a1b25" stroke-width="3"/>
+    <!-- deck top color -->
+    <path d="M 40 210 L 220 210 L 224 220 L 36 220 Z" fill="#ff6a0a"/>
+    <!-- wheels -->
+    <circle cx="50" cy="270" r="32" fill="#1a1b25"/>
+    <circle cx="50" cy="270" r="18" fill="#737486"/>
+    <circle cx="210" cy="270" r="32" fill="#1a1b25"/>
+    <circle cx="210" cy="270" r="18" fill="#737486"/>
+    <!-- battery indicator -->
+    <rect x="100" y="225" width="60" height="8" rx="2" fill="#737486" opacity="0.5"/>
+    <rect x="100" y="225" width="42" height="8" rx="2" fill="#10b981"/>
+  </g>
+  <text x="400" y="558" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="28" fill="#0d0e15" opacity="0.7">Monopattino elettrico</text>
+</svg>

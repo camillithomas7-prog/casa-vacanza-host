@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="bgt" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0a3742"/>
+      <stop offset="60%" stop-color="#0e7490"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="carbody" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2f303d"/>
+      <stop offset="100%" stop-color="#1a1b25"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bgt)"/>
+  <!-- airplane silhouette -->
+  <g opacity="0.25">
+    <path d="M 580 100 L 700 80 L 720 95 L 620 130 L 615 160 L 595 165 L 600 130 L 555 145 L 540 135 Z" fill="#fff"/>
+  </g>
+  <!-- runway lines -->
+  <g opacity="0.4">
+    <line x1="100" y1="500" x2="700" y2="500" stroke="#fff" stroke-width="2" stroke-dasharray="20 14"/>
+  </g>
+  <ellipse cx="400" cy="490" rx="280" ry="12" fill="#000" opacity="0.35"/>
+  <!-- car -->
+  <g transform="translate(180 250)">
+    <!-- body -->
+    <path d="M 30 120 Q 40 60 90 50 L 200 30 Q 280 30 340 60 L 400 80 L 410 120 L 410 170 L 30 170 Z" fill="url(#carbody)" stroke="#0d0e15" stroke-width="3"/>
+    <!-- windows -->
+    <path d="M 95 60 L 200 45 Q 270 45 320 65 L 350 85 L 105 85 Z" fill="#a5f3fc" opacity="0.85" stroke="#0d0e15" stroke-width="2"/>
+    <line x1="200" y1="46" x2="200" y2="85" stroke="#0d0e15" stroke-width="2"/>
+    <!-- doors -->
+    <line x1="200" y1="85" x2="200" y2="170" stroke="#0d0e15" stroke-width="2" opacity="0.4"/>
+    <!-- headlight -->
+    <ellipse cx="400" cy="115" rx="14" ry="10" fill="#ffd5a4"/>
+    <!-- detail strip -->
+    <rect x="40" y="125" width="370" height="3" fill="#ff6a0a"/>
+    <!-- wheels -->
+    <circle cx="120" cy="180" r="34" fill="#0d0e15"/>
+    <circle cx="120" cy="180" r="18" fill="#737486"/>
+    <circle cx="120" cy="180" r="6" fill="#0d0e15"/>
+    <circle cx="340" cy="180" r="34" fill="#0d0e15"/>
+    <circle cx="340" cy="180" r="18" fill="#737486"/>
+    <circle cx="340" cy="180" r="6" fill="#0d0e15"/>
+  </g>
+  <text x="400" y="558" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="28" fill="#fff" opacity="0.85">Transfer aeroporto</text>
+</svg>
