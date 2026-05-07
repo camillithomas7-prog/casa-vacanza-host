@@ -26,9 +26,10 @@ $rentals = rows("SELECT * FROM services WHERE active = 1 AND type IN ($rentalTyp
 $experiences = rows("SELECT * FROM services WHERE active = 1 AND type IN ($expTypes) ORDER BY position ASC LIMIT 6");
 $transfers = rows("SELECT * FROM services WHERE active = 1 AND type = 'transfer' ORDER BY position ASC LIMIT 4");
 
-$title = 'Casa Vacanza · Affitti brevi premium';
+$title = t('meta.home_title');
 require __DIR__ . '/partials/head.php';
 require __DIR__ . '/partials/site-header.php';
+$_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
 ?>
 <!-- HERO -->
 <section class="relative isolate -mt-[68px] pt-[68px] overflow-hidden">
@@ -36,32 +37,32 @@ require __DIR__ . '/partials/site-header.php';
   <div class="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-transparent to-white dark:to-ink-950"></div>
   <div class="container-wide pt-12 md:pt-20 pb-12 md:pb-20 grid lg:grid-cols-12 gap-10 items-center">
     <div class="lg:col-span-7 animate-slide-up">
-      <div class="badge-brand mb-4"><i data-lucide="sparkles" class="size-[12px]"></i> Selezionati a mano · 100% gestione diretta</div>
+      <div class="badge-brand mb-4"><i data-lucide="sparkles" class="size-[12px]"></i> <?= e(t('hero.badge')) ?></div>
       <h1 class="font-serif font-semibold text-[44px] sm:text-6xl lg:text-[72px] leading-[1.02] tracking-tight text-balance">
-        La tua prossima<br>
-        <span class="italic font-medium relative">vacanza
+        <?= e(t('hero.title.line1')) ?><br>
+        <span class="italic font-medium relative"><?= e(t('hero.title.italic')) ?>
           <svg class="absolute -bottom-2 left-0 w-full" height="16" viewBox="0 0 240 16" fill="none"><path d="M2 9 C 80 1, 160 1, 238 9" stroke="#ff6a0a" stroke-width="3" stroke-linecap="round" fill="none"/></svg>
-        </span> inizia<br> qui.
+        </span><br> <?= e(t('hero.title.line3')) ?>
       </h1>
-      <p class="text-lg text-ink-600 dark:text-ink-300 mt-6 max-w-xl text-pretty">Appartamenti selezionati personalmente a Sharm El Sheikh: Naama Bay, Hadaba, Nabq, Sharks Bay e Old Market. Check-in fluido, assistenza in italiano, ospitalità che si sente.</p>
+      <p class="text-lg text-ink-600 dark:text-ink-300 mt-6 max-w-xl text-pretty"><?= e(t('hero.subtitle')) ?></p>
       <div class="flex flex-wrap gap-3 mt-8">
-        <a href="/appartamenti.php" class="btn-primary h-12 px-6 text-base">Esplora appartamenti <i data-lucide="arrow-right" class="size-[16px]"></i></a>
-        <a href="#come-funziona" class="btn-outline h-12 px-6 text-base">Come funziona</a>
+        <a href="/appartamenti.php<?= $_lp ?>" class="btn-primary h-12 px-6 text-base"><?= e(t('hero.cta.explore')) ?> <i data-lucide="arrow-right" class="size-[16px]"></i></a>
+        <a href="#come-funziona" class="btn-outline h-12 px-6 text-base"><?= e(t('hero.cta.how')) ?></a>
       </div>
 
       <!-- TRUST -->
       <div class="grid grid-cols-3 gap-6 mt-12 max-w-md">
         <div>
           <div class="font-display font-bold text-3xl tabular-nums"><?= $totalApartments ?></div>
-          <div class="text-xs text-ink-500 mt-1">Appartamenti</div>
+          <div class="text-xs text-ink-500 mt-1"><?= e(t('hero.stats.apartments')) ?></div>
         </div>
         <div>
           <div class="font-display font-bold text-3xl tabular-nums flex items-center gap-1"><?= $avgRating ? number_format($avgRating, 1) : '5.0' ?> <i data-lucide="star" class="size-[20px] fill-amber-400 text-amber-400"></i></div>
-          <div class="text-xs text-ink-500 mt-1"><?= $totalReviews ?: 'Nuove' ?> recensioni</div>
+          <div class="text-xs text-ink-500 mt-1"><?= $totalReviews ? $totalReviews . ' ' . e(t('common.reviews')) : e(t('hero.stats.reviews_new')) ?></div>
         </div>
         <div>
           <div class="font-display font-bold text-3xl tabular-nums"><?= e($totalGuests) ?></div>
-          <div class="text-xs text-ink-500 mt-1">Ospiti accolti</div>
+          <div class="text-xs text-ink-500 mt-1"><?= e(t('hero.stats.guests')) ?></div>
         </div>
       </div>
     </div>
@@ -95,29 +96,29 @@ require __DIR__ . '/partials/site-header.php';
       <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent">
         <i data-lucide="map-pin" class="size-[18px] text-brand-500 shrink-0"></i>
         <div class="flex-1">
-          <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Dove</div>
+          <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.where')) ?></div>
           <select name="city" class="w-full bg-transparent outline-none text-sm font-medium">
-            <option value="">Tutte le zone</option>
+            <option value=""><?= e(t('common.all_areas')) ?></option>
             <?php foreach ($cities as $c): ?><option value="<?= e($c) ?>"><?= e($c) ?></option><?php endforeach; ?>
           </select>
         </div>
       </label>
       <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
         <i data-lucide="calendar" class="size-[18px] text-brand-500 shrink-0"></i>
-        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Check-in</div>
+        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.checkin')) ?></div>
           <input type="date" name="from" class="w-full bg-transparent outline-none text-sm font-medium"></div>
       </label>
       <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
         <i data-lucide="calendar" class="size-[18px] text-brand-500 shrink-0"></i>
-        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Check-out</div>
+        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.checkout')) ?></div>
           <input type="date" name="to" class="w-full bg-transparent outline-none text-sm font-medium"></div>
       </label>
       <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
         <i data-lucide="users" class="size-[18px] text-brand-500 shrink-0"></i>
-        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Ospiti</div>
+        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.guests')) ?></div>
           <input type="number" name="guests" min="1" value="2" class="w-full bg-transparent outline-none text-sm font-medium"></div>
       </label>
-      <button class="btn-primary h-12 md:h-full px-6 md:px-5"><i data-lucide="search" class="size-[18px]"></i> Cerca</button>
+      <button class="btn-primary h-12 md:h-full px-6 md:px-5"><i data-lucide="search" class="size-[18px]"></i> <?= e(t('common.search')) ?></button>
     </form>
   </div>
 </section>
@@ -127,23 +128,23 @@ require __DIR__ . '/partials/site-header.php';
 <section class="container-wide py-16">
   <div class="flex items-end justify-between mb-8">
     <div>
-      <div class="badge-brand mb-2">Zone di Sharm El Sheikh</div>
-      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Scegli la tua zona.</h2>
-      <p class="text-ink-500 mt-2">Naama Bay, Hadaba, Sharks Bay, Nabq Bay e Old Market.</p>
+      <div class="badge-brand mb-2"><?= e(t('home.zones.badge')) ?></div>
+      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight"><?= e(t('home.zones.title')) ?></h2>
+      <p class="text-ink-500 mt-2"><?= e(t('home.zones.sub')) ?></p>
     </div>
-    <a href="/appartamenti.php" class="hidden sm:inline-flex text-sm text-brand-600 font-medium hover:underline">Vedi tutte →</a>
+    <a href="/appartamenti.php<?= $_lp ?>" class="hidden sm:inline-flex text-sm text-brand-600 font-medium hover:underline"><?= e(t('common.see_all_arrow')) ?></a>
   </div>
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
     <?php foreach (array_slice($cities, 0, 4) as $city):
       $cityCover = val('SELECT cover_image FROM apartments WHERE city = ? AND cover_image IS NOT NULL LIMIT 1', [$city]);
       $cityCount = (int)val('SELECT COUNT(*) FROM apartments WHERE city = ? AND active = 1', [$city]);
     ?>
-      <a href="/appartamenti.php?city=<?= urlencode($city) ?>" class="relative aspect-[4/5] rounded-2xl overflow-hidden group shadow-card">
+      <a href="/appartamenti.php?city=<?= urlencode($city) ?><?= $_lp ? '&lang=' . urlencode(currentLang()) : '' ?>" class="relative aspect-[4/5] rounded-2xl overflow-hidden group shadow-card">
         <?php if ($cityCover): ?><img src="<?= e($cityCover) ?>" class="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition duration-700 ease-out-expo"><?php endif; ?>
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
         <div class="absolute bottom-0 left-0 right-0 p-5 text-white">
           <div class="font-serif font-semibold text-2xl"><?= e($city) ?></div>
-          <div class="text-xs text-white/80 mt-1"><?= $cityCount ?> <?= $cityCount === 1 ? 'appartamento' : 'appartamenti' ?></div>
+          <div class="text-xs text-white/80 mt-1"><?= $cityCount ?> <?= $cityCount === 1 ? e(t('home.zones.unit_one')) : e(t('home.zones.unit_many')) ?></div>
         </div>
       </a>
     <?php endforeach; ?>
@@ -155,11 +156,11 @@ require __DIR__ . '/partials/site-header.php';
 <section class="container-wide py-16">
   <div class="flex items-end justify-between mb-8">
     <div>
-      <div class="badge-brand mb-2">In evidenza</div>
-      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Le nostre case.</h2>
-      <p class="text-ink-500 mt-2">Una selezione delle proprietà più richieste.</p>
+      <div class="badge-brand mb-2"><?= e(t('home.featured.badge')) ?></div>
+      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight"><?= e(t('home.featured.title')) ?></h2>
+      <p class="text-ink-500 mt-2"><?= e(t('home.featured.sub')) ?></p>
     </div>
-    <a href="/appartamenti.php" class="btn-outline hidden sm:inline-flex">Vedi tutto <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+    <a href="/appartamenti.php<?= $_lp ?>" class="btn-outline hidden sm:inline-flex"><?= e(t('common.see_all')) ?> <i data-lucide="arrow-right" class="size-[14px]"></i></a>
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <?php foreach ($apartments as $i => $a):
@@ -186,7 +187,7 @@ require __DIR__ . '/partials/site-header.php';
           </div>
           <div class="text-right">
             <span class="font-display font-bold text-lg tabular-nums"><?= fmtMoney((float)$a['base_price']) ?></span>
-            <span class="text-xs text-ink-500">/notte</span>
+            <span class="text-xs text-ink-500"><?= e(t('common.per_night')) ?></span>
           </div>
         </div>
       </a>
@@ -198,12 +199,14 @@ require __DIR__ . '/partials/site-header.php';
 <section class="container-wide py-12">
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <?php foreach ([
-      ['key-round', 'Noleggi', 'Auto, scooter, golf cart, monopattini', '/noleggi.php', 'Da €15/g'],
-      ['compass', 'Escursioni', 'Ras Mohammed, deserto, Cairo, Sinai', '/escursioni.php', 'Da €30/p'],
-      ['plane-takeoff', 'Transfer aeroporto', 'Auto e minibus da/per SSH', '/transfer.php', 'Da €25'],
-      ['waves', 'Diving & snorkeling', 'Reef e relitti del Mar Rosso', '/escursioni.php?cat=diving', 'Da €45/p'],
-    ] as $i => $s): ?>
-      <a href="<?= e($s[3]) ?>" class="card p-5 card-hover group animate-slide-up" style="animation-delay:<?= $i * 50 ?>ms">
+      ['key-round', t('home.banner.rentals.title'), t('home.banner.rentals.sub'), '/noleggi.php', 'Da €15/g'],
+      ['compass', t('home.banner.excursions.title'), t('home.banner.excursions.sub'), '/escursioni.php', 'Da €30/p'],
+      ['plane-takeoff', t('home.banner.transfer.title'), t('home.banner.transfer.sub'), '/transfer.php', 'Da €25'],
+      ['waves', t('home.banner.diving.title'), t('home.banner.diving.sub'), '/escursioni.php?cat=diving', 'Da €45/p'],
+    ] as $i => $s):
+      $href = $s[3] . ($_lp ? (strpos($s[3], '?') !== false ? '&lang=' . urlencode(currentLang()) : $_lp) : '');
+    ?>
+      <a href="<?= e($href) ?>" class="card p-5 card-hover group animate-slide-up" style="animation-delay:<?= $i * 50 ?>ms">
         <div class="h-11 w-11 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center shadow-[0_6px_16px_-6px_rgba(240,78,0,.5)] mb-3"><i data-lucide="<?= $s[0] ?>" class="size-[18px]"></i></div>
         <div class="font-display font-bold"><?= e($s[1]) ?></div>
         <p class="text-ink-500 mt-1 text-xs"><?= e($s[2]) ?></p>
@@ -221,11 +224,11 @@ require __DIR__ . '/partials/site-header.php';
 <section class="container-wide py-16">
   <div class="flex items-end justify-between mb-8 flex-wrap gap-3">
     <div>
-      <div class="badge-brand mb-2"><i data-lucide="key-round" class="size-[12px]"></i> Noleggi</div>
-      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Muoviti come vuoi.</h2>
-      <p class="text-ink-500 mt-2">Auto, golf cart, scooter e monopattini elettrici.</p>
+      <div class="badge-brand mb-2"><i data-lucide="key-round" class="size-[12px]"></i> <?= e(t('nav.rentals')) ?></div>
+      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight"><?= e(t('home.rentals.title')) ?></h2>
+      <p class="text-ink-500 mt-2"><?= e(t('home.rentals.sub')) ?></p>
     </div>
-    <a href="/noleggi.php" class="btn-outline hidden sm:inline-flex">Tutti i noleggi <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+    <a href="/noleggi.php<?= $_lp ?>" class="btn-outline hidden sm:inline-flex"><?= e(t('home.rentals.see_all')) ?> <i data-lucide="arrow-right" class="size-[14px]"></i></a>
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <?php foreach ($rentals as $i => $s): ?>
@@ -233,7 +236,7 @@ require __DIR__ . '/partials/site-header.php';
         <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-ink-100 dark:bg-ink-900 relative shadow-card">
           <?php if ($s['cover_image']): ?><img src="<?= e($s['cover_image']) ?>" alt="<?= e($s['name']) ?>" class="h-full w-full object-cover group-hover:scale-105 transition duration-700 ease-out-expo"><?php endif; ?>
           <div class="absolute top-3 left-3 badge bg-white/95 text-ink-900 backdrop-blur"><i data-lucide="<?= e(serviceTypeIcon($s['type'])) ?>" class="size-[12px]"></i> <?= e(serviceTypeShort($s['type'])) ?></div>
-          <?php if ($s['resort_name']): ?><div class="absolute top-3 right-3 badge bg-brand-500 text-white">presso resort</div><?php endif; ?>
+          <?php if ($s['resort_name']): ?><div class="absolute top-3 right-3 badge bg-brand-500 text-white"><?= e(t('rent.at_resort')) ?></div><?php endif; ?>
         </div>
         <div class="mt-4 flex items-center justify-between gap-2">
           <div class="min-w-0">
@@ -242,14 +245,14 @@ require __DIR__ . '/partials/site-header.php';
           </div>
           <div class="text-right shrink-0">
             <span class="font-display font-bold text-lg tabular-nums"><?= fmtMoney((float)$s['daily_price']) ?></span>
-            <div class="text-xs text-ink-500">/giorno</div>
+            <div class="text-xs text-ink-500"><?= e(t('common.per_day')) ?></div>
           </div>
         </div>
       </a>
     <?php endforeach; ?>
   </div>
   <div class="mt-8 sm:hidden text-center">
-    <a href="/noleggi.php" class="btn-outline inline-flex">Tutti i noleggi <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+    <a href="/noleggi.php<?= $_lp ?>" class="btn-outline inline-flex"><?= e(t('home.rentals.see_all')) ?> <i data-lucide="arrow-right" class="size-[14px]"></i></a>
   </div>
 </section>
 <?php endif; ?>
@@ -259,11 +262,11 @@ require __DIR__ . '/partials/site-header.php';
 <section class="container-wide py-16">
   <div class="flex items-end justify-between mb-8 flex-wrap gap-3">
     <div>
-      <div class="badge-brand mb-2"><i data-lucide="compass" class="size-[12px]"></i> Escursioni</div>
-      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Vivi Sharm.</h2>
-      <p class="text-ink-500 mt-2">Snorkeling, deserto, diving, tour culturali — con guida italiana.</p>
+      <div class="badge-brand mb-2"><i data-lucide="compass" class="size-[12px]"></i> <?= e(t('nav.excursions')) ?></div>
+      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight"><?= e(t('home.excursions.title')) ?></h2>
+      <p class="text-ink-500 mt-2"><?= e(t('home.excursions.sub')) ?></p>
     </div>
-    <a href="/escursioni.php" class="btn-outline hidden sm:inline-flex">Tutte le escursioni <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+    <a href="/escursioni.php<?= $_lp ?>" class="btn-outline hidden sm:inline-flex"><?= e(t('home.excursions.see_all')) ?> <i data-lucide="arrow-right" class="size-[14px]"></i></a>
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <?php foreach ($experiences as $i => $s): ?>
@@ -276,9 +279,9 @@ require __DIR__ . '/partials/site-header.php';
           <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
             <div class="font-display font-bold text-xl line-clamp-2"><?= e($s['name']) ?></div>
             <div class="flex items-baseline gap-1 mt-1">
-              <span class="text-xs text-white/80">da</span>
+              <span class="text-xs text-white/80"><?= e(t('common.from')) ?></span>
               <span class="font-display font-bold text-xl tabular-nums"><?= fmtMoney((float)$s['price_per_person']) ?></span>
-              <span class="text-xs text-white/80">/persona</span>
+              <span class="text-xs text-white/80"><?= e(t('common.per_person')) ?></span>
             </div>
           </div>
         </div>
@@ -286,7 +289,7 @@ require __DIR__ . '/partials/site-header.php';
     <?php endforeach; ?>
   </div>
   <div class="mt-8 sm:hidden text-center">
-    <a href="/escursioni.php" class="btn-outline inline-flex">Tutte le escursioni <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+    <a href="/escursioni.php<?= $_lp ?>" class="btn-outline inline-flex"><?= e(t('home.excursions.see_all')) ?> <i data-lucide="arrow-right" class="size-[14px]"></i></a>
   </div>
 </section>
 <?php endif; ?>
@@ -296,32 +299,32 @@ require __DIR__ . '/partials/site-header.php';
 <section class="container-wide py-16">
   <div class="flex items-end justify-between mb-8 flex-wrap gap-3">
     <div>
-      <div class="badge-brand mb-2"><i data-lucide="plane-takeoff" class="size-[12px]"></i> Transfer aeroporto</div>
-      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Dal volo al letto.</h2>
-      <p class="text-ink-500 mt-2">Transfer privato dall'aeroporto SSH a tutti i villaggi.</p>
+      <div class="badge-brand mb-2"><i data-lucide="plane-takeoff" class="size-[12px]"></i> <?= e(t('home.banner.transfer.title')) ?></div>
+      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight"><?= e(t('home.transfer.title')) ?></h2>
+      <p class="text-ink-500 mt-2"><?= e(t('home.transfer.sub')) ?></p>
     </div>
-    <a href="/transfer.php" class="btn-outline hidden sm:inline-flex">Tutte le tratte <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+    <a href="/transfer.php<?= $_lp ?>" class="btn-outline hidden sm:inline-flex"><?= e(t('home.transfer.see_all')) ?> <i data-lucide="arrow-right" class="size-[14px]"></i></a>
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
     <?php foreach ($transfers as $i => $s): ?>
       <a href="/transfer.php?slug=<?= e($s['slug']) ?>" class="card overflow-hidden p-0 card-hover group animate-slide-up" style="animation-delay:<?= $i * 50 ?>ms">
         <div class="aspect-[16/10] bg-ink-100 dark:bg-ink-900 relative">
           <?php if ($s['cover_image']): ?><img src="<?= e($s['cover_image']) ?>" alt="<?= e($s['name']) ?>" class="h-full w-full object-cover group-hover:scale-105 transition duration-700 ease-out-expo"><?php endif; ?>
-          <div class="absolute top-3 left-3 badge bg-white/95 text-ink-900 backdrop-blur"><i data-lucide="users" class="size-[12px]"></i> max <?= (int)$s['vehicle_capacity'] ?></div>
+          <div class="absolute top-3 left-3 badge bg-white/95 text-ink-900 backdrop-blur"><i data-lucide="users" class="size-[12px]"></i> <?= e(t('common.max')) ?> <?= (int)$s['vehicle_capacity'] ?></div>
         </div>
         <div class="p-4">
           <div class="text-xs text-ink-500 truncate"><?= e($s['from_location']) ?> →</div>
           <div class="font-display font-bold truncate"><?= e($s['to_location']) ?></div>
           <div class="flex items-baseline gap-1 mt-2">
             <span class="font-display font-bold text-lg tabular-nums"><?= fmtMoney((float)$s['price_per_group']) ?></span>
-            <span class="text-xs text-ink-500">a tratta</span>
+            <span class="text-xs text-ink-500"><?= e(t('common.per_trip')) ?></span>
           </div>
         </div>
       </a>
     <?php endforeach; ?>
   </div>
   <div class="mt-8 sm:hidden text-center">
-    <a href="/transfer.php" class="btn-outline inline-flex">Tutte le tratte <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+    <a href="/transfer.php<?= $_lp ?>" class="btn-outline inline-flex"><?= e(t('home.transfer.see_all')) ?> <i data-lucide="arrow-right" class="size-[14px]"></i></a>
   </div>
 </section>
 <?php endif; ?>
@@ -329,15 +332,15 @@ require __DIR__ . '/partials/site-header.php';
 <!-- COME FUNZIONA -->
 <section id="come-funziona" class="container-wide py-20">
   <div class="text-center max-w-2xl mx-auto mb-12">
-    <div class="badge-brand mb-3">Come funziona</div>
-    <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Tre passi, zero stress.</h2>
+    <div class="badge-brand mb-3"><?= e(t('home.howit.badge')) ?></div>
+    <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight"><?= e(t('home.howit.title')) ?></h2>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-5 relative">
     <div class="hidden md:block absolute top-12 left-[16%] right-[16%] h-px border-t-2 border-dashed border-brand-300/50"></div>
     <?php foreach ([
-      ['1','search', 'Trova', 'Sfoglia la collezione, filtra per zona, date e ospiti. Vedi disponibilità live.'],
-      ['2','calendar-check', 'Prenota', 'Compila il modulo. Ricevi conferma immediata via WhatsApp/Email con tutto il necessario.'],
-      ['3','key-round', 'Soggiorna', 'Check-in semplice, istruzioni chiare. Siamo qui per qualsiasi cosa, 7/7.'],
+      ['1','search', t('home.howit.s1.t'), t('home.howit.s1.d')],
+      ['2','calendar-check', t('home.howit.s2.t'), t('home.howit.s2.d')],
+      ['3','key-round', t('home.howit.s3.t'), t('home.howit.s3.d')],
     ] as $i => $s): ?>
       <div class="card-elev p-7 relative animate-slide-up" style="animation-delay:<?= $i * 100 ?>ms">
         <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center shadow-[0_8px_18px_-6px_rgba(240,78,0,.5)] mb-5"><i data-lucide="<?= $s[1] ?>" class="size-[22px]"></i></div>
@@ -353,10 +356,10 @@ require __DIR__ . '/partials/site-header.php';
 <section class="container-wide py-12">
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <?php foreach ([
-      ['shield-check', 'Pagamenti sicuri', 'Acconto e saldo trasparenti, ricevuta sempre.'],
-      ['key-round', 'Check-in semplice', 'Istruzioni chiare, supporto WhatsApp 7/7.'],
-      ['star', 'Recensioni reali', 'Solo clienti verificati, niente sorprese.'],
-      ['heart', 'Selezione curata', 'Ogni casa visitata personalmente.'],
+      ['shield-check', t('home.benefit.b1.t'), t('home.benefit.b1.d')],
+      ['key-round', t('home.benefit.b2.t'), t('home.benefit.b2.d')],
+      ['star', t('home.benefit.b3.t'), t('home.benefit.b3.d')],
+      ['heart', t('home.benefit.b4.t'), t('home.benefit.b4.d')],
     ] as $i => $f): ?>
       <div class="card p-5 card-hover">
         <div class="h-11 w-11 rounded-xl bg-brand-50 dark:bg-brand-500/15 text-brand-600 flex items-center justify-center mb-3"><i data-lucide="<?= $f[0] ?>" class="size-[18px]"></i></div>
@@ -371,8 +374,8 @@ require __DIR__ . '/partials/site-header.php';
 <?php if ($topReviews): ?>
 <section class="container-wide py-16">
   <div class="text-center max-w-2xl mx-auto mb-10">
-    <div class="badge-brand mb-3">Cosa dicono di noi</div>
-    <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Recensioni vere, da clienti veri.</h2>
+    <div class="badge-brand mb-3"><?= e(t('home.testi.badge')) ?></div>
+    <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight"><?= e(t('home.testi.title')) ?></h2>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
     <?php foreach ($topReviews as $r):
@@ -405,11 +408,11 @@ require __DIR__ . '/partials/site-header.php';
     <div class="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-white/15 blur-3xl pointer-events-none"></div>
     <div class="absolute inset-0 opacity-[0.05] pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 24px 24px;"></div>
     <div class="relative">
-      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight text-white text-balance">Pronti a partire?</h2>
-      <p class="text-white/85 mt-3 max-w-xl mx-auto text-pretty">Trova la casa giusta in pochi click. Conferma immediata, prezzi senza sorprese.</p>
+      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight text-white text-balance"><?= e(t('home.cta.title')) ?></h2>
+      <p class="text-white/85 mt-3 max-w-xl mx-auto text-pretty"><?= e(t('home.cta.sub')) ?></p>
       <div class="flex flex-wrap gap-3 justify-center mt-7">
-        <a href="/appartamenti.php" class="btn h-12 px-7 bg-white text-brand-700 hover:bg-ink-50 text-base font-semibold shadow-lg">Esplora ora <i data-lucide="arrow-right" class="size-[16px]"></i></a>
-        <a href="/contatti.php" class="btn h-12 px-7 bg-white/10 text-white border border-white/30 hover:bg-white/20 backdrop-blur text-base">Contattaci</a>
+        <a href="/appartamenti.php<?= $_lp ?>" class="btn h-12 px-7 bg-white text-brand-700 hover:bg-ink-50 text-base font-semibold shadow-lg"><?= e(t('hero.cta.explore')) ?> <i data-lucide="arrow-right" class="size-[16px]"></i></a>
+        <a href="/contatti.php<?= $_lp ?>" class="btn h-12 px-7 bg-white/10 text-white border border-white/30 hover:bg-white/20 backdrop-blur text-base"><?= e(t('nav.contact')) ?></a>
       </div>
     </div>
   </div>

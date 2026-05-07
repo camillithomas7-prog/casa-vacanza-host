@@ -23,7 +23,7 @@ if (!empty($_GET['from']) && !empty($_GET['to'])) {
 
 $cities = array_filter(array_unique(array_column(rows('SELECT DISTINCT city FROM apartments WHERE active = 1'), 'city')));
 
-$title = 'Appartamenti';
+$title = t('nav.apartments');
 require __DIR__ . '/partials/head.php';
 require __DIR__ . '/partials/site-header.php';
 ?>
@@ -32,43 +32,43 @@ require __DIR__ . '/partials/site-header.php';
   <div class="absolute inset-0 -z-10 bg-gradient-to-b from-transparent to-white dark:to-ink-950"></div>
   <div class="container-wide pt-12 md:pt-16 pb-8">
     <div class="max-w-3xl">
-      <div class="badge-brand mb-3">La collezione</div>
-      <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-balance">Trova la casa giusta.</h1>
-      <p class="text-ink-600 dark:text-ink-300 mt-3 text-lg max-w-xl text-pretty">Filtra per zona di Sharm, date, ospiti e prezzo. Ogni casa è ispezionata personalmente.</p>
+      <div class="badge-brand mb-3"><?= e(t('apt_list.badge')) ?></div>
+      <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-balance"><?= e(t('apt_list.title')) ?></h1>
+      <p class="text-ink-600 dark:text-ink-300 mt-3 text-lg max-w-xl text-pretty"><?= e(t('apt_list.sub')) ?></p>
     </div>
 
     <form method="get" class="mt-8 card-elev p-2 grid grid-cols-1 md:grid-cols-[1.4fr_1fr_1fr_0.9fr_auto] gap-1">
       <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent">
         <i data-lucide="map-pin" class="size-[18px] text-brand-500 shrink-0"></i>
         <div class="flex-1">
-          <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Dove</div>
+          <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.where')) ?></div>
           <select name="city" class="w-full bg-transparent outline-none text-sm font-medium">
-            <option value="">Tutte le zone</option>
+            <option value=""><?= e(t('common.all_areas')) ?></option>
             <?php foreach ($cities as $c): ?><option value="<?= e($c) ?>" <?= ($_GET['city'] ?? '') === $c ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?>
           </select>
         </div>
       </label>
       <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
         <i data-lucide="calendar" class="size-[18px] text-brand-500 shrink-0"></i>
-        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Check-in</div>
+        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.checkin')) ?></div>
           <input type="date" name="from" value="<?= e($_GET['from'] ?? '') ?>" class="w-full bg-transparent outline-none text-sm font-medium"></div>
       </label>
       <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
         <i data-lucide="calendar" class="size-[18px] text-brand-500 shrink-0"></i>
-        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Check-out</div>
+        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.checkout')) ?></div>
           <input type="date" name="to" value="<?= e($_GET['to'] ?? '') ?>" class="w-full bg-transparent outline-none text-sm font-medium"></div>
       </label>
       <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
         <i data-lucide="users" class="size-[18px] text-brand-500 shrink-0"></i>
-        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Ospiti</div>
+        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.guests')) ?></div>
           <input type="number" name="guests" min="1" value="<?= (int)($_GET['guests'] ?? 2) ?>" class="w-full bg-transparent outline-none text-sm font-medium"></div>
       </label>
-      <button class="btn-primary h-12 md:h-full px-6 md:px-5"><i data-lucide="search" class="size-[18px]"></i> Cerca</button>
+      <button class="btn-primary h-12 md:h-full px-6 md:px-5"><i data-lucide="search" class="size-[18px]"></i> <?= e(t('common.search')) ?></button>
     </form>
 
     <div class="flex items-center gap-2 flex-wrap mt-5 text-sm">
-      <span class="text-ink-500">Filtri rapidi:</span>
-      <?php foreach ([['guests=2','2 ospiti'],['guests=4','4+ ospiti'],['max=120','sotto i €120']] as $q): $url = '/appartamenti.php?' . $q[0]; ?>
+      <span class="text-ink-500"><?= e(t('apt_list.quickfilters')) ?></span>
+      <?php foreach ([['guests=2', t('apt_list.filter.2g')],['guests=4', t('apt_list.filter.4g')],['max=120', t('apt_list.filter.under')]] as $q): $url = '/appartamenti.php?' . $q[0]; ?>
         <a href="<?= e($url) ?>" class="badge-soft hover:bg-brand-100 dark:hover:bg-brand-500/15 hover:text-brand-700 dark:hover:text-brand-300 transition cursor-pointer"><?= e($q[1]) ?></a>
       <?php endforeach; ?>
     </div>
@@ -77,9 +77,9 @@ require __DIR__ . '/partials/site-header.php';
 
 <section class="container-wide pb-16">
   <?php if (!empty($_GET['from']) && !empty($_GET['to'])): ?>
-    <div class="text-sm text-ink-500 mb-4">Disponibilità per <?= nightsBetween($_GET['from'], $_GET['to']) ?> notti — <strong class="text-ink-900 dark:text-white"><?= count($apartments) ?> risultati</strong></div>
+    <div class="text-sm text-ink-500 mb-4"><?= t('apt_list.results_dates', ['n' => nightsBetween($_GET['from'], $_GET['to']), 'c' => '<strong class="text-ink-900 dark:text-white">' . count($apartments) . '</strong>']) ?></div>
   <?php else: ?>
-    <div class="text-sm text-ink-500 mb-4"><strong class="text-ink-900 dark:text-white"><?= count($apartments) ?></strong> case disponibili</div>
+    <div class="text-sm text-ink-500 mb-4"><?= t('apt_list.results', ['n' => '<strong class="text-ink-900 dark:text-white">' . count($apartments) . '</strong>']) ?></div>
   <?php endif; ?>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -89,7 +89,7 @@ require __DIR__ . '/partials/site-header.php';
       $reviews = rows('SELECT rating FROM reviews WHERE apartment_id = ? AND approved = 1', [$a['id']]);
       $rating = $reviews ? array_sum(array_column($reviews, 'rating')) / count($reviews) : null;
     ?>
-      <a href="/appartamento.php?slug=<?= e($a['slug']) ?>" class="group block animate-slide-up">
+      <a href="/appartamento.php?slug=<?= e($a['slug']) ?><?= currentLang() !== 'it' ? '&lang=' . urlencode(currentLang()) : '' ?>" class="group block animate-slide-up">
         <div class="aspect-[4/5] sm:aspect-[5/6] rounded-2xl overflow-hidden bg-ink-100 dark:bg-ink-900 relative shadow-card">
           <img src="<?= e($cover) ?>" alt="<?= e($a['name']) ?>" class="h-full w-full object-cover group-hover:scale-105 transition duration-700 ease-out-expo">
           <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/15"></div>
@@ -112,7 +112,7 @@ require __DIR__ . '/partials/site-header.php';
           </div>
           <div class="text-right">
             <span class="font-display font-bold text-lg"><?= fmtMoney((float)$a['base_price']) ?></span>
-            <span class="text-xs text-ink-500">/notte</span>
+            <span class="text-xs text-ink-500"><?= e(t('common.per_night')) ?></span>
           </div>
         </div>
       </a>

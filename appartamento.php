@@ -301,7 +301,7 @@ function bookingForm() {
         <div class="text-xs text-ink-500 mt-0.5">Conferma rapida</div>
       <?php endif; ?>
     </div>
-    <a href="#booking-form" class="btn-primary h-12 px-5 shrink-0">Prenota <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+    <a href="#booking-form" class="btn-primary h-12 px-5 shrink-0"><?= e(t('cta.book_now')) ?> <i data-lucide="arrow-right" class="size-[14px]"></i></a>
   </div>
 </div>
 <div class="lg:hidden h-20"></div>

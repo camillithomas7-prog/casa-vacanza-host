@@ -3,7 +3,7 @@
     <div class="lg:col-span-5">
       <img src="/assets/logo-256.png?v=2" alt="<?= e(cfg('site.name')) ?>" class="h-20 w-auto">
       <p class="text-ink-500 dark:text-ink-400 mt-4 max-w-md text-pretty">
-        Appartamenti selezionati a Sharm El Sheikh: Naama Bay, Hadaba, Sharks Bay, Old Market e Nabq. Gestione diretta in italiano, soggiorni curati, prezzi trasparenti.
+        <?= e(t('foot.tagline')) ?>
       </p>
       <?php
         $sFb = setting('social_facebook');
@@ -33,41 +33,42 @@
       </div>
     </div>
 
+    <?php $cl = currentLang(); $lp = $cl !== 'it' ? '?lang=' . urlencode($cl) : ''; ?>
     <div class="lg:col-span-2">
-      <div class="text-xs font-semibold uppercase tracking-wider text-ink-500 dark:text-ink-400 mb-4">Esplora</div>
+      <div class="text-xs font-semibold uppercase tracking-wider text-ink-500 dark:text-ink-400 mb-4"><?= e(t('foot.explore')) ?></div>
       <ul class="space-y-2.5 text-sm">
-        <li><a href="/" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Home</a></li>
-        <li><a href="/appartamenti.php" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Appartamenti</a></li>
-        <li><a href="/noleggi.php" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Noleggi</a></li>
-        <li><a href="/escursioni.php" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Escursioni</a></li>
-        <li><a href="/transfer.php" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Transfer aeroporto</a></li>
-        <li><a href="/contatti.php" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Contatti</a></li>
+        <li><a href="/<?= $lp ?>" class="text-ink-700 dark:text-ink-300 hover:text-brand-600"><?= e(t('nav.home')) ?></a></li>
+        <li><a href="/appartamenti.php<?= $lp ?>" class="text-ink-700 dark:text-ink-300 hover:text-brand-600"><?= e(t('nav.apartments')) ?></a></li>
+        <li><a href="/noleggi.php<?= $lp ?>" class="text-ink-700 dark:text-ink-300 hover:text-brand-600"><?= e(t('nav.rentals')) ?></a></li>
+        <li><a href="/escursioni.php<?= $lp ?>" class="text-ink-700 dark:text-ink-300 hover:text-brand-600"><?= e(t('nav.excursions')) ?></a></li>
+        <li><a href="/transfer.php<?= $lp ?>" class="text-ink-700 dark:text-ink-300 hover:text-brand-600"><?= e(t('nav.transfer')) ?></a></li>
+        <li><a href="/contatti.php<?= $lp ?>" class="text-ink-700 dark:text-ink-300 hover:text-brand-600"><?= e(t('nav.contact')) ?></a></li>
       </ul>
     </div>
 
     <div class="lg:col-span-2">
-      <div class="text-xs font-semibold uppercase tracking-wider text-ink-500 dark:text-ink-400 mb-4">Supporto</div>
+      <div class="text-xs font-semibold uppercase tracking-wider text-ink-500 dark:text-ink-400 mb-4"><?= e(t('foot.support')) ?></div>
       <ul class="space-y-2.5 text-sm">
-        <li><a href="#" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">FAQ</a></li>
-        <li><a href="#" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Termini</a></li>
-        <li><a href="#" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Privacy</a></li>
+        <li><a href="#" class="text-ink-700 dark:text-ink-300 hover:text-brand-600"><?= e(t('foot.faq')) ?></a></li>
+        <li><a href="#" class="text-ink-700 dark:text-ink-300 hover:text-brand-600"><?= e(t('foot.terms')) ?></a></li>
+        <li><a href="#" class="text-ink-700 dark:text-ink-300 hover:text-brand-600"><?= e(t('foot.privacy')) ?></a></li>
       </ul>
     </div>
 
     <div class="lg:col-span-3">
-      <div class="text-xs font-semibold uppercase tracking-wider text-ink-500 dark:text-ink-400 mb-4">Contattaci</div>
+      <div class="text-xs font-semibold uppercase tracking-wider text-ink-500 dark:text-ink-400 mb-4"><?= e(t('foot.contact_us')) ?></div>
       <div class="flex items-center gap-2 text-sm text-ink-700 dark:text-ink-300"><i data-lucide="mail" class="size-[14px] text-brand-500"></i> <?= e(setting('contact_email', cfg('site.email'))) ?></div>
       <div class="flex items-center gap-2 text-sm text-ink-700 dark:text-ink-300 mt-1.5"><i data-lucide="phone" class="size-[14px] text-brand-500"></i> <?= e(setting('contact_phone', cfg('site.phone'))) ?></div>
       <div class="mt-4 p-3 rounded-xl bg-white dark:bg-ink-900 border border-ink-100 dark:border-ink-800/80">
-        <div class="text-xs text-ink-500">Risposta entro</div>
-        <div class="font-semibold">poche ore, 7/7</div>
+        <div class="text-xs text-ink-500"><?= e(t('foot.response_in')) ?></div>
+        <div class="font-semibold"><?= e(t('foot.response_time')) ?></div>
       </div>
     </div>
   </div>
   <div class="border-t border-ink-100 dark:border-ink-800/80">
     <div class="container-wide py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-500">
-      <span>© <?= date('Y') ?> <?= e(setting('site_name', cfg('site.name'))) ?>. Tutti i diritti riservati.</span>
-      <span>Progettato con cura · v1.0</span>
+      <span>© <?= date('Y') ?> <?= e(setting('site_name', cfg('site.name'))) ?>. <?= e(t('foot.copyright')) ?></span>
+      <span><?= e(t('foot.crafted')) ?> · v1.0</span>
     </div>
   </div>
 </footer>
