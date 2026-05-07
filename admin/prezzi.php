@@ -37,15 +37,87 @@ $title = 'Prezzi avanzati';
 require __DIR__ . '/../partials/head.php';
 require __DIR__ . '/../partials/admin-shell-top.php';
 ?>
-<div class="space-y-5">
+<div class="space-y-5" x-data="{ helpOpen: false }">
   <div class="flex items-center justify-between flex-wrap gap-3">
     <div>
-      <h1 class="font-display text-3xl font-bold">Prezzi avanzati</h1>
+      <div class="flex items-center gap-2">
+        <h1 class="font-display text-3xl font-bold">Prezzi avanzati</h1>
+        <button type="button" @click="helpOpen = true"
+          class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-600 hover:bg-orange-200 transition"
+          title="Cosa significa? Clicca per la guida"
+          aria-label="Apri guida prezzi avanzati">
+          <i data-lucide="help-circle" class="size-[20px]"></i>
+        </button>
+      </div>
       <p class="text-ink-500 mt-1">Tariffe stagionali, weekend, alta stagione, override per intervalli.</p>
     </div>
     <form method="get"><select name="apt" onchange="this.form.submit()" class="input">
       <?php foreach ($apartments as $a): ?><option value="<?= e($a['id']) ?>" <?= $a['id'] === $aptId ? 'selected' : '' ?>><?= e($a['name']) ?></option><?php endforeach; ?>
     </select></form>
+  </div>
+
+  <!-- Modale guida -->
+  <div x-show="helpOpen" x-cloak
+       @keydown.escape.window="helpOpen = false"
+       class="fixed inset-0 z-50 flex items-center justify-center p-4"
+       style="display: none;">
+    <div class="absolute inset-0 bg-black/50" @click="helpOpen = false"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between rounded-t-2xl">
+        <h2 class="font-display text-2xl font-bold">Come funzionano i Prezzi avanzati</h2>
+        <button type="button" @click="helpOpen = false" class="text-ink-500 hover:text-ink-900" aria-label="Chiudi guida">
+          <i data-lucide="x" class="size-[24px]"></i>
+        </button>
+      </div>
+      <div class="px-6 py-5 space-y-5 text-[15px] leading-relaxed">
+
+        <div>
+          <h3 class="font-bold text-lg mb-2">A cosa serve?</h3>
+          <p>Quando hai creato l'appartamento hai messo <b>un prezzo solo a notte</b> (per esempio 70 €). Quello vale per tutto l'anno.</p>
+          <p class="mt-2">Ma in una casa vacanza i prezzi cambiano con le stagioni: <b>in agosto</b> o a <b>Capodanno</b> c'è tanta richiesta e puoi chiedere di più; <b>a novembre</b> invece conviene abbassare per riempire le settimane.</p>
+          <p class="mt-2">In questa pagina crei le <b>eccezioni stagionali</b>: scegli un periodo dell'anno e per quei giorni il sito userà un prezzo diverso, al posto dei 70 € normali.</p>
+        </div>
+
+        <div class="bg-orange-50 border border-orange-200 rounded-xl p-4">
+          <h3 class="font-bold mb-2">Esempio pratico</h3>
+          <p class="mb-3">Per un appartamento con prezzo base <b>70 €/notte</b>, potresti aggiungere queste regole:</p>
+          <table class="w-full text-sm">
+            <thead class="text-left">
+              <tr class="border-b border-orange-200">
+                <th class="py-1">Quando</th>
+                <th class="py-1 text-right">€/notte</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-orange-200/60">
+              <tr><td class="py-1.5">Bassa stagione (1 nov → 31 mar)</td><td class="text-right font-medium">45 €</td></tr>
+              <tr><td class="py-1.5">Alta stagione (1 giu → 30 set)</td><td class="text-right font-medium">100 €</td></tr>
+              <tr><td class="py-1.5">Ferragosto (10 → 20 ago)</td><td class="text-right font-medium">140 €</td></tr>
+              <tr><td class="py-1.5">Capodanno (28 dic → 5 gen)</td><td class="text-right font-medium">180 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <h3 class="font-bold text-lg mb-2">Come si compila?</h3>
+          <ul class="space-y-2.5 list-none pl-0">
+            <li class="flex gap-3"><span class="font-bold text-orange-600 min-w-[80px]">Nome</span><span>Una piccola etichetta che ti aiuta a riconoscere la regola. Esempi: <i>"Agosto"</i>, <i>"Capodanno"</i>, <i>"Bassa stagione"</i>.</span></li>
+            <li class="flex gap-3"><span class="font-bold text-orange-600 min-w-[80px]">Dal / Al</span><span>Le date del periodo. <b>Attenzione:</b> il giorno di <i>"Al"</i> NON è incluso. Esempio: dal <b>1 agosto</b> al <b>1 settembre</b> = tutto agosto.</span></li>
+            <li class="flex gap-3"><span class="font-bold text-orange-600 min-w-[80px]">€/notte</span><span>Il prezzo speciale per quel periodo. Sostituisce i 70 € normali.</span></li>
+            <li class="flex gap-3"><span class="font-bold text-orange-600 min-w-[80px]">Min notti</span><span>Lascia <b>1</b>. È un campo non ancora attivo.</span></li>
+            <li class="flex gap-3"><span class="font-bold text-orange-600 min-w-[80px]">Priorità</span><span>Serve solo se due regole si sovrappongono. Per le stagioni lascia <b>1</b>; per i periodi speciali tipo Capodanno o Ferragosto metti <b>5</b> o <b>10</b>: così quel prezzo "vince" sopra l'altro.</span></li>
+          </ul>
+        </div>
+
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+          <h3 class="font-bold mb-1 text-emerald-900">Non sai cosa fare?</h3>
+          <p class="text-emerald-900">Non aggiungere nessuna regola. Il sito userà <b>il prezzo base</b> che hai messo nell'appartamento (<?= fmtMoney((float)$apt['base_price']) ?>) tutti i giorni dell'anno. Tutto funziona lo stesso.</p>
+        </div>
+
+      </div>
+      <div class="sticky bottom-0 bg-white border-t px-6 py-3 rounded-b-2xl flex justify-end">
+        <button type="button" @click="helpOpen = false" class="btn-primary">Ho capito</button>
+      </div>
+    </div>
   </div>
 
   <form method="post" class="card p-5 grid sm:grid-cols-7 gap-3">
