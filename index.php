@@ -401,7 +401,7 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
       <div class="absolute -inset-4 bg-gradient-to-br from-brand-100 via-brand-50 to-sand-100 dark:from-brand-500/10 dark:via-brand-500/5 dark:to-transparent rounded-[2.5rem] -z-10 blur-xl opacity-70"></div>
       <div class="absolute -top-3 -left-3 h-24 w-24 rounded-2xl bg-brand-500/15 -z-10"></div>
       <div class="absolute -bottom-3 -right-3 h-32 w-32 rounded-3xl bg-sea-300/30 dark:bg-sea-500/15 -z-10"></div>
-      <img src="/assets/patrizia-portrait.jpg?v=1"
+      <img src="/assets/patrizia-portrait.jpg?v=2"
            alt="Patrizia Mancini"
            loading="lazy"
            class="relative w-full h-auto rounded-3xl shadow-pop object-cover">
