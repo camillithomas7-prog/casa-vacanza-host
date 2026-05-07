@@ -86,7 +86,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
   <div class="card p-5">
     <h3 class="font-display font-bold mb-3">Andamento <?= $year ?></h3>
-    <canvas id="barChart" height="80"></canvas>
+    <div style="position:relative;height:300px"><canvas id="barChart"></canvas></div>
   </div>
 
   <form method="post" class="card p-5 grid sm:grid-cols-6 gap-2">
@@ -143,18 +143,24 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
-const data = <?= json_encode(array_values($monthly)) ?>;
-const labels = <?= json_encode(array_keys($monthly)) ?>;
-new Chart(document.getElementById('barChart'), {
-  type: 'bar',
-  data: { labels, datasets: [
-    { label: 'Ricavi', data: data.map(d => d.rev), backgroundColor: '#10b981', borderRadius: 8 },
-    { label: 'Spese', data: data.map(d => d.exp), backgroundColor: '#ef4444', borderRadius: 8 },
-    { label: 'Utile', data: data.map(d => d.rev - d.exp), backgroundColor: '#ff6a0a', borderRadius: 8 },
-  ]},
-  options: { plugins: { tooltip: { callbacks: { label: c => c.dataset.label + ': ' + new Intl.NumberFormat('it-IT', { style:'currency', currency:'EUR' }).format(c.parsed.y) } } } }
+window.addEventListener('DOMContentLoaded', function() {
+  if (typeof Chart === 'undefined') return;
+  const data = <?= json_encode(array_values($monthly)) ?>;
+  const labels = <?= json_encode(array_keys($monthly)) ?>;
+  const el = document.getElementById('barChart');
+  if (!el) return;
+  new Chart(el, {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'Ricavi', data: data.map(d => d.rev), backgroundColor: '#10b981', borderRadius: 8 },
+      { label: 'Spese', data: data.map(d => d.exp), backgroundColor: '#ef4444', borderRadius: 8 },
+      { label: 'Utile', data: data.map(d => d.rev - d.exp), backgroundColor: '#ff6a0a', borderRadius: 8 },
+    ]},
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { tooltip: { callbacks: { label: c => c.dataset.label + ': ' + new Intl.NumberFormat('it-IT', { style:'currency', currency:'EUR' }).format(c.parsed.y) } } } }
+  });
 });
 </script>
 <?php require __DIR__ . '/../partials/admin-shell-bottom.php';

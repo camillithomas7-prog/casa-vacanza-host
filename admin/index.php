@@ -119,13 +119,13 @@ require __DIR__ . '/../partials/admin-shell-top.php';
           <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-brand-500"></span> Utile</span>
         </div>
       </div>
-      <div class="h-72"><canvas id="lineChart"></canvas></div>
+      <div style="position:relative;height:300px"><canvas id="lineChart"></canvas></div>
     </div>
     <div class="card p-6">
       <h2 class="font-serif text-xl font-semibold tracking-tight">Top appartamenti</h2>
       <p class="text-xs text-ink-500 mt-0.5 mb-4">per fatturato</p>
       <?php if (!$top): ?><div class="text-sm text-ink-500">Nessun dato.</div><?php else: ?>
-        <div class="h-56 mb-4"><canvas id="pieChart"></canvas></div>
+        <div style="position:relative;height:220px" class="mb-4"><canvas id="pieChart"></canvas></div>
         <ul class="space-y-1.5 text-sm">
           <?php foreach ($top as $i => $t): ?>
             <li class="flex items-center justify-between">
@@ -199,41 +199,48 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
-const series = <?= json_encode($series) ?>;
-const top = <?= json_encode($top) ?>;
-const eur = v => new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(v || 0);
-const isDark = () => document.documentElement.classList.contains('dark');
-const grid = () => isDark() ? '#2f303d' : '#eeeef1';
-const tick = () => isDark() ? '#737486' : '#9293a2';
+window.addEventListener('DOMContentLoaded', function() {
+  if (typeof Chart === 'undefined') { console.error('Chart.js non caricato'); return; }
+  const series = <?= json_encode($series) ?>;
+  const top = <?= json_encode($top) ?>;
+  const eur = v => new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(v || 0);
+  const isDark = () => document.documentElement.classList.contains('dark');
+  const grid = () => isDark() ? '#2f303d' : '#eeeef1';
+  const tick = () => isDark() ? '#737486' : '#9293a2';
 
-const lineCtx = document.getElementById('lineChart').getContext('2d');
-const gradRev = lineCtx.createLinearGradient(0, 0, 0, 280);
-gradRev.addColorStop(0, 'rgba(16,185,129,.25)'); gradRev.addColorStop(1, 'rgba(16,185,129,0)');
-new Chart(lineCtx, {
-  type: 'line',
-  data: {
-    labels: series.map(s => s.month),
-    datasets: [
-      { label: 'Ricavi', data: series.map(s => s.rev), borderColor: '#10b981', backgroundColor: gradRev, tension: 0.4, fill: true, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 6 },
-      { label: 'Spese', data: series.map(s => s.exp), borderColor: '#ef4444', tension: 0.4, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 6 },
-      { label: 'Utile', data: series.map(s => s.profit), borderColor: '#ff6a0a', tension: 0.4, borderWidth: 2.5, borderDash: [], pointRadius: 0, pointHoverRadius: 6 },
-    ]
-  },
-  options: { responsive: true, maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a1b25', borderRadius: 12, padding: 12, displayColors: true, boxPadding: 4, callbacks: { label: c => '  ' + c.dataset.label + ': ' + eur(c.parsed.y) } } },
-    scales: { x: { grid: { display: false }, ticks: { color: tick() } }, y: { grid: { color: grid(), drawBorder: false }, ticks: { color: tick(), callback: v => '€' + (v/1000 >= 1 ? (v/1000) + 'k' : v) } } }
+  const lineEl = document.getElementById('lineChart');
+  if (lineEl) {
+    const lineCtx = lineEl.getContext('2d');
+    const gradRev = lineCtx.createLinearGradient(0, 0, 0, 300);
+    gradRev.addColorStop(0, 'rgba(16,185,129,.25)'); gradRev.addColorStop(1, 'rgba(16,185,129,0)');
+    new Chart(lineCtx, {
+      type: 'line',
+      data: {
+        labels: series.map(s => s.month),
+        datasets: [
+          { label: 'Ricavi', data: series.map(s => s.rev), borderColor: '#10b981', backgroundColor: gradRev, tension: 0.4, fill: true, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 6 },
+          { label: 'Spese', data: series.map(s => s.exp), borderColor: '#ef4444', tension: 0.4, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 6 },
+          { label: 'Utile', data: series.map(s => s.profit), borderColor: '#ff6a0a', tension: 0.4, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 6 },
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a1b25', borderRadius: 12, padding: 12, displayColors: true, boxPadding: 4, callbacks: { label: c => '  ' + c.dataset.label + ': ' + eur(c.parsed.y) } } },
+        scales: { x: { grid: { display: false }, ticks: { color: tick() } }, y: { grid: { color: grid() }, ticks: { color: tick(), callback: v => '€' + (v/1000 >= 1 ? (v/1000) + 'k' : v) } } }
+      }
+    });
+  }
+
+  const pieEl = document.getElementById('pieChart');
+  if (pieEl && top.length) {
+    new Chart(pieEl, {
+      type: 'doughnut',
+      data: { labels: top.map(t => t.name), datasets: [{ data: top.map(t => t.total), backgroundColor: ['#ff6a0a','#f04e00','#9c300d','#ff8a32','#ffb56c'], borderWidth: 0, borderRadius: 8, spacing: 4 }] },
+      options: { cutout: '70%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => '  ' + c.label + ': ' + eur(c.parsed) } } } }
+    });
   }
 });
-
-if (top.length) {
-  new Chart(document.getElementById('pieChart'), {
-    type: 'doughnut',
-    data: { labels: top.map(t => t.name), datasets: [{ data: top.map(t => t.total), backgroundColor: ['#ff6a0a','#f04e00','#9c300d','#ff8a32','#ffb56c'], borderWidth: 0, borderRadius: 8, spacing: 4 }] },
-    options: { cutout: '70%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => '  ' + c.label + ': ' + eur(c.parsed) } } } }
-  });
-}
 </script>
 <?php require __DIR__ . '/../partials/admin-shell-bottom.php';
