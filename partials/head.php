@@ -71,11 +71,14 @@ try { if (localStorage.getItem('cv-theme') === 'dark') document.documentElement.
 </script>
 <style type="text/tailwindcss">
 @layer base {
-  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; overflow-x: hidden; }
-  body { @apply bg-white text-ink-900 dark:bg-ink-950 dark:text-ink-50; font-feature-settings: 'cv11','ss01','ss03'; overflow-x: hidden; max-width: 100vw; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; overflow-x: clip; }
+  body { @apply bg-white text-ink-900 dark:bg-ink-950 dark:text-ink-50; font-feature-settings: 'cv11','ss01','ss03'; overflow-x: clip; width: 100%; max-width: 100%; }
   ::selection { @apply bg-brand-500/30; }
   [x-cloak] { display: none !important; }
-  img, video { max-width: 100%; height: auto; }
+  img, video, canvas { max-width: 100%; height: auto; }
+  /* Hard cap viewport overflow — exclude fixed elements which need to span viewport */
+  body > *:not(.fixed):not([style*="position:fixed"]):not([style*="position: fixed"]) { max-width: 100%; }
+  table { max-width: 100%; }
 }
 @layer components {
   .container-wide { @apply max-w-[1240px] mx-auto px-5 sm:px-6 lg:px-8; }

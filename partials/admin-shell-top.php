@@ -34,8 +34,8 @@ $titles = [
 ];
 $pageMeta = $titles[$path] ?? ['Admin', ''];
 ?>
-<div class="min-h-screen flex bg-ink-50 dark:bg-ink-950" x-data="{ open: false }">
-<aside class="fixed lg:sticky inset-y-0 left-0 z-40 w-72 bg-white dark:bg-ink-900/95 dark:backdrop-blur-xl border-r border-ink-100 dark:border-ink-800/80 transition-transform lg:translate-x-0 flex flex-col" :class="open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
+<div class="min-h-screen flex bg-ink-50 dark:bg-ink-950 overflow-x-hidden w-full max-w-[100vw]" x-data="{ open: false }">
+<aside class="fixed lg:sticky inset-y-0 left-0 z-40 w-72 max-w-[85vw] bg-white dark:bg-ink-900/95 dark:backdrop-blur-xl border-r border-ink-100 dark:border-ink-800/80 transition-transform lg:translate-x-0 flex flex-col" :class="open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
   <div class="h-20 px-5 flex items-center justify-between border-b border-ink-100 dark:border-ink-800/80 shrink-0">
     <a href="/admin/index.php" class="flex items-center group">
       <img src="/assets/logo-256.png?v=2" alt="<?= e(cfg('site.name')) ?>" class="h-14 w-auto">
@@ -76,28 +76,28 @@ $pageMeta = $titles[$path] ?? ['Admin', ''];
 
 <div x-show="open" x-cloak class="fixed inset-0 z-30 bg-black/40 lg:hidden" @click="open=false" style="display:none"></div>
 
-<div class="flex-1 min-w-0">
+<div class="flex-1 min-w-0 max-w-full overflow-x-hidden">
   <header class="sticky top-0 z-20 h-16 bg-white/85 dark:bg-ink-950/85 backdrop-blur-xl border-b border-ink-100 dark:border-ink-800/80">
-    <div class="h-full px-5 flex items-center gap-3">
-      <button class="lg:hidden btn-ghost p-2" @click="open=true"><i data-lucide="menu" class="size-[20px]"></i></button>
-      <div>
-        <div class="text-xs text-ink-500"><?= e($pageMeta[1]) ?></div>
-        <div class="font-display font-bold text-base leading-tight"><?= e($pageMeta[0]) ?></div>
+    <div class="h-full px-3 sm:px-5 flex items-center gap-2 sm:gap-3">
+      <button class="lg:hidden btn-ghost p-2 shrink-0" @click="open=true"><i data-lucide="menu" class="size-[20px]"></i></button>
+      <div class="min-w-0 flex-1 sm:flex-none">
+        <div class="text-[10px] sm:text-xs text-ink-500 truncate"><?= e($pageMeta[1]) ?></div>
+        <div class="font-display font-bold text-sm sm:text-base leading-tight truncate"><?= e($pageMeta[0]) ?></div>
       </div>
       <div class="flex-1 max-w-md ml-auto relative hidden md:block">
         <i data-lucide="search" class="size-[16px] absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400"></i>
         <input placeholder="Cerca prenotazioni, clienti, appartamenti…" class="input pl-10 pr-12 bg-ink-50/50 dark:bg-ink-900/40 border-transparent focus:bg-white dark:focus:bg-ink-900">
         <kbd class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono bg-white dark:bg-ink-800 border border-ink-200 dark:border-ink-700 rounded px-1.5 py-0.5 text-ink-500">⌘K</kbd>
       </div>
-      <button onclick="toggleTheme()" class="h-10 w-10 rounded-xl flex items-center justify-center hover:bg-ink-100 dark:hover:bg-ink-800 text-ink-600 dark:text-ink-300 transition">
+      <button onclick="toggleTheme()" class="h-10 w-10 shrink-0 rounded-xl flex items-center justify-center hover:bg-ink-100 dark:hover:bg-ink-800 text-ink-600 dark:text-ink-300 transition">
         <i data-lucide="moon" class="size-[18px] dark:hidden"></i>
         <i data-lucide="sun" class="size-[18px] hidden dark:inline"></i>
       </button>
-      <a href="/admin/notifiche.php" class="relative h-10 w-10 rounded-xl flex items-center justify-center hover:bg-ink-100 dark:hover:bg-ink-800 transition">
+      <a href="/admin/notifiche.php" class="relative h-10 w-10 shrink-0 rounded-xl flex items-center justify-center hover:bg-ink-100 dark:hover:bg-ink-800 transition">
         <i data-lucide="bell" class="size-[18px]"></i>
         <?php if ($unreadNotifs > 0): ?><span class="absolute top-1.5 right-1.5 h-4 min-w-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center"><?= $unreadNotifs ?></span><?php endif; ?>
       </a>
-      <a href="/" target="_blank" title="Vai al sito" class="h-10 w-10 sm:w-auto sm:px-3.5 rounded-xl flex items-center justify-center sm:gap-2 border border-ink-200 dark:border-ink-700/80 text-ink-700 dark:text-ink-200 hover:bg-ink-50 dark:hover:bg-ink-800 transition text-sm"><i data-lucide="external-link" class="size-[16px]"></i> <span class="hidden sm:inline">Sito</span></a>
+      <a href="/" target="_blank" title="Vai al sito" class="h-10 w-10 sm:w-auto sm:px-3.5 shrink-0 rounded-xl flex items-center justify-center sm:gap-2 border border-ink-200 dark:border-ink-700/80 text-ink-700 dark:text-ink-200 hover:bg-ink-50 dark:hover:bg-ink-800 transition text-sm"><i data-lucide="external-link" class="size-[16px]"></i> <span class="hidden sm:inline">Sito</span></a>
     </div>
   </header>
   <main class="p-4 sm:p-5 lg:p-8 animate-fade-in">

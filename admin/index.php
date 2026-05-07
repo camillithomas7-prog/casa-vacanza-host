@@ -107,25 +107,25 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
   <!-- CHART -->
   <div class="grid lg:grid-cols-3 gap-5">
-    <div class="card p-6 lg:col-span-2">
-      <div class="flex items-end justify-between mb-4">
-        <div>
-          <h2 class="font-serif text-xl font-semibold tracking-tight">Andamento mensile</h2>
-          <p class="text-xs text-ink-500 mt-0.5">Ultimi 12 mesi · ricavi vs spese vs utile</p>
+    <div class="card p-4 sm:p-6 lg:col-span-2 overflow-hidden">
+      <div class="flex items-end justify-between mb-4 flex-wrap gap-2">
+        <div class="min-w-0">
+          <h2 class="font-serif text-lg sm:text-xl font-semibold tracking-tight">Andamento mensile</h2>
+          <p class="text-xs text-ink-500 mt-0.5">Ultimi 12 mesi</p>
         </div>
-        <div class="flex gap-3 text-xs">
+        <div class="flex gap-2 sm:gap-3 text-[11px] sm:text-xs flex-wrap">
           <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Ricavi</span>
           <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span> Spese</span>
           <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-brand-500"></span> Utile</span>
         </div>
       </div>
-      <div class="relative h-[220px] sm:h-[260px] lg:h-[300px]"><canvas id="lineChart"></canvas></div>
+      <div class="relative h-[220px] sm:h-[260px] lg:h-[300px] w-full max-w-full overflow-hidden"><canvas id="lineChart"></canvas></div>
     </div>
-    <div class="card p-4 sm:p-6">
-      <h2 class="font-serif text-xl font-semibold tracking-tight">Top appartamenti</h2>
+    <div class="card p-4 sm:p-6 overflow-hidden">
+      <h2 class="font-serif text-lg sm:text-xl font-semibold tracking-tight">Top appartamenti</h2>
       <p class="text-xs text-ink-500 mt-0.5 mb-4">per fatturato</p>
       <?php if (!$top): ?><div class="text-sm text-ink-500">Nessun dato.</div><?php else: ?>
-        <div class="relative h-[180px] sm:h-[220px] mb-4"><canvas id="pieChart"></canvas></div>
+        <div class="relative h-[180px] sm:h-[220px] mb-4 w-full max-w-full overflow-hidden"><canvas id="pieChart"></canvas></div>
         <ul class="space-y-1.5 text-sm">
           <?php foreach ($top as $i => $t): ?>
             <li class="flex items-center justify-between">
