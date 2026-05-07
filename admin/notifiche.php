@@ -35,7 +35,15 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <i data-lucide="bell-ring" class="size-[22px]"></i>
       </div>
       <div class="flex-1 min-w-[260px]">
-        <h3 class="font-display font-bold text-lg">Notifiche sul telefono</h3>
+        <div class="flex items-center gap-2 flex-wrap">
+          <h3 class="font-display font-bold text-lg">Notifiche sul telefono</h3>
+          <button type="button" @click="helpOpen = true"
+            class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-orange-100 text-orange-600 hover:bg-orange-200 transition"
+            title="Quali notifiche riceverò?"
+            aria-label="Apri guida notifiche">
+            <i data-lucide="help-circle" class="size-[16px]"></i>
+          </button>
+        </div>
         <p class="text-sm text-ink-500 mt-0.5">
           Ricevi un avviso istantaneo sul tuo telefono o computer quando arriva una nuova prenotazione.
         </p>
@@ -88,6 +96,121 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         </p>
       </div>
     </div>
+
+    <!-- Modale guida notifiche -->
+    <div x-show="helpOpen" x-cloak
+         @keydown.escape.window="helpOpen = false"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4"
+         style="display: none;">
+      <div class="absolute inset-0 bg-black/50" @click="helpOpen = false"></div>
+      <div class="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between rounded-t-2xl">
+          <h2 class="font-display text-2xl font-bold">Quali notifiche riceverai?</h2>
+          <button type="button" @click="helpOpen = false" class="text-ink-500 hover:text-ink-900" aria-label="Chiudi">
+            <i data-lucide="x" class="size-[24px]"></i>
+          </button>
+        </div>
+        <div class="px-6 py-5 space-y-5 text-[15px] leading-relaxed">
+
+          <p>Quando attivi le notifiche su questo dispositivo, il sistema ti manderà <b>un avviso sul telefono</b> (anche se non sei sull'app) in <b>6 situazioni diverse</b>:</p>
+
+          <div class="space-y-3">
+
+            <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/60">
+              <div class="flex items-start gap-3">
+                <div class="h-9 w-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="bookmark-plus" class="size-[18px]"></i>
+                </div>
+                <div>
+                  <div class="font-semibold">Nuova prenotazione appartamento</div>
+                  <div class="text-sm text-ink-600 mt-0.5">Quando un cliente prenota dal sito uno dei tuoi appartamenti. <b>Ti arriva subito</b>, in tempo reale.</div>
+                  <div class="text-xs text-ink-500 mt-1.5"><i>Esempio: "Marco Rossi ha richiesto Hadaba Pool Residence dal 12/06 al 19/06"</i></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/60">
+              <div class="flex items-start gap-3">
+                <div class="h-9 w-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="package" class="size-[18px]"></i>
+                </div>
+                <div>
+                  <div class="font-semibold">Nuova prenotazione servizio</div>
+                  <div class="text-sm text-ink-600 mt-0.5">Quando un cliente prenota un'<b>escursione</b>, un <b>transfer</b> o un <b>noleggio auto</b>. Ti arriva subito.</div>
+                  <div class="text-xs text-ink-500 mt-1.5"><i>Esempio: "Sofia ha richiesto Snorkeling Ras Mohammed"</i></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-sky-200 bg-sky-50/60">
+              <div class="flex items-start gap-3">
+                <div class="h-9 w-9 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="calendar-clock" class="size-[18px]"></i>
+                </div>
+                <div>
+                  <div class="font-semibold">Domani arriva un cliente</div>
+                  <div class="text-sm text-ink-600 mt-0.5">Il giorno prima del check-in: ti ricorda chi sta per arrivare così puoi <b>preparare le chiavi</b> con calma.</div>
+                  <div class="text-xs text-ink-500 mt-1.5"><i>Esempio: "Domani arriva: Marco Rossi · Hadaba Pool Residence · 4 ospiti"</i></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-sky-200 bg-sky-50/60">
+              <div class="flex items-start gap-3">
+                <div class="h-9 w-9 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="calendar-x" class="size-[18px]"></i>
+                </div>
+                <div>
+                  <div class="font-semibold">Domani parte un cliente</div>
+                  <div class="text-sm text-ink-600 mt-0.5">Il giorno prima del check-out: ti ricorda chi sta per partire così puoi <b>pianificare le pulizie</b> e organizzare la signora delle pulizie.</div>
+                  <div class="text-xs text-ink-500 mt-1.5"><i>Esempio: "Domani parte: Sofia · prepara le pulizie per dopo il check-out"</i></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-amber-200 bg-amber-50/60">
+              <div class="flex items-start gap-3">
+                <div class="h-9 w-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="key-round" class="size-[18px]"></i>
+                </div>
+                <div>
+                  <div class="font-semibold">Oggi arriva / Oggi parte</div>
+                  <div class="text-sm text-ink-600 mt-0.5">All'inizio della giornata, il riepilogo di chi <b>arriva oggi</b> e chi <b>parte oggi</b>: niente più sorprese né dimenticanze.</div>
+                  <div class="text-xs text-ink-500 mt-1.5"><i>Esempio: "Oggi parte: Sofia · ricorda pulizie e richiesta recensione"</i></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-red-200 bg-red-50/60">
+              <div class="flex items-start gap-3">
+                <div class="h-9 w-9 rounded-xl bg-red-100 text-red-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="alert-triangle" class="size-[18px]"></i>
+                </div>
+                <div>
+                  <div class="font-semibold">Pagamento mancante</div>
+                  <div class="text-sm text-ink-600 mt-0.5">Se un cliente ha confermato la prenotazione ma <b>non ha ancora pagato l'acconto</b> e il check-in è entro 3 giorni, ti avviso così puoi chiamarlo.</div>
+                  <div class="text-xs text-ink-500 mt-1.5"><i>Esempio: "Pagamento mancante: Marco · Check-in il 12/06 senza acconto registrato"</i></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 text-sm">
+            <div class="font-semibold mb-1">📱 Importante</div>
+            <ul class="space-y-1 list-disc pl-5">
+              <li>Le notifiche le ricevi <b>sul dispositivo dove hai cliccato "Attiva"</b>. Se vuoi riceverle anche su un secondo telefono o sul PC, devi cliccare "Attiva" anche da lì.</li>
+              <li>Su iPhone serve <b>installare il sito come app</b> (Safari → Aggiungi a Home) e iOS 16.4 o successivo.</li>
+              <li>Se non vuoi più riceverle, torna qui e clicca "Disattiva qui".</li>
+            </ul>
+          </div>
+
+        </div>
+        <div class="sticky bottom-0 bg-white border-t px-6 py-3 rounded-b-2xl flex justify-end">
+          <button type="button" @click="helpOpen = false" class="btn-primary">Ho capito</button>
+        </div>
+      </div>
+    </div>
   </div>
   <script>
     function pushPanel(){
@@ -96,6 +219,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         busy: false,
         message: '',
         messageType: 'info',
+        helpOpen: false,
         async init(){
           if (!window.cvPush) { this.state = 'unsupported'; return; }
           const s = await window.cvPush.status();
