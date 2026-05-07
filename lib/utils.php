@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/i18n.php';
+
 function e(?string $s): string { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
 
 function setting(string $key, ?string $default = null): ?string {
