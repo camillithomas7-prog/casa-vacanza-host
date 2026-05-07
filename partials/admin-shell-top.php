@@ -97,7 +97,7 @@ $pageMeta = $titles[$path] ?? ['Admin', ''];
         <i data-lucide="bell" class="size-[18px]"></i>
         <?php if ($unreadNotifs > 0): ?><span class="absolute top-1.5 right-1.5 h-4 min-w-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center"><?= $unreadNotifs ?></span><?php endif; ?>
       </a>
-      <a href="/" target="_blank" class="hidden sm:inline-flex btn-outline h-10 px-3.5 text-sm"><i data-lucide="external-link" class="size-[14px]"></i> Sito</a>
+      <a href="/" target="_blank" title="Vai al sito" class="h-10 w-10 sm:w-auto sm:px-3.5 rounded-xl flex items-center justify-center sm:gap-2 border border-ink-200 dark:border-ink-700/80 text-ink-700 dark:text-ink-200 hover:bg-ink-50 dark:hover:bg-ink-800 transition text-sm"><i data-lucide="external-link" class="size-[16px]"></i> <span class="hidden sm:inline">Sito</span></a>
     </div>
   </header>
   <main class="p-5 lg:p-8 animate-fade-in">
