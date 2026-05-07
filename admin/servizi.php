@@ -44,7 +44,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <?php endforeach; ?>
   </div>
 
-  <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
     <?php foreach ($items as $s): ?>
       <div class="card overflow-hidden p-0 card-hover">
         <div class="aspect-[16/10] bg-ink-100 dark:bg-ink-900 relative">

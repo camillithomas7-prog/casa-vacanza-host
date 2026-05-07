@@ -44,7 +44,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
   <?php if ($msg): ?><div class="card p-3 text-sm bg-emerald-50 border-emerald-200 text-emerald-700"><?= e($msg) ?></div><?php endif; ?>
 
-  <div class="grid lg:grid-cols-2 gap-5">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
     <form method="post" class="card p-4 sm:p-5 space-y-3">
       <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
       <input type="hidden" name="action" value="save_settings">

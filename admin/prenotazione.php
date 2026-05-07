@@ -107,7 +107,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
   </div>
 
-  <div class="grid lg:grid-cols-3 gap-5">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
     <div class="lg:col-span-2 space-y-5">
       <div class="card p-4 sm:p-5">
         <h3 class="font-display font-bold mb-3">Soggiorno</h3>
@@ -126,7 +126,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
       <div class="card p-4 sm:p-5">
         <h3 class="font-display font-bold mb-3">Contatti cliente</h3>
-        <div class="grid sm:grid-cols-2 gap-3 text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div><div class="text-xs text-ink-500">Email</div><div><?= e($b['customer_email'] ?: '—') ?></div></div>
           <div><div class="text-xs text-ink-500">Telefono</div><div><?= e($b['customer_phone'] ?: '—') ?></div></div>
           <div><div class="text-xs text-ink-500">Paese</div><div><?= e($b['customer_country'] ?: '—') ?></div></div>
@@ -138,7 +138,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <div class="flex items-center justify-between mb-3">
           <h3 class="font-display font-bold">Pagamenti</h3>
         </div>
-        <form method="post" class="grid sm:grid-cols-5 gap-2 mb-4 p-3 rounded-xl bg-ink-50 dark:bg-ink-900">
+        <form method="post" class="grid grid-cols-1 sm:grid-cols-5 gap-2 mb-4 p-3 rounded-xl bg-ink-50 dark:bg-ink-900">
           <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
           <input type="hidden" name="action" value="payment_add">
           <input class="input" type="number" step="0.01" name="amount" placeholder="Importo" value="<?= $due > 0 ? $due : 0 ?>" required>
@@ -175,7 +175,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
             <label class="btn-outline cursor-pointer text-sm"><i data-lucide="upload" class="size-[14px]"></i> Carica<input type="file" name="files[]" multiple class="hidden" onchange="this.form.submit()"></label>
           </form>
         </div>
-        <div class="grid sm:grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <?php foreach ($documents as $d): ?>
             <div class="flex items-center gap-2 p-2 rounded-xl border border-ink-100 dark:border-ink-800">
               <i data-lucide="file-text" class="size-[18px] text-brand-500"></i>

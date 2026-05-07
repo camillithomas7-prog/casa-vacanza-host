@@ -43,7 +43,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <button class="btn-primary sm:col-span-6"><i data-lucide="plus" class="size-[16px]"></i> Aggiungi</button>
   </form>
 
-  <div class="grid md:grid-cols-2 gap-4">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <?php foreach ($reviews as $r): ?>
       <div class="card p-4 sm:p-5">
         <div class="flex items-center justify-between">

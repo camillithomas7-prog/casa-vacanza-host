@@ -54,7 +54,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <button class="btn-primary"><i data-lucide="save" class="size-[18px]"></i> Crea</button>
   </div>
 
-  <div class="grid lg:grid-cols-2 gap-5">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
     <div class="card p-4 sm:p-5 space-y-3">
       <h3 class="font-display font-bold">Cliente</h3>
       <label class="block"><span class="label">Nome e cognome</span><input class="input" name="name" required></label>

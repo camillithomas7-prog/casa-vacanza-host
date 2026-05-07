@@ -69,7 +69,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </form>
   </div>
 
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <?php foreach ([
       ['Fatturato', fmtMoney($totalRev), 'bg-emerald-500'],
       ['Incassato', fmtMoney($totalPaid), 'bg-sky-500'],
@@ -102,7 +102,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <button class="btn-primary sm:col-span-2 lg:col-span-1 h-12"><i data-lucide="plus" class="size-[16px]"></i> Aggiungi</button>
   </form>
 
-  <div class="grid lg:grid-cols-3 gap-5">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
     <div class="card p-4 sm:p-5 lg:col-span-2 overflow-x-auto">
       <h3 class="font-display font-bold mb-3">Voci</h3>
       <table class="table-base">

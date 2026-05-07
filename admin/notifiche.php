@@ -273,7 +273,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       }
     }
   </script>
-  <div class="grid lg:grid-cols-2 gap-5">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
     <div class="card p-4 sm:p-5">
       <h3 class="font-display font-bold mb-3">Notifiche</h3>
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">

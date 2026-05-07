@@ -18,7 +18,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <a href="/admin/appartamento-edit.php" class="btn-primary"><i data-lucide="plus" class="size-[18px]"></i> Nuovo appartamento</a>
   </div>
 
-  <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
     <?php foreach ($items as $a): $cover = $a['cover_image'] ?: $a['photo']; ?>
       <div class="card overflow-hidden p-0 card-hover group">
         <div class="aspect-[16/10] bg-ink-100 dark:bg-ink-900 relative">

@@ -123,7 +123,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
   </div>
 
-  <div class="grid lg:grid-cols-2 gap-5">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
     <div class="card p-4 sm:p-5 space-y-3">
       <h3 class="font-display font-bold">Tipo & informazioni</h3>
       <label class="block"><span class="label">Tipo servizio</span>

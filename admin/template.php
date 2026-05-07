@@ -32,7 +32,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <p class="text-ink-500 mt-1">Personalizza i messaggi automatici inviati ai clienti.</p>
   </div>
 
-  <div class="grid lg:grid-cols-4 gap-5">
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-5">
     <div class="card p-3">
       <ul class="space-y-1">
         <?php foreach ($templates as $t): ?>

@@ -64,7 +64,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
   </div>
 
-  <div class="grid lg:grid-cols-3 gap-5">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
     <div class="lg:col-span-2 space-y-5">
       <div class="card p-4 sm:p-5">
         <h3 class="font-display font-bold mb-3">Servizio</h3>
@@ -93,7 +93,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
       <div class="card p-4 sm:p-5">
         <h3 class="font-display font-bold mb-3">Cliente</h3>
-        <div class="grid sm:grid-cols-2 gap-3 text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div><div class="text-xs text-ink-500">Nome</div><div><?= e($b['customer_name']) ?></div></div>
           <div><div class="text-xs text-ink-500">Email</div><div><?= e($b['customer_email'] ?: '—') ?></div></div>
           <div><div class="text-xs text-ink-500">Telefono</div><div><?= e($b['customer_phone'] ?: '—') ?></div></div>

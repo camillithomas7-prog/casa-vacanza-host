@@ -62,7 +62,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   </div>
 
   <!-- KPI -->
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <?php
       $kpis = [
         ['Fatturato', fmtMoney($revenue), count($bookings) . ' prenotazioni', 'trending-up', 'from-emerald-400 to-emerald-600', $revTrend],
@@ -88,7 +88,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <?php endforeach; ?>
   </div>
 
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <?php foreach ([
       ['Appartamenti attivi', $apt_count, 'building-2', 'text-sky-500 bg-sky-500/10'],
       ['Prossimi check-in', count($upcoming), 'log-in', 'text-violet-500 bg-violet-500/10'],
@@ -106,7 +106,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   </div>
 
   <!-- CHART -->
-  <div class="grid lg:grid-cols-3 gap-5">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
     <div class="card p-4 sm:p-6 lg:col-span-2 overflow-hidden">
       <div class="flex items-end justify-between mb-4 flex-wrap gap-2">
         <div class="min-w-0">
@@ -139,7 +139,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   </div>
 
   <!-- LISTE -->
-  <div class="grid lg:grid-cols-2 gap-5">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
     <div class="card p-4 sm:p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-serif text-xl font-semibold tracking-tight">Prossimi arrivi</h2>
