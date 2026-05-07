@@ -185,6 +185,33 @@ require __DIR__ . '/partials/site-header.php';
   </div>
 </section>
 
+<!-- ALTRI SERVIZI -->
+<section class="container-wide py-16">
+  <div class="text-center max-w-2xl mx-auto mb-10">
+    <div class="badge-brand mb-3">Tutto in un posto</div>
+    <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Vacanza completa, zero pensieri.</h2>
+    <p class="text-ink-500 mt-3 text-pretty">Oltre all'appartamento ti organizziamo transfer, noleggi e le migliori escursioni di Sharm.</p>
+  </div>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    <?php foreach ([
+      ['plane-takeoff', 'Transfer aeroporto', 'Auto privata o minibus dall\'aeroporto a qualsiasi villaggio.', '/transfer.php', 'Da €25'],
+      ['key-round', 'Noleggi auto & scooter', 'Auto, scooter, golf cart e monopattini. Tariffe giornaliere e mensili.', '/noleggi.php', 'Da €15/giorno'],
+      ['compass', 'Escursioni guidate', 'Ras Mohammed, deserto, beduini, Cairo. Con guida italiana.', '/escursioni.php', 'Da €30/persona'],
+      ['waves', 'Diving & snorkeling', 'Reef incredibili, Thistlegorm, Tiran. Centri diving certificati.', '/escursioni.php?cat=diving', 'Da €110'],
+    ] as $i => $s): ?>
+      <a href="<?= e($s[3]) ?>" class="card p-6 card-hover group animate-slide-up" style="animation-delay:<?= $i * 60 ?>ms">
+        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center shadow-[0_8px_18px_-6px_rgba(240,78,0,.5)] mb-4"><i data-lucide="<?= $s[0] ?>" class="size-[20px]"></i></div>
+        <div class="font-display font-bold text-lg"><?= e($s[1]) ?></div>
+        <p class="text-ink-500 mt-1.5 text-sm text-pretty"><?= e($s[2]) ?></p>
+        <div class="flex items-center justify-between mt-4 pt-4 border-t border-ink-100 dark:border-ink-800/80">
+          <span class="text-sm font-semibold text-brand-600"><?= e($s[4]) ?></span>
+          <i data-lucide="arrow-right" class="size-[16px] text-ink-400 group-hover:text-brand-600 group-hover:translate-x-1 transition-all"></i>
+        </div>
+      </a>
+    <?php endforeach; ?>
+  </div>
+</section>
+
 <!-- COME FUNZIONA -->
 <section id="come-funziona" class="container-wide py-20">
   <div class="text-center max-w-2xl mx-auto mb-12">

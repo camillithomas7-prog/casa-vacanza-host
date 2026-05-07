@@ -27,6 +27,10 @@ $titles = [
   '/admin/coupon.php' => ['Coupon', 'Sconti'],
   '/admin/impostazioni.php' => ['Impostazioni', 'Account e backup'],
   '/admin/notifiche.php' => ['Notifiche', 'Attività recente'],
+  '/admin/servizi.php' => ['Servizi extra', 'Veicoli, escursioni, transfer'],
+  '/admin/servizio-edit.php' => ['Servizio', 'Modifica scheda'],
+  '/admin/servizi-prenotazioni.php' => ['Prenotazioni servizi', 'Veicoli, escursioni, transfer'],
+  '/admin/servizi-prenotazione.php' => ['Prenotazione servizio', 'Dettaglio'],
 ];
 $pageMeta = $titles[$path] ?? ['Admin', ''];
 ?>
@@ -44,6 +48,9 @@ $pageMeta = $titles[$path] ?? ['Admin', ''];
     <?php navItem('/admin/appartamenti.php', 'building-2', 'Appartamenti', $path); ?>
     <?php navItem('/admin/calendario.php', 'calendar', 'Calendario', $path); ?>
     <?php navItem('/admin/prenotazioni.php', 'bookmark-check', 'Prenotazioni', $path); ?>
+    <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 px-3 pb-1.5 pt-4">Servizi extra</div>
+    <?php navItem('/admin/servizi.php', 'package', 'Catalogo servizi', $path); ?>
+    <?php navItem('/admin/servizi-prenotazioni.php', 'clipboard-list', 'Prenotazioni servizi', $path); ?>
     <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 px-3 pb-1.5 pt-4">Strategia</div>
     <?php navItem('/admin/prezzi.php', 'wallet', 'Prezzi', $path); ?>
     <?php navItem('/admin/spese.php', 'receipt', 'Spese & bilancio', $path); ?>

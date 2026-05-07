@@ -17,8 +17,10 @@
       <ul class="space-y-2.5 text-sm">
         <li><a href="/" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Home</a></li>
         <li><a href="/appartamenti.php" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Appartamenti</a></li>
+        <li><a href="/noleggi.php" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Noleggi</a></li>
+        <li><a href="/escursioni.php" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Escursioni</a></li>
+        <li><a href="/transfer.php" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Transfer aeroporto</a></li>
         <li><a href="/contatti.php" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Contatti</a></li>
-        <li><a href="/admin/login.php" class="text-ink-700 dark:text-ink-300 hover:text-brand-600">Area admin</a></li>
       </ul>
     </div>
 

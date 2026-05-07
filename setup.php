@@ -231,6 +231,84 @@ CREATE TABLE IF NOT EXISTS settings (
   setting_key VARCHAR(80) PRIMARY KEY,
   setting_value TEXT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS services (
+  id VARCHAR(32) PRIMARY KEY,
+  slug VARCHAR(190) UNIQUE NOT NULL,
+  type VARCHAR(40) NOT NULL,
+  name VARCHAR(190) NOT NULL,
+  description TEXT,
+  cover_image VARCHAR(500),
+  gallery TEXT,
+  daily_price DECIMAL(10,2),
+  weekend_price DECIMAL(10,2),
+  weekly_price DECIMAL(10,2),
+  biweekly_price DECIMAL(10,2),
+  triweekly_price DECIMAL(10,2),
+  monthly_price DECIMAL(10,2),
+  long_stay_discount_7 DECIMAL(5,2) DEFAULT 0,
+  long_stay_discount_14 DECIMAL(5,2) DEFAULT 0,
+  long_stay_discount_30 DECIMAL(5,2) DEFAULT 0,
+  cleaning_fee DECIMAL(10,2) DEFAULT 0,
+  security_deposit DECIMAL(10,2) DEFAULT 0,
+  price_per_person DECIMAL(10,2),
+  price_per_group DECIMAL(10,2),
+  duration_hours DECIMAL(5,1),
+  group_size_min INT DEFAULT 1,
+  group_size_max INT DEFAULT 10,
+  resort_name VARCHAR(190),
+  resort_address VARCHAR(255),
+  features TEXT,
+  includes TEXT,
+  excludes TEXT,
+  meeting_point VARCHAR(255),
+  schedule_days VARCHAR(255),
+  from_location VARCHAR(190),
+  to_location VARCHAR(190),
+  vehicle_capacity INT,
+  insurance_included TINYINT(1) DEFAULT 0,
+  fuel_included TINYINT(1) DEFAULT 0,
+  helmet_included TINYINT(1) DEFAULT 0,
+  min_age INT,
+  license_required TINYINT(1) DEFAULT 0,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  position INT DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_type (type),
+  INDEX idx_slug (slug)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS service_bookings (
+  id VARCHAR(32) PRIMARY KEY,
+  code VARCHAR(40) UNIQUE NOT NULL,
+  service_id VARCHAR(32) NOT NULL,
+  customer_id VARCHAR(32) NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE,
+  pickup_time VARCHAR(8),
+  participants INT DEFAULT 1,
+  pickup_location VARCHAR(255),
+  dropoff_location VARCHAR(255),
+  flight_number VARCHAR(40),
+  details TEXT,
+  status VARCHAR(30) NOT NULL DEFAULT 'pending',
+  source VARCHAR(30) NOT NULL DEFAULT 'direct',
+  base_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+  extras DECIMAL(10,2) NOT NULL DEFAULT 0,
+  discount DECIMAL(10,2) NOT NULL DEFAULT 0,
+  total DECIMAL(10,2) NOT NULL DEFAULT 0,
+  paid DECIMAL(10,2) NOT NULL DEFAULT 0,
+  currency VARCHAR(3) NOT NULL DEFAULT 'EUR',
+  notes TEXT,
+  coupon_code VARCHAR(40),
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (service_id) REFERENCES services(id),
+  FOREIGN KEY (customer_id) REFERENCES customers(id),
+  INDEX idx_svc (service_id),
+  INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
 
 foreach (preg_split('/;\s*\n/', $schema) as $stmt) {
@@ -242,7 +320,7 @@ echo "✓ Schema creato/verificato\n";
 if ($reset) {
     echo "⚠ RESET RICHIESTO — pulizia dati...\n";
     $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
-    foreach (['payments','documents','bookings','customers','date_blocks','price_rules','photos','reviews','expenses','notifications','activity_logs','coupons','apartments','message_templates','settings'] as $t) {
+    foreach (['payments','documents','bookings','service_bookings','customers','date_blocks','price_rules','photos','reviews','expenses','notifications','activity_logs','coupons','apartments','services','message_templates','settings'] as $t) {
         $pdo->exec("TRUNCATE TABLE $t");
     }
     $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
@@ -414,6 +492,239 @@ if ($count > 0 && !$reset) {
         [newId(), 'new_booking', 'Nuova prenotazione', 'Marco Rossi ha richiesto Sharks Bay Diving Suite', '/admin/prenotazioni.php']);
 
     echo "✓ Coupon e notifiche pronti\n";
+
+    // ============== SERVIZI: VEICOLI / ESCURSIONI / TRANSFER ==============
+    $services = [
+      // ============ AUTO ============
+      ['slug'=>'suzuki-jimny-4x4', 'type'=>'car', 'name'=>'Suzuki Jimny 4x4',
+       'description'=>"SUV compatto 4x4 ideale per esplorare il deserto e le strade di Sharm. Aria condizionata, cambio manuale, 4 posti.\n\nPerfetto per gite a Dahab, Ras Mohammed e zone interne.",
+       'cover_image'=>'https://images.unsplash.com/photo-1629897048514-3dd7414efc7d?w=1200&q=80',
+       'gallery'=>json_encode([
+         'https://images.unsplash.com/photo-1629897048514-3dd7414efc7d?w=1200&q=80',
+         'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=1200&q=80',
+       ]),
+       'daily_price'=>50, 'weekly_price'=>300, 'biweekly_price'=>550, 'triweekly_price'=>800, 'monthly_price'=>1100,
+       'long_stay_discount_7'=>5, 'long_stay_discount_14'=>10, 'long_stay_discount_30'=>20,
+       'cleaning_fee'=>15, 'security_deposit'=>200,
+       'features'=>json_encode(['Aria condizionata','Cambio manuale','4x4','4 posti','Bluetooth','Radio']),
+       'insurance_included'=>1, 'fuel_included'=>0, 'min_age'=>21, 'license_required'=>1],
+
+      ['slug'=>'renault-clio', 'type'=>'car', 'name'=>'Renault Clio · Auto economica',
+       'description'=>"Compatta affidabile per spostarsi in città. Aria condizionata, cambio manuale, perfetta per coppie e piccoli gruppi.",
+       'cover_image'=>'https://images.unsplash.com/photo-1542362567-b07e54358753?w=1200&q=80',
+       'gallery'=>json_encode([
+         'https://images.unsplash.com/photo-1542362567-b07e54358753?w=1200&q=80',
+         'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=1200&q=80',
+       ]),
+       'daily_price'=>35, 'weekly_price'=>210, 'biweekly_price'=>380, 'monthly_price'=>800,
+       'long_stay_discount_7'=>5, 'long_stay_discount_14'=>10, 'long_stay_discount_30'=>15,
+       'cleaning_fee'=>10, 'security_deposit'=>150,
+       'features'=>json_encode(['Aria condizionata','5 porte','Bluetooth','GPS']),
+       'insurance_included'=>1, 'min_age'=>21, 'license_required'=>1],
+
+      ['slug'=>'hyundai-i10-automatic', 'type'=>'car', 'name'=>'Hyundai i10 Automatica',
+       'description'=>"Cambio automatico, ideale per chi non guida bene il manuale. Climatizzata, agile in città.",
+       'cover_image'=>'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&q=80',
+       'gallery'=>json_encode([
+         'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&q=80',
+       ]),
+       'daily_price'=>40, 'weekly_price'=>240, 'biweekly_price'=>440, 'monthly_price'=>900,
+       'long_stay_discount_7'=>5, 'long_stay_discount_14'=>10, 'long_stay_discount_30'=>15,
+       'cleaning_fee'=>10, 'security_deposit'=>150,
+       'features'=>json_encode(['Aria condizionata','Cambio automatico','5 porte','Bluetooth']),
+       'insurance_included'=>1, 'min_age'=>21, 'license_required'=>1],
+
+      // ============ GOLF CART ============
+      ['slug'=>'golf-cart-naama-bay-4posti', 'type'=>'golf_cart', 'name'=>'Golf cart 4 posti · Naama Bay',
+       'description'=>"Golf cart elettrico 4 posti per spostarti nel resort e sulla Promenade di Naama Bay senza problemi di parcheggio.",
+       'cover_image'=>'https://images.unsplash.com/photo-1592890288564-76628a30a657?w=1200&q=80',
+       'gallery'=>json_encode(['https://images.unsplash.com/photo-1592890288564-76628a30a657?w=1200&q=80']),
+       'daily_price'=>25, 'weekly_price'=>150, 'monthly_price'=>500,
+       'long_stay_discount_7'=>5, 'long_stay_discount_14'=>10,
+       'security_deposit'=>50,
+       'resort_name'=>'Naama Bay Resort', 'resort_address'=>'Naama Bay Promenade, Sharm El Sheikh',
+       'features'=>json_encode(['Elettrico','4 posti','Tetto','Vano bagagli']),
+       'min_age'=>18, 'license_required'=>0],
+
+      ['slug'=>'golf-cart-hadaba-6posti', 'type'=>'golf_cart', 'name'=>'Golf cart 6 posti · Hadaba',
+       'description'=>"Modello familiare 6 posti per gruppi. Disponibile presso il resort di Hadaba con accesso libero alla zona privata.",
+       'cover_image'=>'https://images.unsplash.com/photo-1606140797900-b30c2569a5b3?w=1200&q=80',
+       'gallery'=>json_encode(['https://images.unsplash.com/photo-1606140797900-b30c2569a5b3?w=1200&q=80']),
+       'daily_price'=>35, 'weekly_price'=>210, 'monthly_price'=>700,
+       'long_stay_discount_7'=>5, 'long_stay_discount_14'=>10,
+       'security_deposit'=>80,
+       'resort_name'=>'Hadaba Resort', 'resort_address'=>'Hadaba, Ras Um Sid, Sharm El Sheikh',
+       'features'=>json_encode(['Elettrico','6 posti','Tetto']),
+       'min_age'=>18, 'license_required'=>0],
+
+      // ============ SCOOTER ============
+      ['slug'=>'scooter-50cc', 'type'=>'scooter', 'name'=>'Scooter 50cc',
+       'description'=>"Scooter agile per spostarti tra Naama Bay e Old Market. Casco incluso. Disponibile presso il punto noleggio di Naama Bay.",
+       'cover_image'=>'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=1200&q=80',
+       'gallery'=>json_encode(['https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=1200&q=80']),
+       'daily_price'=>20, 'weekly_price'=>120, 'monthly_price'=>400,
+       'long_stay_discount_7'=>5, 'long_stay_discount_14'=>10,
+       'security_deposit'=>100,
+       'resort_name'=>'Naama Bay - Punto noleggio',
+       'resort_address'=>'Naama Bay Promenade angolo Sultan Hotel, Sharm El Sheikh',
+       'features'=>json_encode(['50cc','2 posti','Casco incluso','Bauletto']),
+       'helmet_included'=>1, 'min_age'=>18, 'license_required'=>1],
+
+      // ============ MONOPATTINO ELETTRICO ============
+      ['slug'=>'monopattino-elettrico', 'type'=>'escooter', 'name'=>'Monopattino elettrico',
+       'description'=>"Monopattino elettrico per spostamenti rapidi sulla Promenade. Autonomia 30km, velocità max 25 km/h. Disponibile presso il resort di Nabq Bay.",
+       'cover_image'=>'https://images.unsplash.com/photo-1609954551106-0d1c0bdca0e2?w=1200&q=80',
+       'gallery'=>json_encode(['https://images.unsplash.com/photo-1609954551106-0d1c0bdca0e2?w=1200&q=80']),
+       'daily_price'=>15, 'weekly_price'=>80, 'monthly_price'=>250,
+       'long_stay_discount_7'=>5, 'long_stay_discount_14'=>10,
+       'security_deposit'=>50,
+       'resort_name'=>'Nabq Bay Resort', 'resort_address'=>'Nabq Bay Resort Area, Sharm El Sheikh',
+       'features'=>json_encode(['Elettrico','Autonomia 30km','Pieghevole','25 km/h max','Caschetto incluso']),
+       'helmet_included'=>1, 'min_age'=>16],
+
+      // ============ ESCURSIONI BARCA ============
+      ['slug'=>'snorkeling-ras-mohammed', 'type'=>'boat_excursion', 'name'=>'Snorkeling Ras Mohammed',
+       'description'=>"Giornata in barca al Parco Nazionale di Ras Mohammed: 2 stop di snorkeling tra i reef più belli del Mar Rosso, pranzo a bordo incluso, partenza dal porto di Sharm.",
+       'cover_image'=>'https://images.unsplash.com/photo-1559599189-fe84dea4eb79?w=1200&q=80',
+       'gallery'=>json_encode([
+         'https://images.unsplash.com/photo-1559599189-fe84dea4eb79?w=1200&q=80',
+         'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=1200&q=80',
+         'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&q=80',
+       ]),
+       'price_per_person'=>45, 'duration_hours'=>8, 'group_size_min'=>1, 'group_size_max'=>40,
+       'meeting_point'=>'Porto turistico Sharm El Sheikh',
+       'includes'=>json_encode(['Transfer da/per hotel','Pranzo a bordo','Bevande','Maschera e pinne','Guida italiana']),
+       'excludes'=>json_encode(['Tasse parco (5 USD)','Mance']),
+       'schedule_days'=>'Lun,Mar,Mer,Gio,Ven,Sab,Dom'],
+
+      ['slug'=>'isola-tiran-snorkeling', 'type'=>'boat_excursion', 'name'=>'Isola di Tiran in barca',
+       'description'=>"Giornata sull'Isola di Tiran, 4 punti di snorkeling tra reef e relitti, acque turchesi cristalline. Pranzo a bordo incluso.",
+       'cover_image'=>'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=1200&q=80',
+       'gallery'=>json_encode([
+         'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=1200&q=80',
+         'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&q=80',
+       ]),
+       'price_per_person'=>40, 'duration_hours'=>8, 'group_size_min'=>1, 'group_size_max'=>40,
+       'meeting_point'=>'Porto turistico Sharm El Sheikh',
+       'includes'=>json_encode(['Transfer','Pranzo a bordo','Bevande','Maschera e pinne']),
+       'schedule_days'=>'Lun,Mer,Ven,Sab,Dom'],
+
+      // ============ ESCURSIONI DESERTO ============
+      ['slug'=>'safari-quad-deserto', 'type'=>'desert_excursion', 'name'=>'Safari Quad nel deserto',
+       'description'=>"Avventura in quad nel deserto del Sinai al tramonto. Visita a un villaggio beduino tradizionale con cena tipica e narghilè sotto le stelle.",
+       'cover_image'=>'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200&q=80',
+       'gallery'=>json_encode([
+         'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200&q=80',
+         'https://images.unsplash.com/photo-1547155728-a9b58a4f0a91?w=1200&q=80',
+       ]),
+       'price_per_person'=>35, 'duration_hours'=>5, 'group_size_min'=>1, 'group_size_max'=>20,
+       'meeting_point'=>'Pickup hotel ore 14:30',
+       'includes'=>json_encode(['Pickup','Quad singolo o doppio','Tè beduino','Cena tipica','Spettacolo']),
+       'excludes'=>json_encode(['Mance','Bevande extra']),
+       'schedule_days'=>'Lun,Mar,Mer,Gio,Ven,Sab,Dom'],
+
+      ['slug'=>'beduino-cammelli-cena', 'type'=>'desert_excursion', 'name'=>'Beduini, cammelli e cena nel deserto',
+       'description'=>"Esperienza tradizionale: dorso del cammello al tramonto, cena tipica beduina sotto le stelle, musica dal vivo e narghilè.",
+       'cover_image'=>'https://images.unsplash.com/photo-1547155728-a9b58a4f0a91?w=1200&q=80',
+       'gallery'=>json_encode(['https://images.unsplash.com/photo-1547155728-a9b58a4f0a91?w=1200&q=80']),
+       'price_per_person'=>30, 'duration_hours'=>5, 'group_size_min'=>1, 'group_size_max'=>30,
+       'meeting_point'=>'Pickup hotel ore 16:00',
+       'includes'=>json_encode(['Pickup','Cammello','Cena tipica','Spettacolo','Narghilè']),
+       'schedule_days'=>'Lun,Mer,Gio,Sab,Dom'],
+
+      // ============ DIVING / DAY TRIP ============
+      ['slug'=>'immersione-singola-thistlegorm', 'type'=>'diving', 'name'=>'Immersione Thistlegorm',
+       'description'=>"Day trip al relitto della SS Thistlegorm, uno dei diving site più famosi al mondo. 2 immersioni guidate, pranzo a bordo. Solo divers certificati.",
+       'cover_image'=>'https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=1200&q=80',
+       'gallery'=>json_encode(['https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=1200&q=80']),
+       'price_per_person'=>110, 'duration_hours'=>10, 'group_size_min'=>1, 'group_size_max'=>20,
+       'meeting_point'=>'Porto turistico Sharm El Sheikh ore 5:30',
+       'includes'=>json_encode(['2 immersioni','Pranzo','Bevande','Bombole','Pesi','Guida diving']),
+       'excludes'=>json_encode(['Attrezzatura completa (noleggio 25€)','Tasse parco']),
+       'schedule_days'=>'Mar,Gio,Sab'],
+
+      // ============ TOUR CULTURALI ============
+      ['slug'=>'cairo-piramidi-day-trip', 'type'=>'tour', 'name'=>'Cairo & Piramidi · Day trip',
+       'description'=>"Volo a/r in giornata al Cairo: Piramidi di Giza, Sfinge, Museo Egizio, mercato Khan El Khalili. Guida italiana dedicata.",
+       'cover_image'=>'https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=1200&q=80',
+       'gallery'=>json_encode([
+         'https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=1200&q=80',
+         'https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=1200&q=80',
+       ]),
+       'price_per_person'=>250, 'duration_hours'=>16, 'group_size_min'=>2, 'group_size_max'=>15,
+       'meeting_point'=>'Aeroporto Sharm ore 4:00 (pickup hotel ore 3:00)',
+       'includes'=>json_encode(['Voli a/r','Trasferimenti','Pranzo','Guida italiana','Ingressi monumenti']),
+       'excludes'=>json_encode(['Bevande','Mance']),
+       'schedule_days'=>'Lun,Mer,Sab'],
+
+      ['slug'=>'monte-sinai-alba', 'type'=>'tour', 'name'=>'Monte Sinai · Alba sulla cima',
+       'description'=>"Salita notturna al Monte Sinai per assistere all'alba, visita al Monastero di Santa Caterina. Esperienza unica.",
+       'cover_image'=>'https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=1200&q=80',
+       'gallery'=>json_encode(['https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=1200&q=80']),
+       'price_per_person'=>55, 'duration_hours'=>14, 'group_size_min'=>2, 'group_size_max'=>20,
+       'meeting_point'=>'Pickup hotel ore 22:00',
+       'includes'=>json_encode(['Pickup','Guida','Ingresso monastero','Tè caldo']),
+       'excludes'=>json_encode(['Bastone (5 EGP)','Cammello opzionale','Mance']),
+       'schedule_days'=>'Mar,Gio,Sab'],
+
+      // ============ TRANSFER ============
+      ['slug'=>'transfer-aeroporto-naama-bay', 'type'=>'transfer', 'name'=>'Transfer aeroporto → Naama Bay',
+       'description'=>"Transfer privato dall'aeroporto di Sharm El Sheikh agli hotel/appartamenti di Naama Bay. Auto privata fino a 4 persone.",
+       'cover_image'=>'https://images.unsplash.com/photo-1542362567-b07e54358753?w=1200&q=80',
+       'price_per_group'=>25, 'vehicle_capacity'=>4,
+       'from_location'=>'Aeroporto SSH', 'to_location'=>'Naama Bay',
+       'features'=>json_encode(['Auto privata','Fino a 4 persone','Aria condizionata','Bagagli inclusi','24/7'])],
+
+      ['slug'=>'transfer-aeroporto-hadaba', 'type'=>'transfer', 'name'=>'Transfer aeroporto → Hadaba',
+       'description'=>"Transfer privato aeroporto-Hadaba/Ras Um Sid. Auto fino a 4 persone.",
+       'cover_image'=>'https://images.unsplash.com/photo-1542362567-b07e54358753?w=1200&q=80',
+       'price_per_group'=>30, 'vehicle_capacity'=>4,
+       'from_location'=>'Aeroporto SSH', 'to_location'=>'Hadaba / Ras Um Sid',
+       'features'=>json_encode(['Auto privata','Fino a 4 persone','Aria condizionata','24/7'])],
+
+      ['slug'=>'transfer-aeroporto-nabq', 'type'=>'transfer', 'name'=>'Transfer aeroporto → Nabq Bay',
+       'description'=>"Transfer privato aeroporto-Nabq Bay. Tragitto circa 30 minuti.",
+       'cover_image'=>'https://images.unsplash.com/photo-1542362567-b07e54358753?w=1200&q=80',
+       'price_per_group'=>35, 'vehicle_capacity'=>4,
+       'from_location'=>'Aeroporto SSH', 'to_location'=>'Nabq Bay',
+       'features'=>json_encode(['Auto privata','Fino a 4 persone','Aria condizionata','24/7'])],
+
+      ['slug'=>'transfer-aeroporto-sharks-bay', 'type'=>'transfer', 'name'=>'Transfer aeroporto → Sharks Bay',
+       'description'=>"Transfer privato aeroporto-Sharks Bay (zona diving).",
+       'cover_image'=>'https://images.unsplash.com/photo-1542362567-b07e54358753?w=1200&q=80',
+       'price_per_group'=>30, 'vehicle_capacity'=>4,
+       'from_location'=>'Aeroporto SSH', 'to_location'=>'Sharks Bay',
+       'features'=>json_encode(['Auto privata','Fino a 4 persone','Aria condizionata'])],
+
+      ['slug'=>'transfer-minibus-7posti', 'type'=>'transfer', 'name'=>'Transfer minibus 7 posti',
+       'description'=>"Minibus privato 7 posti per gruppi familiari. Da/per qualsiasi villaggio o appartamento di Sharm.",
+       'cover_image'=>'https://images.unsplash.com/photo-1542362567-b07e54358753?w=1200&q=80',
+       'price_per_group'=>50, 'vehicle_capacity'=>7,
+       'from_location'=>'Aeroporto SSH', 'to_location'=>'Qualsiasi zona di Sharm',
+       'features'=>json_encode(['Minibus 7 posti','Bagagli','Aria condizionata','Conducente'])],
+    ];
+
+    $svcIds = [];
+    foreach ($services as $i => $s) {
+        $s['position'] = $i;
+        $id = newId(); $svcIds[$s['slug']] = $id;
+        $cols = array_keys($s);
+        $colsStr = implode(',', $cols);
+        $placeholders = implode(',', array_fill(0, count($cols), '?'));
+        q("INSERT INTO services (id, $colsStr) VALUES (?, $placeholders)", array_merge([$id], array_values($s)));
+    }
+    echo "✓ " . count($services) . " servizi extra creati (auto, golf cart, scooter, monopattino, escursioni, transfer)\n";
+
+    // demo service bookings
+    $sb1 = newId();
+    q('INSERT INTO service_bookings (id, code, service_id, customer_id, start_date, end_date, participants, base_price, total, paid, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [$sb1, 'SV-2026-0001', $svcIds['suzuki-jimny-4x4'], $c1, $bk(7), $bk(14), 4, 300, 315, 100, 'confirmed']);
+    q('INSERT INTO service_bookings (id, code, service_id, customer_id, start_date, participants, base_price, total, paid, status, pickup_time, pickup_location, dropoff_location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [newId(), 'SV-2026-0002', $svcIds['transfer-aeroporto-naama-bay'], $c2, $bk(-12), 2, 25, 25, 25, 'completed', '14:30', 'Aeroporto SSH', 'Naama Bay Sea View']);
+    q('INSERT INTO service_bookings (id, code, service_id, customer_id, start_date, participants, base_price, total, paid, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [newId(), 'SV-2026-0003', $svcIds['snorkeling-ras-mohammed'], $c3, $bk(22), 2, 90, 90, 0, 'pending']);
+
+    echo "✓ Prenotazioni servizi demo create\n";
 }
 
 echo "\n✅ Setup completato!\n";
