@@ -585,12 +585,11 @@ if ($count > 0 && !$reset) {
       // ============ ESCURSIONI IN BARCA ============
       ['slug'=>'ras-mohammed-snorkeling', 'type'=>'boat_excursion', 'name'=>'Ras Mohammed: snorkeling nel parco marino',
        'description'=>"Giornata in barca al Parco Nazionale di Ras Mohammed, l'area marina protetta più famosa del Mar Rosso. 3 stop di snorkeling tra coralli intatti, mangrovie e il celebre Lago Magico.\n\nPranzo a bordo incluso, accompagnamento di guida italiana esperta. Partenza dal porto turistico di Sharm El Sheikh.",
-       'cover_image'=>'https://images.unsplash.com/photo-1559599189-fe84dea4eb79?w=1200&q=80',
+       'cover_image'=>'/assets/services/exc_ras_mohammed.jpg',
        'gallery'=>json_encode([
-         'https://images.unsplash.com/photo-1559599189-fe84dea4eb79?w=1200&q=80',
-         'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=1200&q=80',
-         'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&q=80',
-         'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&q=80',
+         '/assets/services/exc_ras_mohammed.jpg',
+         '/assets/services/exc_dolphins.jpg',
+         '/assets/services/exc_white_island.jpg',
        ]),
        'price_per_person'=>45, 'duration_hours'=>8, 'group_size_min'=>1, 'group_size_max'=>40,
        'meeting_point'=>'Porto turistico Sharm El Sheikh · pickup hotel ore 8:00',
@@ -600,11 +599,11 @@ if ($count > 0 && !$reset) {
 
       ['slug'=>'dolphin-house-cruise', 'type'=>'boat_excursion', 'name'=>'Crociera Dolphin House con pranzo a bordo',
        'description'=>"Crociera giornaliera al reef Dolphin House, dove un branco residente di delfini incontra spesso le barche. Snorkeling, sosta su isolotto sabbioso e pranzo gourmet a bordo.\n\nGiornata premium con barca limitata a 30 persone per garantire il massimo comfort.",
-       'cover_image'=>'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=1200&q=80',
+       'cover_image'=>'/assets/services/exc_dolphins.jpg',
        'gallery'=>json_encode([
-         'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=1200&q=80',
-         'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&q=80',
-         'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&q=80',
+         '/assets/services/exc_dolphins.jpg',
+         '/assets/services/exc_ras_mohammed.jpg',
+         '/assets/services/exc_white_island.jpg',
        ]),
        'price_per_person'=>75, 'duration_hours'=>9, 'group_size_min'=>2, 'group_size_max'=>30,
        'meeting_point'=>'Porto turistico Sharm El Sheikh · pickup hotel ore 7:30',
@@ -614,10 +613,11 @@ if ($count > 0 && !$reset) {
 
       ['slug'=>'private-yacht-half-day', 'type'=>'boat_excursion', 'name'=>'Yacht privato: mezza giornata su misura',
        'description'=>"La tua giornata, il tuo programma: yacht 12 metri privato per gruppo fino a 8 persone. Itinerario flessibile (Tiran, White Island, Ras Mohammed), aperitivo a bordo, snorkeling dove preferisci.\n\nTariffa per yacht intero, perfetto per famiglie e gruppi che cercano privacy.",
-       'cover_image'=>'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&q=80',
+       'cover_image'=>'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=1200&q=80',
        'gallery'=>json_encode([
-         'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&q=80',
-         'https://images.unsplash.com/photo-1559599189-fe84dea4eb79?w=1200&q=80',
+         'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=1200&q=80',
+         '/assets/services/exc_dolphins.jpg',
+         '/assets/services/exc_white_island.jpg',
        ]),
        'price_per_person'=>0, 'price_per_group'=>890, 'duration_hours'=>5, 'group_size_min'=>1, 'group_size_max'=>8,
        'meeting_point'=>'Marina privata · pickup hotel ore 9:00',
@@ -627,10 +627,11 @@ if ($count > 0 && !$reset) {
 
       ['slug'=>'white-island-snorkel', 'type'=>'boat_excursion', 'name'=>'White Island: l\'isola che scompare',
        'description'=>"Banco di sabbia bianca che emerge dal mare con la bassa marea: una delle esperienze più scenografiche di Sharm. Sosta alle barriere di Tiran per snorkeling spettacolare.\n\nPranzo a bordo, atmosfera caraibica nel cuore del Mar Rosso.",
-       'cover_image'=>'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&q=80',
+       'cover_image'=>'/assets/services/exc_white_island.jpg',
        'gallery'=>json_encode([
-         'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&q=80',
-         'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=1200&q=80',
+         '/assets/services/exc_white_island.jpg',
+         '/assets/services/exc_ras_mohammed.jpg',
+         '/assets/services/exc_dolphins.jpg',
        ]),
        'price_per_person'=>55, 'duration_hours'=>7, 'group_size_min'=>2, 'group_size_max'=>30,
        'meeting_point'=>'Porto turistico · pickup hotel ore 8:00',
@@ -641,9 +642,9 @@ if ($count > 0 && !$reset) {
       // ============ ESCURSIONI NEL DESERTO ============
       ['slug'=>'quad-bedouin-sunset', 'type'=>'desert_excursion', 'name'=>'Quad nel deserto al tramonto + cena beduina',
        'description'=>"L'esperienza più amata: quad nel deserto del Sinai al tramonto, sosta in un villaggio beduino autentico con cena tipica sotto le stelle, narghilè e musica dal vivo.\n\nPossibilità di guidare singolo o doppio, accompagnamento guida esperta.",
-       'cover_image'=>'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200&q=80',
+       'cover_image'=>'/assets/services/exc_quad.jpg',
        'gallery'=>json_encode([
-         'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200&q=80',
+         '/assets/services/exc_quad.jpg',
          'https://images.unsplash.com/photo-1571679654681-ba01b9e1e117?w=1200&q=80',
          'https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=1200&q=80',
        ]),
@@ -655,11 +656,11 @@ if ($count > 0 && !$reset) {
 
       ['slug'=>'beduino-cammelli-cena', 'type'=>'desert_excursion', 'name'=>'Beduini, cammelli e cena nel deserto',
        'description'=>"Esperienza tradizionale al 100%: passeggiata sul dorso del cammello al tramonto nel deserto del Sinai, cena tipica beduina sotto le stelle con musica dal vivo, danza del ventre e narghilè.\n\nIdeale per famiglie e chi cerca un'avventura tranquilla.",
-       'cover_image'=>'https://images.unsplash.com/photo-1571679654681-ba01b9e1e117?w=1200&q=80',
+       'cover_image'=>'https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=1200&q=80',
        'gallery'=>json_encode([
-         'https://images.unsplash.com/photo-1571679654681-ba01b9e1e117?w=1200&q=80',
          'https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=1200&q=80',
-         'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200&q=80',
+         'https://images.unsplash.com/photo-1571679654681-ba01b9e1e117?w=1200&q=80',
+         '/assets/services/exc_quad.jpg',
        ]),
        'price_per_person'=>30, 'duration_hours'=>5, 'group_size_min'=>1, 'group_size_max'=>30,
        'meeting_point'=>'Pickup hotel ore 16:00',
@@ -673,7 +674,8 @@ if ($count > 0 && !$reset) {
        'cover_image'=>'https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=1200&q=80',
        'gallery'=>json_encode([
          'https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=1200&q=80',
-         'https://images.unsplash.com/photo-1559599189-fe84dea4eb79?w=1200&q=80',
+         'https://images.unsplash.com/photo-1535905557558-afc4877a26fc?w=1200&q=80',
+         '/assets/services/exc_ras_mohammed.jpg',
        ]),
        'price_per_person'=>110, 'duration_hours'=>10, 'group_size_min'=>1, 'group_size_max'=>16,
        'meeting_point'=>'Porto turistico Sharm El Sheikh · partenza 5:30',
@@ -684,11 +686,11 @@ if ($count > 0 && !$reset) {
       // ============ TOUR CULTURALI ============
       ['slug'=>'cairo-pyramids-day-trip', 'type'=>'tour', 'name'=>'Il Cairo: piramidi, Sfinge e Museo Egizio in un giorno',
        'description'=>"Volo a/r in giornata al Cairo per vivere le 3 meraviglie egiziane in un solo viaggio: Piramidi di Giza, Sfinge, Museo Egizio, e tempo libero al mercato di Khan El Khalili.\n\nGuida italiana dedicata, voli, pranzo, ingressi e trasferimenti tutto incluso.",
-       'cover_image'=>'https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=1200&q=80',
+       'cover_image'=>'/assets/services/exc_pyramids.jpg',
        'gallery'=>json_encode([
+         '/assets/services/exc_pyramids.jpg',
          'https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=1200&q=80',
          'https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?w=1200&q=80',
-         'https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?w=1200&q=80',
        ]),
        'price_per_person'=>295, 'duration_hours'=>15, 'group_size_min'=>2, 'group_size_max'=>15,
        'meeting_point'=>'Aeroporto Sharm · pickup hotel ore 3:30',
@@ -698,11 +700,11 @@ if ($count > 0 && !$reset) {
 
       ['slug'=>'sinai-sunrise-monastery', 'type'=>'tour', 'name'=>'Monte Sinai all\'alba e Monastero di Santa Caterina',
        'description'=>"L'esperienza spirituale per eccellenza: salita notturna al Monte Sinai (2.285m) per assistere all'alba dalla cima dove Mosè ricevette le Tavole. Visita al Monastero di Santa Caterina, patrimonio UNESCO.\n\nPickup serale dall'hotel, rientro mattino successivo.",
-       'cover_image'=>'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80',
+       'cover_image'=>'/assets/services/exc_sinai.jpg',
        'gallery'=>json_encode([
+         '/assets/services/exc_sinai.jpg',
          'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80',
          'https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6?w=1200&q=80',
-         'https://images.unsplash.com/photo-1561489413-985b06da5bee?w=1200&q=80',
        ]),
        'price_per_person'=>85, 'duration_hours'=>18, 'group_size_min'=>2, 'group_size_max'=>20,
        'meeting_point'=>'Pickup hotel ore 22:00',
