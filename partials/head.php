@@ -138,6 +138,37 @@ try { if (localStorage.getItem('cv-theme') === 'dark') document.documentElement.
   .mask-fade-r { mask-image: linear-gradient(to right, black 70%, transparent); }
   .mask-fade-b { mask-image: linear-gradient(to bottom, black 70%, transparent); }
 }
+<style>
+@media all and (display-mode: standalone) {
+  #cv-pwa-splash {
+    position: fixed; inset: 0; z-index: 99999;
+    background: #1a0d05 url('/assets/sharm/splash_bg.jpg') center/cover no-repeat;
+    display: flex; align-items: center; justify-content: center;
+    animation: cvSplashOut 0.6s ease 1.4s forwards;
+  }
+  #cv-pwa-splash::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(240,78,0,.35) 0%, rgba(26,13,5,.55) 60%, rgba(0,0,0,.7) 100%);
+  }
+  #cv-pwa-splash > div {
+    position: relative; z-index: 1; text-align: center;
+    animation: cvSplashIn 0.7s cubic-bezier(.16,1,.3,1) both;
+  }
+  #cv-pwa-splash img { height: 144px; width: auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,.5)); }
+  #cv-pwa-splash .cv-tag {
+    color: rgba(255,255,255,.92); margin-top: 18px;
+    font-family: 'Fraunces', Georgia, serif; font-size: 18px; font-weight: 500;
+    letter-spacing: .02em; text-shadow: 0 2px 12px rgba(0,0,0,.6);
+  }
+  @keyframes cvSplashIn { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
+  @keyframes cvSplashOut { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+}
 </style>
 </head>
 <body class="min-h-screen">
+<div id="cv-pwa-splash" aria-hidden="true">
+  <div>
+    <img src="/assets/logo-512.png?v=2" alt="">
+    <div class="cv-tag">Sharm El Sheikh · Patrizia Mancini</div>
+  </div>
+</div>

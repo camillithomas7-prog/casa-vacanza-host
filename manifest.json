@@ -4,7 +4,7 @@
   "description": "Gestione appartamenti casa vacanza",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#1a0d05",
   "theme_color": "#f04e00",
   "icons": [
     { "src": "/assets/logo-mark.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
