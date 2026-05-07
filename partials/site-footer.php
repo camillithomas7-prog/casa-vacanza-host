@@ -58,7 +58,7 @@
     <div class="lg:col-span-3">
       <div class="text-xs font-semibold uppercase tracking-wider text-ink-500 dark:text-ink-400 mb-4"><?= e(t('foot.contact_us')) ?></div>
       <div class="flex items-center gap-2 text-sm text-ink-700 dark:text-ink-300"><i data-lucide="mail" class="size-[14px] text-brand-500"></i> <?= e(setting('contact_email', cfg('site.email'))) ?></div>
-      <div class="flex items-center gap-2 text-sm text-ink-700 dark:text-ink-300 mt-1.5"><i data-lucide="phone" class="size-[14px] text-brand-500"></i> <?= e(setting('contact_phone', cfg('site.phone'))) ?></div>
+      <div class="flex items-center gap-2 text-sm text-ink-700 dark:text-ink-300 mt-1.5"><i data-lucide="phone" class="size-[14px] text-brand-500"></i> <?= e(setting('contact_phone', cfg('site.phone') && !str_starts_with(cfg('site.phone'), '+39 000') ? cfg('site.phone') : '+39 371 352 4264')) ?></div>
       <div class="mt-4 p-3 rounded-xl bg-white dark:bg-ink-900 border border-ink-100 dark:border-ink-800/80">
         <div class="text-xs text-ink-500"><?= e(t('foot.response_in')) ?></div>
         <div class="font-semibold"><?= e(t('foot.response_time')) ?></div>

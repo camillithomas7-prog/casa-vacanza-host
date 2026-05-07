@@ -5,7 +5,7 @@ $title = t('nav.contact');
 require __DIR__ . '/partials/head.php';
 require __DIR__ . '/partials/site-header.php';
 $cEmail = setting('contact_email', cfg('site.email'));
-$cPhone = setting('contact_phone', cfg('site.phone'));
+$cPhone = setting('contact_phone', cfg('site.phone') && !str_starts_with(cfg('site.phone'), '+39 000') ? cfg('site.phone') : '+39 371 352 4264');
 ?>
 <section class="relative isolate -mt-[68px] pt-[68px] overflow-hidden">
   <div class="absolute inset-0 -z-10 gradient-mesh"></div>
