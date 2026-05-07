@@ -20,6 +20,10 @@ $totalReviews = (int)val('SELECT COUNT(*) FROM reviews WHERE approved = 1');
 $totalGuests = '5.000+';
 $topReviews = rows('SELECT r.*, a.name AS apartment_name, a.city AS apartment_city FROM reviews r JOIN apartments a ON r.apartment_id = a.id WHERE r.approved = 1 ORDER BY r.rating DESC, r.created_at DESC LIMIT 3');
 
+$cPhone = setting('contact_phone', cfg('site.phone'));
+$waNumber = preg_replace('/\D/', '', $cPhone ?: '');
+$waLink = $waNumber ? 'https://wa.me/' . $waNumber . '?text=' . rawurlencode('Ciao Patrizia, vorrei informazioni sui vostri appartamenti a Sharm El Sheikh.') : '/contatti.php';
+
 $rentalTypes = "'" . implode("','", SERVICE_GROUPS['rental']) . "'";
 $expTypes = "'" . implode("','", SERVICE_GROUPS['experience']) . "'";
 $rentals = rows("SELECT * FROM services WHERE active = 1 AND type IN ($rentalTypes) ORDER BY position ASC LIMIT 6");
@@ -448,7 +452,7 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
       </div>
 
       <div class="flex flex-wrap gap-3 mt-8">
-        <a href="/contatti.php<?= $_lp ?>" class="btn-primary"><i data-lucide="message-circle" class="size-[16px]"></i> Scrivimi su WhatsApp</a>
+        <a href="<?= e($waLink) ?>" target="_blank" rel="noopener" class="btn-primary"><i data-lucide="message-circle" class="size-[16px]"></i> Scrivimi su WhatsApp</a>
         <a href="/appartamenti.php<?= $_lp ?>" class="btn-outline"><i data-lucide="building-2" class="size-[16px]"></i> Vedi gli appartamenti</a>
       </div>
 
