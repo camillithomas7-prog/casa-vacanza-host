@@ -23,7 +23,7 @@ require __DIR__ . '/partials/head.php';
 require __DIR__ . '/partials/site-header.php';
 ?>
 <!-- HERO -->
-<section class="relative -mt-[68px] pt-[68px] overflow-hidden">
+<section class="relative isolate -mt-[68px] pt-[68px] overflow-hidden">
   <div class="absolute inset-0 -z-10 gradient-mesh"></div>
   <div class="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-transparent to-white dark:to-ink-950"></div>
   <div class="container-wide pt-12 md:pt-20 pb-12 md:pb-20 grid lg:grid-cols-12 gap-10 items-center">
@@ -76,8 +76,8 @@ require __DIR__ . '/partials/site-header.php';
           <img src="<?= e($heroImgs[2]) ?>" class="h-full w-full object-cover">
         </div>
       <?php endif; ?>
-      <div class="absolute -top-8 -left-4 h-32 w-32 rounded-full bg-brand-200/50 blur-2xl -z-10"></div>
-      <div class="absolute -bottom-8 -right-4 h-40 w-40 rounded-full bg-sea-200/50 blur-2xl -z-10"></div>
+      <div class="absolute -top-8 -left-4 h-32 w-32 rounded-full bg-brand-200/50 blur-2xl -z-10 pointer-events-none"></div>
+      <div class="absolute -bottom-8 -right-4 h-40 w-40 rounded-full bg-sea-200/50 blur-2xl -z-10 pointer-events-none"></div>
     </div>
   </div>
 
@@ -259,15 +259,17 @@ require __DIR__ . '/partials/site-header.php';
 
 <!-- CTA FINALE -->
 <section class="container-wide py-16">
-  <div class="card-elev relative overflow-hidden p-10 md:p-16 text-center">
-    <div class="absolute inset-0 -z-10 bg-gradient-to-br from-brand-500 via-brand-600 to-brand-700"></div>
-    <div class="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-white/10 blur-3xl"></div>
-    <div class="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-white/10 blur-3xl"></div>
-    <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight text-white text-balance">Pronti a partire?</h2>
-    <p class="text-white/80 mt-3 max-w-xl mx-auto text-pretty">Trova la casa giusta in pochi click. Conferma immediata, prezzi senza sorprese.</p>
-    <div class="flex flex-wrap gap-3 justify-center mt-7">
-      <a href="/appartamenti.php" class="btn h-12 px-7 bg-white text-brand-700 hover:bg-ink-50 text-base font-semibold">Esplora ora <i data-lucide="arrow-right" class="size-[16px]"></i></a>
-      <a href="/contatti.php" class="btn h-12 px-7 bg-white/10 text-white border border-white/20 hover:bg-white/15 text-base">Contattaci</a>
+  <div class="relative isolate overflow-hidden p-10 md:p-16 text-center rounded-3xl shadow-pop bg-gradient-to-br from-brand-500 via-brand-600 to-brand-700">
+    <div class="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-white/15 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-white/15 blur-3xl pointer-events-none"></div>
+    <div class="absolute inset-0 opacity-[0.05] pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 24px 24px;"></div>
+    <div class="relative">
+      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight text-white text-balance">Pronti a partire?</h2>
+      <p class="text-white/85 mt-3 max-w-xl mx-auto text-pretty">Trova la casa giusta in pochi click. Conferma immediata, prezzi senza sorprese.</p>
+      <div class="flex flex-wrap gap-3 justify-center mt-7">
+        <a href="/appartamenti.php" class="btn h-12 px-7 bg-white text-brand-700 hover:bg-ink-50 text-base font-semibold shadow-lg">Esplora ora <i data-lucide="arrow-right" class="size-[16px]"></i></a>
+        <a href="/contatti.php" class="btn h-12 px-7 bg-white/10 text-white border border-white/30 hover:bg-white/20 backdrop-blur text-base">Contattaci</a>
+      </div>
     </div>
   </div>
 </section>

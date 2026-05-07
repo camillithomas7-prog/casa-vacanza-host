@@ -20,11 +20,10 @@ require __DIR__ . '/../partials/head.php';
 ?>
 <div class="min-h-screen grid lg:grid-cols-2">
   <!-- LATO BRAND -->
-  <div class="hidden lg:flex flex-col justify-between p-12 relative overflow-hidden text-white bg-ink-950">
-    <div class="absolute inset-0 -z-10 bg-gradient-to-br from-brand-700 via-brand-600 to-ink-950"></div>
-    <div class="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-brand-400/30 blur-3xl animate-glow-pulse"></div>
-    <div class="absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-full bg-sea-400/20 blur-3xl animate-glow-pulse" style="animation-delay:-1.5s"></div>
-    <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 24px 24px;"></div>
+  <div class="hidden lg:flex flex-col justify-between p-12 relative isolate overflow-hidden text-white bg-gradient-to-br from-brand-700 via-brand-600 to-ink-950">
+    <div class="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-brand-400/30 blur-3xl animate-glow-pulse pointer-events-none"></div>
+    <div class="absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-full bg-sea-400/20 blur-3xl animate-glow-pulse pointer-events-none" style="animation-delay:-1.5s"></div>
+    <div class="absolute inset-0 opacity-[0.05] pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 24px 24px;"></div>
 
     <div class="relative flex items-center gap-2.5">
       <span class="h-10 w-10 rounded-2xl bg-white text-brand-600 flex items-center justify-center shadow-pop"><i data-lucide="home" class="size-[18px]"></i></span>

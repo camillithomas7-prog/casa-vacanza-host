@@ -5,7 +5,7 @@ $title = 'Contatti';
 require __DIR__ . '/partials/head.php';
 require __DIR__ . '/partials/site-header.php';
 ?>
-<section class="relative -mt-[68px] pt-[68px]">
+<section class="relative isolate -mt-[68px] pt-[68px] overflow-hidden">
   <div class="absolute inset-0 -z-10 gradient-mesh"></div>
   <div class="absolute inset-0 -z-10 bg-gradient-to-b from-transparent to-white dark:to-ink-950"></div>
   <div class="container-narrow pt-16 md:pt-20 pb-10">
