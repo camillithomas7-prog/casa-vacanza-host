@@ -362,6 +362,100 @@ $TRANSLATIONS = [
     'de' => 'Finde dein Zuhause in wenigen Klicks. Sofortige Bestätigung, keine versteckten Kosten.',
 ],
 
+// ========== ABOUT PATRIZIA ==========
+'home.about.badge' => [
+    'it' => 'La fondatrice', 'en' => 'The founder', 'ru' => 'Основательница', 'es' => 'La fundadora', 'de' => 'Die Gründerin',
+],
+'home.about.available' => [
+    'it' => 'Disponibile su WhatsApp',
+    'en' => 'Available on WhatsApp',
+    'ru' => 'Доступна в WhatsApp',
+    'es' => 'Disponible en WhatsApp',
+    'de' => 'Verfügbar auf WhatsApp',
+],
+'home.about.title_pre' => [
+    'it' => '', 'en' => '', 'ru' => '', 'es' => '', 'de' => '',
+],
+'home.about.title_post' => [
+    'it' => ', il vostro riferimento a Sharm.',
+    'en' => ', your trusted contact in Sharm.',
+    'ru' => ' — ваш надежный контакт в Шарм-эш-Шейхе.',
+    'es' => ', vuestra referencia en Sharm.',
+    'de' => ', Ihre Ansprechpartnerin in Sharm.',
+],
+'home.about.p1' => [
+    'it' => 'Mi occupo <b>personalmente</b> di ogni ospite, dal primo messaggio fino al rientro a casa. Gli appartamenti che vedete sul sito li ho <b>selezionati uno per uno</b>, in zone che conosco a fondo: posizione, qualità, sicurezza e rapporto qualità-prezzo sono verificati di persona, non delegati a una piattaforma.',
+    'en' => 'I take care of every guest <b>personally</b>, from the first message until you return home. Each apartment on this website has been <b>hand-picked</b>, in areas I know inside out: location, quality, safety and value for money are verified in person, never delegated to a platform.',
+    'ru' => 'Я <b>лично</b> сопровождаю каждого гостя — от первого сообщения до возвращения домой. Все апартаменты на сайте я <b>отобрала по одному</b>, в районах, которые знаю досконально: расположение, качество, безопасность и соотношение цены и качества проверены лично, а не доверены платформе.',
+    'es' => 'Me ocupo <b>personalmente</b> de cada huésped, desde el primer mensaje hasta el regreso a casa. Los apartamentos que ven en el sitio los he <b>seleccionado uno a uno</b>, en zonas que conozco a fondo: ubicación, calidad, seguridad y relación calidad-precio se verifican en persona, no se delegan a una plataforma.',
+    'de' => 'Ich kümmere mich <b>persönlich</b> um jeden Gast — von der ersten Nachricht bis zur Heimreise. Die Apartments auf dieser Seite habe ich <b>einzeln ausgewählt</b>, in Vierteln, die ich genau kenne: Lage, Qualität, Sicherheit und Preis-Leistung prüfe ich selbst, nicht über eine Plattform.',
+],
+'home.about.p2' => [
+    'it' => 'Vi seguo con <b>assistenza in italiano sempre disponibile</b>, anche fuori orario: per un dubbio sul check-in, un transfer da organizzare, un\'escursione da prenotare o semplicemente il consiglio giusto su dove mangiare bene. Trovate una <b>professionista presente, discreta e rapida</b>, non un call center.',
+    'en' => 'I support you with <b>round-the-clock assistance in Italian and English</b>, even after hours: a check-in question, a transfer to arrange, a tour to book, or simply the right tip on where to dine well. You\'ll find a <b>discreet, responsive professional</b>, not a call center.',
+    'ru' => 'Я всегда на связи — поддержка в любое время дня и ночи: вопрос по заселению, организация трансфера, бронирование экскурсии или просто совет, где вкусно поужинать. Со мной вы получаете <b>деликатного и быстрого специалиста</b>, а не колл-центр.',
+    'es' => 'Os acompaño con <b>asistencia siempre disponible</b>, incluso fuera de horario: una duda del check-in, un transfer que organizar, una excursión que reservar o simplemente el consejo justo sobre dónde cenar bien. Encontrarán una <b>profesional presente, discreta y rápida</b>, no un call center.',
+    'de' => 'Ich begleite Sie mit <b>jederzeit erreichbarer Betreuung</b>, auch außerhalb der Geschäftszeiten: bei Fragen zum Check-in, einem Transfer, einer Tour oder einem einfachen Tipp, wo man gut essen kann. Sie finden eine <b>diskrete, schnelle Ansprechpartnerin</b> — kein Callcenter.',
+],
+'home.about.feature1.t' => [
+    'it' => 'Selezione personale', 'en' => 'Personal selection', 'ru' => 'Личный отбор', 'es' => 'Selección personal', 'de' => 'Persönliche Auswahl',
+],
+'home.about.feature1.d' => [
+    'it' => 'ogni appartamento verificato',
+    'en' => 'every apartment vetted',
+    'ru' => 'каждые апартаменты проверены',
+    'es' => 'cada apartamento verificado',
+    'de' => 'jedes Apartment geprüft',
+],
+'home.about.feature2.t' => [
+    'it' => 'Assistenza H24', 'en' => '24/7 support', 'ru' => 'Поддержка 24/7', 'es' => 'Asistencia 24/7', 'de' => '24/7-Betreuung',
+],
+'home.about.feature2.d' => [
+    'it' => 'in italiano, anche di notte',
+    'en' => 'in Italian and English, day or night',
+    'ru' => 'днем и ночью',
+    'es' => 'también de noche',
+    'de' => 'auch nachts',
+],
+'home.about.feature3.t' => [
+    'it' => 'Conoscenza locale', 'en' => 'Local know-how', 'ru' => 'Знание места', 'es' => 'Conocimiento local', 'de' => 'Ortskenntnis',
+],
+'home.about.feature3.d' => [
+    'it' => 'consigli su misura',
+    'en' => 'tailored advice',
+    'ru' => 'персональные советы',
+    'es' => 'consejos a medida',
+    'de' => 'maßgeschneiderter Rat',
+],
+'home.about.cta_wa' => [
+    'it' => 'Scrivimi su WhatsApp',
+    'en' => 'Message me on WhatsApp',
+    'ru' => 'Написать в WhatsApp',
+    'es' => 'Escríbeme por WhatsApp',
+    'de' => 'Schreib mir auf WhatsApp',
+],
+'home.about.cta_apt' => [
+    'it' => 'Vedi gli appartamenti',
+    'en' => 'Browse apartments',
+    'ru' => 'Смотреть апартаменты',
+    'es' => 'Ver los apartamentos',
+    'de' => 'Apartments ansehen',
+],
+'home.about.quote' => [
+    'it' => '«Il mio obiettivo è semplice: che ogni ospite torni a casa serenamente, con la sensazione di essere stato seguito da una persona di fiducia.»',
+    'en' => '"My goal is simple: every guest returns home relaxed, feeling they were looked after by a trusted person."',
+    'ru' => '«Моя цель проста: чтобы каждый гость вернулся домой со спокойной душой, чувствуя, что о нем заботился человек, которому можно доверять.»',
+    'es' => '«Mi objetivo es simple: que cada huésped vuelva a casa tranquilo, con la sensación de haber sido atendido por una persona de confianza.»',
+    'de' => '„Mein Ziel ist einfach: Jeder Gast kehrt entspannt nach Hause zurück, mit dem Gefühl, von einer vertrauenswürdigen Person betreut worden zu sein."',
+],
+'home.about.wa_message' => [
+    'it' => 'Ciao Patrizia, vorrei informazioni sui vostri appartamenti a Sharm El Sheikh.',
+    'en' => 'Hi Patrizia, I would like information about your apartments in Sharm El Sheikh.',
+    'ru' => 'Здравствуйте, Патриция! Хотела бы получить информацию о ваших апартаментах в Шарм-эш-Шейхе.',
+    'es' => 'Hola Patrizia, me gustaría información sobre vuestros apartamentos en Sharm El Sheikh.',
+    'de' => 'Hallo Patrizia, ich hätte gern Informationen zu Ihren Apartments in Sharm El Sheikh.',
+],
+
 // ========== APARTMENTS LIST ==========
 'apt_list.badge' => [
     'it' => 'La collezione', 'en' => 'The collection', 'ru' => 'Коллекция', 'es' => 'La colección', 'de' => 'Die Auswahl',

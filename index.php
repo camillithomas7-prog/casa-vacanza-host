@@ -22,7 +22,7 @@ $topReviews = rows('SELECT r.*, a.name AS apartment_name, a.city AS apartment_ci
 
 $cPhone = setting('contact_phone', cfg('site.phone'));
 $waNumber = preg_replace('/\D/', '', $cPhone ?: '');
-$waLink = $waNumber ? 'https://wa.me/' . $waNumber . '?text=' . rawurlencode('Ciao Patrizia, vorrei informazioni sui vostri appartamenti a Sharm El Sheikh.') : '/contatti.php';
+$waLink = $waNumber ? 'https://wa.me/' . $waNumber . '?text=' . rawurlencode(t('home.about.wa_message')) : '/contatti.php';
 
 $rentalTypes = "'" . implode("','", SERVICE_GROUPS['rental']) . "'";
 $expTypes = "'" . implode("','", SERVICE_GROUPS['experience']) . "'";
@@ -421,53 +421,43 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
            class="relative w-full h-auto rounded-3xl shadow-pop object-cover">
       <div class="absolute bottom-5 left-5 bg-white/95 dark:bg-ink-900/95 backdrop-blur-sm rounded-2xl px-4 py-2.5 shadow-card flex items-center gap-2.5">
         <span class="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="text-sm font-medium">Disponibile su WhatsApp</span>
+        <span class="text-sm font-medium"><?= e(t('home.about.available')) ?></span>
       </div>
     </div>
 
     <div>
-      <div class="badge-brand mb-4"><i data-lucide="user-round" class="size-[14px]"></i> La fondatrice</div>
+      <div class="badge-brand mb-4"><i data-lucide="user-round" class="size-[14px]"></i> <?= e(t('home.about.badge')) ?></div>
       <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight text-balance">
-        <span class="text-gradient-brand">Patrizia Mancini</span>, il vostro riferimento a Sharm.
+        <span class="text-gradient-brand">Patrizia Mancini</span><?= e(t('home.about.title_post')) ?>
       </h2>
 
       <div class="mt-6 space-y-4 text-ink-700 dark:text-ink-300 text-[17px] leading-relaxed text-pretty">
-        <p>
-          Mi occupo <b>personalmente</b> di ogni ospite, dal primo messaggio fino al rientro a casa.
-          Gli appartamenti che vedete sul sito li ho <b>selezionati uno per uno</b>, in zone che conosco
-          a fondo: posizione, qualità, sicurezza e rapporto qualità-prezzo sono verificati di persona,
-          non delegati a una piattaforma.
-        </p>
-        <p>
-          Vi seguo con <b>assistenza in italiano sempre disponibile</b>, anche fuori orario: per un
-          dubbio sul check-in, un transfer da organizzare, un'escursione da prenotare o semplicemente
-          il consiglio giusto su dove mangiare bene. Trovate una <b>professionista presente, discreta
-          e rapida</b>, non un call center.
-        </p>
+        <p><?= t('home.about.p1') ?></p>
+        <p><?= t('home.about.p2') ?></p>
       </div>
 
       <div class="grid grid-cols-3 gap-4 mt-8">
         <div>
-          <div class="flex items-center gap-2"><i data-lucide="check-circle-2" class="size-[20px] text-brand-600"></i><div class="font-display text-base sm:text-lg font-bold">Selezione personale</div></div>
-          <div class="text-xs text-ink-500 mt-1">ogni appartamento verificato</div>
+          <div class="flex items-center gap-2"><i data-lucide="check-circle-2" class="size-[20px] text-brand-600 shrink-0"></i><div class="font-display text-base sm:text-lg font-bold"><?= e(t('home.about.feature1.t')) ?></div></div>
+          <div class="text-xs text-ink-500 mt-1"><?= e(t('home.about.feature1.d')) ?></div>
         </div>
         <div>
-          <div class="flex items-center gap-2"><i data-lucide="message-circle" class="size-[20px] text-brand-600"></i><div class="font-display text-base sm:text-lg font-bold">Assistenza H24</div></div>
-          <div class="text-xs text-ink-500 mt-1">in italiano, anche di notte</div>
+          <div class="flex items-center gap-2"><i data-lucide="message-circle" class="size-[20px] text-brand-600 shrink-0"></i><div class="font-display text-base sm:text-lg font-bold"><?= e(t('home.about.feature2.t')) ?></div></div>
+          <div class="text-xs text-ink-500 mt-1"><?= e(t('home.about.feature2.d')) ?></div>
         </div>
         <div>
-          <div class="flex items-center gap-2"><i data-lucide="map-pin" class="size-[20px] text-brand-600"></i><div class="font-display text-base sm:text-lg font-bold">Conoscenza locale</div></div>
-          <div class="text-xs text-ink-500 mt-1">consigli su misura</div>
+          <div class="flex items-center gap-2"><i data-lucide="map-pin" class="size-[20px] text-brand-600 shrink-0"></i><div class="font-display text-base sm:text-lg font-bold"><?= e(t('home.about.feature3.t')) ?></div></div>
+          <div class="text-xs text-ink-500 mt-1"><?= e(t('home.about.feature3.d')) ?></div>
         </div>
       </div>
 
       <div class="flex flex-wrap gap-3 mt-8">
-        <a href="<?= e($waLink) ?>" target="_blank" rel="noopener" class="btn-primary"><i data-lucide="message-circle" class="size-[16px]"></i> Scrivimi su WhatsApp</a>
-        <a href="/appartamenti.php<?= $_lp ?>" class="btn-outline"><i data-lucide="building-2" class="size-[16px]"></i> Vedi gli appartamenti</a>
+        <a href="<?= e($waLink) ?>" target="_blank" rel="noopener" class="btn-primary"><i data-lucide="message-circle" class="size-[16px]"></i> <?= e(t('home.about.cta_wa')) ?></a>
+        <a href="/appartamenti.php<?= $_lp ?>" class="btn-outline"><i data-lucide="building-2" class="size-[16px]"></i> <?= e(t('home.about.cta_apt')) ?></a>
       </div>
 
       <blockquote class="mt-8 pl-5 border-l-2 border-brand-500 italic text-ink-600 dark:text-ink-400 text-pretty">
-        «Il mio obiettivo è semplice: che ogni ospite torni a casa serenamente, con la sensazione di essere stato seguito da una persona di fiducia.»
+        <?= e(t('home.about.quote')) ?>
       </blockquote>
     </div>
   </div>
