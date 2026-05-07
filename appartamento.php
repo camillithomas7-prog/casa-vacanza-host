@@ -106,8 +106,9 @@ require __DIR__ . '/partials/site-header.php';
         </div>
       <?php endif; ?>
 
-      <div>
-        <h2 class="font-serif text-3xl font-semibold tracking-tight mb-5">Disponibilità</h2>
+      <div id="calendar" class="scroll-mt-24">
+        <h2 class="font-serif text-3xl font-semibold tracking-tight mb-2">Disponibilità</h2>
+        <p class="text-ink-500 mb-5">Tocca le date verdi per selezionare check-in e check-out.</p>
         <div class="card p-6">
           <?php require __DIR__ . '/partials/calendar-public.php'; ?>
         </div>
@@ -153,7 +154,7 @@ require __DIR__ . '/partials/site-header.php';
     </div>
 
     <!-- BOOKING CARD -->
-    <aside class="lg:sticky lg:top-24 self-start" x-data="bookingForm()">
+    <aside id="booking-form" class="lg:sticky lg:top-24 self-start scroll-mt-24" x-data="bookingForm()" x-init="init()">
       <div class="card-elev p-6 shadow-card">
         <div class="flex items-baseline justify-between gap-2 mb-1">
           <div>
@@ -241,14 +242,33 @@ require __DIR__ . '/partials/site-header.php';
 <script>
 function bookingForm() {
   return {
+    aptId: <?= json_encode($a['id']) ?>,
     from: '', to: '', guests: 2, coupon: '', name: '', email: '', phone: '',
     q: null, busy: false, done: null, err: '',
     fmt(n) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(n || 0); },
+    init() {
+      try {
+        const saved = JSON.parse(sessionStorage.getItem('cv_book_' + this.aptId) || '{}');
+        if (saved.from) this.from = saved.from;
+        if (saved.to) this.to = saved.to;
+      } catch (e) {}
+      if (this.from && this.to) this.quote();
+      this.$watch('from', () => this.persist());
+      this.$watch('to', () => this.persist());
+      window.addEventListener('cv-cal-pick', (e) => {
+        this.from = e.detail.from || '';
+        this.to = e.detail.to || '';
+        if (this.from && this.to) this.quote(); else this.q = null;
+      });
+    },
+    persist() {
+      try { sessionStorage.setItem('cv_book_' + this.aptId, JSON.stringify({ from: this.from, to: this.to })); } catch (e) {}
+    },
     async quote() {
       if (!this.from || !this.to) return;
       try {
         const r = await fetch('/api/quote.php', { method: 'POST', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ apartment_id: <?= json_encode($a['id']) ?>, from: this.from, to: this.to, guests: this.guests, coupon: this.coupon }) });
+          body: JSON.stringify({ apartment_id: this.aptId, from: this.from, to: this.to, guests: this.guests, coupon: this.coupon }) });
         this.q = await r.json();
       } catch (e) {}
     },
@@ -256,10 +276,11 @@ function bookingForm() {
       this.busy = true; this.err = '';
       try {
         const r = await fetch('/api/booking.php', { method: 'POST', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ apartment_id: <?= json_encode($a['id']) ?>, from: this.from, to: this.to, guests: this.guests, coupon: this.coupon, name: this.name, email: this.email, phone: this.phone }) });
+          body: JSON.stringify({ apartment_id: this.aptId, from: this.from, to: this.to, guests: this.guests, coupon: this.coupon, name: this.name, email: this.email, phone: this.phone }) });
         const d = await r.json();
         if (!r.ok) throw new Error(d.error || 'Errore');
         this.done = d.code;
+        try { sessionStorage.removeItem('cv_book_' + this.aptId); } catch (e) {}
       } catch (e) { this.err = e.message; } finally { this.busy = false; }
     }
   };
