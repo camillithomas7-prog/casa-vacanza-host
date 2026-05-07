@@ -10,6 +10,8 @@ if (!tableExists('apartments')) {
     exit;
 }
 
+require_once __DIR__ . '/lib/services.php';
+
 $apartments = rows('SELECT a.* FROM apartments a WHERE a.active = 1 ORDER BY a.created_at DESC LIMIT 6');
 $cities = array_filter(array_unique(array_column($apartments, 'city')));
 $totalApartments = (int)val('SELECT COUNT(*) FROM apartments WHERE active = 1');
@@ -17,6 +19,12 @@ $avgRating = (float)val('SELECT AVG(rating) FROM reviews WHERE approved = 1');
 $totalReviews = (int)val('SELECT COUNT(*) FROM reviews WHERE approved = 1');
 $totalGuests = (int)val('SELECT COUNT(*) FROM bookings WHERE status IN ("completed","checked_in")');
 $topReviews = rows('SELECT r.*, a.name AS apartment_name, a.city AS apartment_city FROM reviews r JOIN apartments a ON r.apartment_id = a.id WHERE r.approved = 1 ORDER BY r.rating DESC, r.created_at DESC LIMIT 3');
+
+$rentalTypes = "'" . implode("','", SERVICE_GROUPS['rental']) . "'";
+$expTypes = "'" . implode("','", SERVICE_GROUPS['experience']) . "'";
+$rentals = rows("SELECT * FROM services WHERE active = 1 AND type IN ($rentalTypes) ORDER BY position ASC LIMIT 6");
+$experiences = rows("SELECT * FROM services WHERE active = 1 AND type IN ($expTypes) ORDER BY position ASC LIMIT 6");
+$transfers = rows("SELECT * FROM services WHERE active = 1 AND type = 'transfer' ORDER BY position ASC LIMIT 4");
 
 $title = 'Casa Vacanza · Affitti brevi premium';
 require __DIR__ . '/partials/head.php';
@@ -185,32 +193,137 @@ require __DIR__ . '/partials/site-header.php';
   </div>
 </section>
 
-<!-- ALTRI SERVIZI -->
-<section class="container-wide py-16">
-  <div class="text-center max-w-2xl mx-auto mb-10">
-    <div class="badge-brand mb-3">Tutto in un posto</div>
-    <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Vacanza completa, zero pensieri.</h2>
-    <p class="text-ink-500 mt-3 text-pretty">Oltre all'appartamento ti organizziamo transfer, noleggi e le migliori escursioni di Sharm.</p>
-  </div>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+<!-- BANNER SERVIZI EXTRA -->
+<section class="container-wide py-12">
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <?php foreach ([
-      ['plane-takeoff', 'Transfer aeroporto', 'Auto privata o minibus dall\'aeroporto a qualsiasi villaggio.', '/transfer.php', 'Da €25'],
-      ['key-round', 'Noleggi auto & scooter', 'Auto, scooter, golf cart e monopattini. Tariffe giornaliere e mensili.', '/noleggi.php', 'Da €15/giorno'],
-      ['compass', 'Escursioni guidate', 'Ras Mohammed, deserto, beduini, Cairo. Con guida italiana.', '/escursioni.php', 'Da €30/persona'],
-      ['waves', 'Diving & snorkeling', 'Reef incredibili, Thistlegorm, Tiran. Centri diving certificati.', '/escursioni.php?cat=diving', 'Da €110'],
+      ['key-round', 'Noleggi', 'Auto, scooter, golf cart, monopattini', '/noleggi.php', 'Da €15/g'],
+      ['compass', 'Escursioni', 'Ras Mohammed, deserto, Cairo, Sinai', '/escursioni.php', 'Da €30/p'],
+      ['plane-takeoff', 'Transfer aeroporto', 'Auto e minibus da/per SSH', '/transfer.php', 'Da €25'],
+      ['waves', 'Diving & snorkeling', 'Reef e relitti del Mar Rosso', '/escursioni.php?cat=diving', 'Da €45/p'],
     ] as $i => $s): ?>
-      <a href="<?= e($s[3]) ?>" class="card p-6 card-hover group animate-slide-up" style="animation-delay:<?= $i * 60 ?>ms">
-        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center shadow-[0_8px_18px_-6px_rgba(240,78,0,.5)] mb-4"><i data-lucide="<?= $s[0] ?>" class="size-[20px]"></i></div>
-        <div class="font-display font-bold text-lg"><?= e($s[1]) ?></div>
-        <p class="text-ink-500 mt-1.5 text-sm text-pretty"><?= e($s[2]) ?></p>
-        <div class="flex items-center justify-between mt-4 pt-4 border-t border-ink-100 dark:border-ink-800/80">
-          <span class="text-sm font-semibold text-brand-600"><?= e($s[4]) ?></span>
-          <i data-lucide="arrow-right" class="size-[16px] text-ink-400 group-hover:text-brand-600 group-hover:translate-x-1 transition-all"></i>
+      <a href="<?= e($s[3]) ?>" class="card p-5 card-hover group animate-slide-up" style="animation-delay:<?= $i * 50 ?>ms">
+        <div class="h-11 w-11 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center shadow-[0_6px_16px_-6px_rgba(240,78,0,.5)] mb-3"><i data-lucide="<?= $s[0] ?>" class="size-[18px]"></i></div>
+        <div class="font-display font-bold"><?= e($s[1]) ?></div>
+        <p class="text-ink-500 mt-1 text-xs"><?= e($s[2]) ?></p>
+        <div class="flex items-center justify-between mt-3 pt-3 border-t border-ink-100 dark:border-ink-800/80">
+          <span class="text-xs font-semibold text-brand-600"><?= e($s[4]) ?></span>
+          <i data-lucide="arrow-right" class="size-[14px] text-ink-400 group-hover:text-brand-600 group-hover:translate-x-1 transition-all"></i>
         </div>
       </a>
     <?php endforeach; ?>
   </div>
 </section>
+
+<!-- NOLEGGI -->
+<?php if ($rentals): ?>
+<section class="container-wide py-16">
+  <div class="flex items-end justify-between mb-8 flex-wrap gap-3">
+    <div>
+      <div class="badge-brand mb-2"><i data-lucide="key-round" class="size-[12px]"></i> Noleggi</div>
+      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Muoviti come vuoi.</h2>
+      <p class="text-ink-500 mt-2">Auto, golf cart, scooter e monopattini elettrici.</p>
+    </div>
+    <a href="/noleggi.php" class="btn-outline hidden sm:inline-flex">Tutti i noleggi <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+  </div>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <?php foreach ($rentals as $i => $s): ?>
+      <a href="/noleggio.php?slug=<?= e($s['slug']) ?>" class="group block animate-slide-up" style="animation-delay:<?= $i * 50 ?>ms">
+        <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-ink-100 dark:bg-ink-900 relative shadow-card">
+          <?php if ($s['cover_image']): ?><img src="<?= e($s['cover_image']) ?>" alt="<?= e($s['name']) ?>" class="h-full w-full object-cover group-hover:scale-105 transition duration-700 ease-out-expo"><?php endif; ?>
+          <div class="absolute top-3 left-3 badge bg-white/95 text-ink-900 backdrop-blur"><i data-lucide="<?= e(serviceTypeIcon($s['type'])) ?>" class="size-[12px]"></i> <?= e(serviceTypeShort($s['type'])) ?></div>
+          <?php if ($s['resort_name']): ?><div class="absolute top-3 right-3 badge bg-brand-500 text-white">presso resort</div><?php endif; ?>
+        </div>
+        <div class="mt-4 flex items-center justify-between gap-2">
+          <div class="min-w-0">
+            <div class="font-display font-bold text-lg truncate"><?= e($s['name']) ?></div>
+            <?php if ($s['resort_name']): ?><div class="text-xs text-ink-500 mt-0.5 flex items-center gap-1 truncate"><i data-lucide="map-pin" class="size-[12px]"></i> <?= e($s['resort_name']) ?></div><?php endif; ?>
+          </div>
+          <div class="text-right shrink-0">
+            <span class="font-display font-bold text-lg tabular-nums"><?= fmtMoney((float)$s['daily_price']) ?></span>
+            <div class="text-xs text-ink-500">/giorno</div>
+          </div>
+        </div>
+      </a>
+    <?php endforeach; ?>
+  </div>
+  <div class="mt-8 sm:hidden text-center">
+    <a href="/noleggi.php" class="btn-outline inline-flex">Tutti i noleggi <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+  </div>
+</section>
+<?php endif; ?>
+
+<!-- ESCURSIONI -->
+<?php if ($experiences): ?>
+<section class="container-wide py-16">
+  <div class="flex items-end justify-between mb-8 flex-wrap gap-3">
+    <div>
+      <div class="badge-brand mb-2"><i data-lucide="compass" class="size-[12px]"></i> Escursioni</div>
+      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Vivi Sharm.</h2>
+      <p class="text-ink-500 mt-2">Snorkeling, deserto, diving, tour culturali — con guida italiana.</p>
+    </div>
+    <a href="/escursioni.php" class="btn-outline hidden sm:inline-flex">Tutte le escursioni <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+  </div>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <?php foreach ($experiences as $i => $s): ?>
+      <a href="/escursione.php?slug=<?= e($s['slug']) ?>" class="group block animate-slide-up" style="animation-delay:<?= $i * 50 ?>ms">
+        <div class="aspect-[4/5] rounded-2xl overflow-hidden bg-ink-100 dark:bg-ink-900 relative shadow-card">
+          <?php if ($s['cover_image']): ?><img src="<?= e($s['cover_image']) ?>" alt="<?= e($s['name']) ?>" class="h-full w-full object-cover group-hover:scale-105 transition duration-700 ease-out-expo"><?php endif; ?>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/0 to-black/15"></div>
+          <div class="absolute top-3 left-3 badge bg-white/95 text-ink-900 backdrop-blur"><i data-lucide="<?= e(serviceTypeIcon($s['type'])) ?>" class="size-[12px]"></i> <?= e(serviceTypeShort($s['type'])) ?></div>
+          <?php if ($s['duration_hours']): ?><div class="absolute top-3 right-3 badge bg-white/95 text-ink-900 backdrop-blur"><i data-lucide="clock" class="size-[12px]"></i> <?= rtrim(rtrim(number_format((float)$s['duration_hours'], 1), '0'), '.') ?> h</div><?php endif; ?>
+          <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
+            <div class="font-display font-bold text-xl line-clamp-2"><?= e($s['name']) ?></div>
+            <div class="flex items-baseline gap-1 mt-1">
+              <span class="text-xs text-white/80">da</span>
+              <span class="font-display font-bold text-xl tabular-nums"><?= fmtMoney((float)$s['price_per_person']) ?></span>
+              <span class="text-xs text-white/80">/persona</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    <?php endforeach; ?>
+  </div>
+  <div class="mt-8 sm:hidden text-center">
+    <a href="/escursioni.php" class="btn-outline inline-flex">Tutte le escursioni <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+  </div>
+</section>
+<?php endif; ?>
+
+<!-- TRANSFER -->
+<?php if ($transfers): ?>
+<section class="container-wide py-16">
+  <div class="flex items-end justify-between mb-8 flex-wrap gap-3">
+    <div>
+      <div class="badge-brand mb-2"><i data-lucide="plane-takeoff" class="size-[12px]"></i> Transfer aeroporto</div>
+      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Dal volo al letto.</h2>
+      <p class="text-ink-500 mt-2">Transfer privato dall'aeroporto SSH a tutti i villaggi.</p>
+    </div>
+    <a href="/transfer.php" class="btn-outline hidden sm:inline-flex">Tutte le tratte <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+  </div>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    <?php foreach ($transfers as $i => $s): ?>
+      <a href="/transfer.php?slug=<?= e($s['slug']) ?>" class="card overflow-hidden p-0 card-hover group animate-slide-up" style="animation-delay:<?= $i * 50 ?>ms">
+        <div class="aspect-[16/10] bg-ink-100 dark:bg-ink-900 relative">
+          <?php if ($s['cover_image']): ?><img src="<?= e($s['cover_image']) ?>" alt="<?= e($s['name']) ?>" class="h-full w-full object-cover group-hover:scale-105 transition duration-700 ease-out-expo"><?php endif; ?>
+          <div class="absolute top-3 left-3 badge bg-white/95 text-ink-900 backdrop-blur"><i data-lucide="users" class="size-[12px]"></i> max <?= (int)$s['vehicle_capacity'] ?></div>
+        </div>
+        <div class="p-4">
+          <div class="text-xs text-ink-500 truncate"><?= e($s['from_location']) ?> →</div>
+          <div class="font-display font-bold truncate"><?= e($s['to_location']) ?></div>
+          <div class="flex items-baseline gap-1 mt-2">
+            <span class="font-display font-bold text-lg tabular-nums"><?= fmtMoney((float)$s['price_per_group']) ?></span>
+            <span class="text-xs text-ink-500">a tratta</span>
+          </div>
+        </div>
+      </a>
+    <?php endforeach; ?>
+  </div>
+  <div class="mt-8 sm:hidden text-center">
+    <a href="/transfer.php" class="btn-outline inline-flex">Tutte le tratte <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+  </div>
+</section>
+<?php endif; ?>
 
 <!-- COME FUNZIONA -->
 <section id="come-funziona" class="container-wide py-20">
