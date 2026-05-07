@@ -120,16 +120,16 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
   </div>
 
-  <form method="post" class="card p-5 grid sm:grid-cols-7 gap-3">
+  <form method="post" class="card p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
     <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
     <input type="hidden" name="action" value="add">
-    <input class="input sm:col-span-2" placeholder="Nome (es. Agosto)" name="name" required>
+    <input class="input col-span-full lg:col-span-2" placeholder="Nome (es. Agosto)" name="name" required>
     <input class="input" type="date" name="start_date" required>
     <input class="input" type="date" name="end_date" required>
     <input class="input" type="number" step="0.01" placeholder="€/notte" name="price_per_night" value="<?= e((string)$apt['base_price']) ?>" required>
     <input class="input" type="number" placeholder="Min notti" name="min_nights" value="1">
     <input class="input" type="number" placeholder="Priorità" name="priority" value="1">
-    <button class="btn-primary sm:col-span-7"><i data-lucide="plus" class="size-[16px]"></i> Aggiungi regola</button>
+    <button class="btn-primary col-span-full"><i data-lucide="plus" class="size-[16px]"></i> Aggiungi regola</button>
   </form>
 
   <div class="card p-0 overflow-x-auto">

@@ -58,7 +58,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <div class="card p-5 space-y-3">
       <h3 class="font-display font-bold">Cliente</h3>
       <label class="block"><span class="label">Nome e cognome</span><input class="input" name="name" required></label>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Email</span><input class="input" type="email" name="email"></label>
         <label class="block"><span class="label">Telefono</span><input class="input" name="phone"></label>
       </div>
@@ -72,7 +72,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
           <?php foreach ($apartments as $a): ?><option value="<?= e($a['id']) ?>" <?= $a['id'] === $preselect ? 'selected' : '' ?>><?= e($a['name']) ?></option><?php endforeach; ?>
         </select>
       </label>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Check-in</span><input class="input" type="date" name="from" x-model="from" @change="quote()" required></label>
         <label class="block"><span class="label">Check-out</span><input class="input" type="date" name="to" x-model="to" @change="quote()" required></label>
         <label class="block"><span class="label">Ospiti</span><input class="input" type="number" min="1" name="guests" x-model.number="guests" @input="quote()"></label>

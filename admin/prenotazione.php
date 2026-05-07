@@ -111,7 +111,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <div class="lg:col-span-2 space-y-5">
       <div class="card p-5">
         <h3 class="font-display font-bold mb-3">Soggiorno</h3>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
           <?php foreach ([
             ['Check-in', fmtDate($b['check_in'])], ['Check-out', fmtDate($b['check_out'])],
             ['Notti', $b['nights']], ['Ospiti', $b['guests']],

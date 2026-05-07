@@ -123,7 +123,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       <label class="block"><span class="label">Nome</span><input class="input" name="name" required value="<?= e($f['name']) ?>"></label>
       <label class="block"><span class="label">Slug</span><input class="input" name="slug" value="<?= e($f['slug']) ?>" placeholder="auto dal nome"></label>
       <label class="block"><span class="label">Descrizione</span><textarea class="input min-h-[120px]" name="description"><?= e($f['description']) ?></textarea></label>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Indirizzo</span><input class="input" name="address" value="<?= e($f['address']) ?>"></label>
         <label class="block"><span class="label">Zona di Sharm</span><input class="input" name="city" value="<?= e($f['city']) ?>" placeholder="es. Naama Bay, Hadaba, Sharks Bay…"></label>
         <label class="block"><span class="label">Paese</span><input class="input" name="country" value="<?= e($f['country']) ?>"></label>
@@ -133,7 +133,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
     <div class="card p-5 space-y-3">
       <h3 class="font-display font-bold">Capacità & spazi</h3>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Ospiti</span><input class="input" type="number" min="1" name="guests" value="<?= (int)$f['guests'] ?>"></label>
         <label class="block"><span class="label">Dimensione (mq)</span><input class="input" type="number" name="size_sqm" value="<?= e((string)$f['size_sqm']) ?>"></label>
         <label class="block"><span class="label">Camere</span><input class="input" type="number" min="0" name="bedrooms" value="<?= (int)$f['bedrooms'] ?>"></label>
@@ -148,7 +148,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
     <div class="card p-5 space-y-3">
       <h3 class="font-display font-bold">Prezzi</h3>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Per notte (€)</span><input class="input" type="number" step="0.01" name="base_price" value="<?= e((string)$f['base_price']) ?>" required></label>
         <label class="block"><span class="label">Weekend (opz.)</span><input class="input" type="number" step="0.01" name="weekend_price" value="<?= e((string)$f['weekend_price']) ?>"></label>
         <label class="block"><span class="label">Settimanale (totale)</span><input class="input" type="number" step="0.01" name="weekly_price" value="<?= e((string)$f['weekly_price']) ?>"></label>
@@ -157,7 +157,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <label class="block"><span class="label">Mensile</span><input class="input" type="number" step="0.01" name="monthly_price" value="<?= e((string)$f['monthly_price']) ?>"></label>
       </div>
       <h3 class="font-display font-bold pt-2">Sconti automatici %</h3>
-      <div class="grid grid-cols-3 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <label class="block"><span class="label">>7 notti</span><input class="input" type="number" name="long_stay_discount_7" value="<?= e((string)$f['long_stay_discount_7']) ?>"></label>
         <label class="block"><span class="label">>14 notti</span><input class="input" type="number" name="long_stay_discount_14" value="<?= e((string)$f['long_stay_discount_14']) ?>"></label>
         <label class="block"><span class="label">>30 notti</span><input class="input" type="number" name="long_stay_discount_30" value="<?= e((string)$f['long_stay_discount_30']) ?>"></label>
@@ -166,7 +166,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
     <div class="card p-5 space-y-3">
       <h3 class="font-display font-bold">Tasse & fee</h3>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Pulizie (€)</span><input class="input" type="number" step="0.01" name="cleaning_fee" value="<?= e((string)$f['cleaning_fee']) ?>"></label>
         <label class="block"><span class="label">Cauzione (€)</span><input class="input" type="number" step="0.01" name="security_deposit" value="<?= e((string)$f['security_deposit']) ?>"></label>
         <label class="block"><span class="label">Tassa soggiorno €/p/notte</span><input class="input" type="number" step="0.01" name="city_tax" value="<?= e((string)$f['city_tax']) ?>"></label>

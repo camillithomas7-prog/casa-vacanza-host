@@ -149,7 +149,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <!-- NOLEGGIO -->
     <div class="card p-5 space-y-3" x-show="['car','golf_cart','scooter','escooter'].includes(type)">
       <h3 class="font-display font-bold">Tariffe noleggio</h3>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">€/giorno</span><input class="input" type="number" step="0.01" name="daily_price" value="<?= e((string)$f['daily_price']) ?>"></label>
         <label class="block"><span class="label">Settimanale</span><input class="input" type="number" step="0.01" name="weekly_price" value="<?= e((string)$f['weekly_price']) ?>"></label>
         <label class="block"><span class="label">2 settimane</span><input class="input" type="number" step="0.01" name="biweekly_price" value="<?= e((string)$f['biweekly_price']) ?>"></label>
@@ -157,19 +157,19 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <label class="block"><span class="label">Mensile</span><input class="input" type="number" step="0.01" name="monthly_price" value="<?= e((string)$f['monthly_price']) ?>"></label>
       </div>
       <h3 class="font-display font-bold pt-2">Sconti automatici %</h3>
-      <div class="grid grid-cols-3 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <label class="block"><span class="label">>7gg</span><input class="input" type="number" name="long_stay_discount_7" value="<?= e((string)$f['long_stay_discount_7']) ?>"></label>
         <label class="block"><span class="label">>14gg</span><input class="input" type="number" name="long_stay_discount_14" value="<?= e((string)$f['long_stay_discount_14']) ?>"></label>
         <label class="block"><span class="label">>30gg</span><input class="input" type="number" name="long_stay_discount_30" value="<?= e((string)$f['long_stay_discount_30']) ?>"></label>
       </div>
       <h3 class="font-display font-bold pt-2">Resort & dettagli</h3>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Nome resort (opzionale)</span><input class="input" name="resort_name" value="<?= e($f['resort_name']) ?>"></label>
         <label class="block"><span class="label">Indirizzo resort</span><input class="input" name="resort_address" value="<?= e($f['resort_address']) ?>"></label>
         <label class="block"><span class="label">Cauzione (€)</span><input class="input" type="number" step="0.01" name="security_deposit" value="<?= e((string)$f['security_deposit']) ?>"></label>
         <label class="block"><span class="label">Età minima</span><input class="input" type="number" name="min_age" value="<?= e((string)$f['min_age']) ?>"></label>
       </div>
-      <div class="grid grid-cols-2 gap-2 pt-2">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
         <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="license_required" <?= $f['license_required'] ? 'checked' : '' ?>> Patente richiesta</label>
         <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="helmet_included" <?= $f['helmet_included'] ? 'checked' : '' ?>> Casco incluso</label>
         <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="fuel_included" <?= $f['fuel_included'] ? 'checked' : '' ?>> Carburante incluso</label>
@@ -180,7 +180,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <!-- ESCURSIONE -->
     <div class="card p-5 space-y-3" x-show="['boat_excursion','desert_excursion','diving','tour','spa','other_excursion'].includes(type)">
       <h3 class="font-display font-bold">Tariffe escursione</h3>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">€/persona</span><input class="input" type="number" step="0.01" name="price_per_person" value="<?= e((string)$f['price_per_person']) ?>"></label>
         <label class="block"><span class="label">€/gruppo (privato)</span><input class="input" type="number" step="0.01" name="price_per_group" value="<?= e((string)$f['price_per_group']) ?>"></label>
         <label class="block"><span class="label">Durata (ore)</span><input class="input" type="number" step="0.5" name="duration_hours" value="<?= e((string)$f['duration_hours']) ?>"></label>
@@ -189,7 +189,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       </div>
       <label class="block"><span class="label">Punto di incontro</span><input class="input" name="meeting_point" value="<?= e($f['meeting_point']) ?>"></label>
       <label class="block"><span class="label">Giorni disponibili (es. Lun,Mer,Ven)</span><input class="input" name="schedule_days" value="<?= e($f['schedule_days']) ?>"></label>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Incluso (uno per riga)</span><textarea class="input min-h-[100px] text-xs" name="includes"><?= e($includes) ?></textarea></label>
         <label class="block"><span class="label">Non incluso</span><textarea class="input min-h-[100px] text-xs" name="excludes"><?= e($excludes) ?></textarea></label>
       </div>
@@ -198,7 +198,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <!-- TRANSFER -->
     <div class="card p-5 space-y-3" x-show="type === 'transfer'">
       <h3 class="font-display font-bold">Transfer</h3>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Da</span><input class="input" name="from_location" value="<?= e($f['from_location']) ?>"></label>
         <label class="block"><span class="label">A</span><input class="input" name="to_location" value="<?= e($f['to_location']) ?>"></label>
         <label class="block"><span class="label">€/tratta</span><input class="input" type="number" step="0.01" name="price_per_group" value="<?= e((string)$f['price_per_group']) ?>"></label>
