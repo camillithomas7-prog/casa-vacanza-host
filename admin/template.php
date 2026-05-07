@@ -28,7 +28,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 ?>
 <div class="space-y-5">
   <div>
-    <h1 class="font-display text-3xl font-bold">Template messaggi</h1>
+    <h1 class="font-display text-2xl sm:text-3xl font-bold">Template messaggi</h1>
     <p class="text-ink-500 mt-1">Personalizza i messaggi automatici inviati ai clienti.</p>
   </div>
 
@@ -45,7 +45,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
 
     <?php if ($tpl): ?>
-      <form method="post" class="card p-5 lg:col-span-2 space-y-3">
+      <form method="post" class="card p-4 sm:p-5 lg:col-span-2 space-y-3">
         <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
         <input type="hidden" name="id" value="<?= e($tpl['id']) ?>">
         <div class="grid grid-cols-2 gap-3">

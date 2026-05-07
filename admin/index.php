@@ -49,15 +49,15 @@ $title = 'Dashboard';
 require __DIR__ . '/../partials/head.php';
 require __DIR__ . '/../partials/admin-shell-top.php';
 ?>
-<div class="space-y-6">
+<div class="space-y-5 sm:space-y-6">
   <div class="flex items-end justify-between flex-wrap gap-3">
-    <div>
-      <h1 class="font-serif text-4xl font-semibold tracking-tight">Buongiorno 👋</h1>
-      <p class="text-ink-500 mt-1 text-pretty">Ecco com'è andata la tua attività di recente.</p>
+    <div class="min-w-0">
+      <h1 class="font-serif text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight">Buongiorno 👋</h1>
+      <p class="text-ink-500 mt-1 text-sm sm:text-base text-pretty">Ecco com'è andata la tua attività di recente.</p>
     </div>
-    <div class="flex gap-2 flex-wrap">
-      <a href="/admin/prenotazione-nuova.php" class="btn-secondary"><i data-lucide="plus" class="size-[16px]"></i> Nuova prenotazione</a>
-      <a href="/admin/appartamento-edit.php" class="btn-outline"><i data-lucide="building-2" class="size-[16px]"></i> Nuovo appartamento</a>
+    <div class="flex gap-2 flex-wrap w-full sm:w-auto">
+      <a href="/admin/prenotazione-nuova.php" class="btn-secondary text-sm flex-1 sm:flex-none"><i data-lucide="plus" class="size-[16px]"></i> <span class="truncate">Nuova prenotazione</span></a>
+      <a href="/admin/appartamento-edit.php" class="btn-outline text-sm flex-1 sm:flex-none"><i data-lucide="building-2" class="size-[16px]"></i> <span class="truncate">Nuovo appartamento</span></a>
     </div>
   </div>
 
@@ -72,17 +72,17 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       ];
       foreach ($kpis as $i => $k):
     ?>
-      <div class="card p-5 card-hover relative overflow-hidden animate-slide-up" style="animation-delay:<?= $i * 60 ?>ms">
-        <div class="flex items-start justify-between">
-          <div class="h-12 w-12 rounded-2xl bg-gradient-to-br <?= $k[4] ?> text-white flex items-center justify-center shadow-md"><i data-lucide="<?= $k[3] ?>" class="size-[20px]"></i></div>
+      <div class="card p-4 sm:p-5 card-hover relative overflow-hidden animate-slide-up" style="animation-delay:<?= $i * 60 ?>ms">
+        <div class="flex items-start justify-between gap-2">
+          <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl bg-gradient-to-br <?= $k[4] ?> text-white flex items-center justify-center shadow-md shrink-0"><i data-lucide="<?= $k[3] ?>" class="size-[20px]"></i></div>
           <?php if ($k[5] !== null): ?>
-            <span class="badge-soft <?= $k[5] >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300' ?> tabular-nums"><i data-lucide="<?= $k[5] >= 0 ? 'trending-up' : 'trending-down' ?>" class="size-[12px]"></i> <?= ($k[5] >= 0 ? '+' : '') . $k[5] ?>%</span>
+            <span class="badge-soft <?= $k[5] >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300' ?> tabular-nums shrink-0"><i data-lucide="<?= $k[5] >= 0 ? 'trending-up' : 'trending-down' ?>" class="size-[12px]"></i> <?= ($k[5] >= 0 ? '+' : '') . $k[5] ?>%</span>
           <?php endif; ?>
         </div>
-        <div class="mt-4">
-          <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e($k[0]) ?></div>
-          <div class="text-[28px] font-display font-bold tracking-tight mt-0.5 tabular-nums"><?= e($k[1]) ?></div>
-          <div class="text-xs text-ink-500 mt-1"><?= e($k[2]) ?></div>
+        <div class="mt-3 sm:mt-4 min-w-0">
+          <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500 truncate"><?= e($k[0]) ?></div>
+          <div class="text-2xl sm:text-[28px] font-display font-bold tracking-tight mt-0.5 tabular-nums truncate"><?= e($k[1]) ?></div>
+          <div class="text-xs text-ink-500 mt-1 truncate"><?= e($k[2]) ?></div>
         </div>
       </div>
     <?php endforeach; ?>
@@ -121,7 +121,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       </div>
       <div class="relative h-[220px] sm:h-[260px] lg:h-[300px]"><canvas id="lineChart"></canvas></div>
     </div>
-    <div class="card p-6">
+    <div class="card p-4 sm:p-6">
       <h2 class="font-serif text-xl font-semibold tracking-tight">Top appartamenti</h2>
       <p class="text-xs text-ink-500 mt-0.5 mb-4">per fatturato</p>
       <?php if (!$top): ?><div class="text-sm text-ink-500">Nessun dato.</div><?php else: ?>
@@ -140,7 +140,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
   <!-- LISTE -->
   <div class="grid lg:grid-cols-2 gap-5">
-    <div class="card p-6">
+    <div class="card p-4 sm:p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-serif text-xl font-semibold tracking-tight">Prossimi arrivi</h2>
         <a href="/admin/calendario.php" class="text-sm text-brand-600 font-medium hover:underline">Calendario →</a>
@@ -158,20 +158,20 @@ require __DIR__ . '/../partials/admin-shell-top.php';
             $initials = mb_strtoupper(mb_substr($parts[0] ?? '·', 0, 1) . (isset($parts[1]) ? mb_substr($parts[1], 0, 1) : ''));
           ?>
             <li>
-              <a href="/admin/prenotazione.php?id=<?= e($b['id']) ?>" class="flex items-center gap-3 p-3 rounded-xl hover:bg-ink-50 dark:hover:bg-ink-900/40 transition group">
-                <span class="h-11 w-11 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-semibold text-sm"><?= e($initials) ?></span>
+              <a href="/admin/prenotazione.php?id=<?= e($b['id']) ?>" class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl hover:bg-ink-50 dark:hover:bg-ink-900/40 transition group">
+                <span class="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-semibold text-xs sm:text-sm shrink-0"><?= e($initials) ?></span>
                 <div class="flex-1 min-w-0">
                   <div class="font-medium text-sm truncate"><?= e($b['customer_name']) ?></div>
                   <div class="text-xs text-ink-500 truncate"><?= e($b['apartment_name']) ?> · <?= fmtDate($b['check_in']) ?> → <?= fmtDate($b['check_out']) ?></div>
                 </div>
-                <span class="badge-soft tabular-nums"><?= $days <= 0 ? 'oggi' : ($days == 1 ? 'domani' : "tra {$days}gg") ?></span>
+                <span class="badge-soft tabular-nums shrink-0 text-[10px] sm:text-xs"><?= $days <= 0 ? 'oggi' : ($days == 1 ? 'domani' : "tra {$days}gg") ?></span>
               </a>
             </li>
           <?php endforeach; ?>
         </ul>
       <?php endif; ?>
     </div>
-    <div class="card p-6">
+    <div class="card p-4 sm:p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-serif text-xl font-semibold tracking-tight">Ultime prenotazioni</h2>
         <a href="/admin/prenotazioni.php" class="text-sm text-brand-600 font-medium hover:underline">Tutte →</a>
@@ -182,15 +182,15 @@ require __DIR__ . '/../partials/admin-shell-top.php';
           $st = $statusMap[$b['status']] ?? ['soft', $b['status']];
         ?>
           <li>
-            <a href="/admin/prenotazione.php?id=<?= e($b['id']) ?>" class="flex items-center gap-3 p-3 rounded-xl hover:bg-ink-50 dark:hover:bg-ink-900/40 transition">
+            <a href="/admin/prenotazione.php?id=<?= e($b['id']) ?>" class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl hover:bg-ink-50 dark:hover:bg-ink-900/40 transition">
               <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2">
+                <div class="flex items-baseline gap-2 min-w-0">
                   <span class="font-medium text-sm truncate"><?= e($b['customer_name']) ?></span>
-                  <span class="text-xs font-mono text-ink-400"><?= e($b['code']) ?></span>
+                  <span class="text-[10px] font-mono text-ink-400 hidden sm:inline shrink-0"><?= e($b['code']) ?></span>
                 </div>
                 <div class="text-xs text-ink-500 truncate"><?= e($b['apartment_name']) ?> · <?= fmtMoney((float)$b['total']) ?></div>
               </div>
-              <span class="badge-<?= $st[0] ?>"><?= e($st[1]) ?></span>
+              <span class="badge-<?= $st[0] ?> shrink-0 text-[10px] sm:text-xs"><?= e($st[1]) ?></span>
             </a>
           </li>
         <?php endforeach; ?>

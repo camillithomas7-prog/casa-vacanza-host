@@ -50,12 +50,12 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 <form method="post" class="space-y-5" x-data="newBooking()">
   <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
   <div class="flex items-center justify-between">
-    <h1 class="font-display text-3xl font-bold">Nuova prenotazione</h1>
+    <h1 class="font-display text-2xl sm:text-3xl font-bold">Nuova prenotazione</h1>
     <button class="btn-primary"><i data-lucide="save" class="size-[18px]"></i> Crea</button>
   </div>
 
   <div class="grid lg:grid-cols-2 gap-5">
-    <div class="card p-5 space-y-3">
+    <div class="card p-4 sm:p-5 space-y-3">
       <h3 class="font-display font-bold">Cliente</h3>
       <label class="block"><span class="label">Nome e cognome</span><input class="input" name="name" required></label>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -65,7 +65,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       <label class="block"><span class="label">Note interne</span><textarea class="input min-h-[100px]" name="notes"></textarea></label>
     </div>
 
-    <div class="card p-5 space-y-3">
+    <div class="card p-4 sm:p-5 space-y-3">
       <h3 class="font-display font-bold">Soggiorno</h3>
       <label class="block"><span class="label">Appartamento</span>
         <select class="input" name="apartment_id" required x-model="apartment_id" @change="quote()">
@@ -95,7 +95,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   </div>
 
   <template x-if="q && q.nights > 0">
-    <div class="card p-5">
+    <div class="card p-4 sm:p-5">
       <h3 class="font-display font-bold mb-3">Riepilogo prezzi</h3>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
         <div class="rounded-xl bg-ink-50 dark:bg-ink-900 p-3"><div class="text-xs text-ink-500">Notti</div><div class="text-lg" x-text="q.nights"></div></div>

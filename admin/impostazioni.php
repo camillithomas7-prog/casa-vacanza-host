@@ -40,12 +40,12 @@ require __DIR__ . '/../partials/head.php';
 require __DIR__ . '/../partials/admin-shell-top.php';
 ?>
 <div class="space-y-5">
-  <h1 class="font-display text-3xl font-bold">Impostazioni</h1>
+  <h1 class="font-display text-2xl sm:text-3xl font-bold">Impostazioni</h1>
 
   <?php if ($msg): ?><div class="card p-3 text-sm bg-emerald-50 border-emerald-200 text-emerald-700"><?= e($msg) ?></div><?php endif; ?>
 
   <div class="grid lg:grid-cols-2 gap-5">
-    <form method="post" class="card p-5 space-y-3">
+    <form method="post" class="card p-4 sm:p-5 space-y-3">
       <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
       <input type="hidden" name="action" value="save_settings">
       <h3 class="font-display font-bold flex items-center gap-2"><i data-lucide="globe" class="size-[18px]"></i> Sito</h3>
@@ -87,7 +87,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       <button class="btn-primary"><i data-lucide="save" class="size-[16px]"></i> Salva</button>
     </form>
 
-    <form method="post" class="card p-5 space-y-3">
+    <form method="post" class="card p-4 sm:p-5 space-y-3">
       <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
       <input type="hidden" name="action" value="change_password">
       <h3 class="font-display font-bold">Account</h3>
@@ -97,7 +97,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       <button class="btn-secondary">Aggiorna password</button>
     </form>
 
-    <div class="card p-5">
+    <div class="card p-4 sm:p-5">
       <h3 class="font-display font-bold flex items-center gap-2"><i data-lucide="database" class="size-[18px]"></i> Backup & dati</h3>
       <p class="text-sm text-ink-500 mb-3 mt-2">Esporta tutti i dati in formato JSON.</p>
       <a href="/admin/backup.php" class="btn-outline">Scarica backup JSON</a>

@@ -109,7 +109,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
   <div class="grid lg:grid-cols-3 gap-5">
     <div class="lg:col-span-2 space-y-5">
-      <div class="card p-5">
+      <div class="card p-4 sm:p-5">
         <h3 class="font-display font-bold mb-3">Soggiorno</h3>
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
           <?php foreach ([
@@ -124,7 +124,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <?php if ($b['notes']): ?><div class="text-sm mt-4 p-3 rounded-xl bg-ink-50 dark:bg-ink-900"><?= e($b['notes']) ?></div><?php endif; ?>
       </div>
 
-      <div class="card p-5">
+      <div class="card p-4 sm:p-5">
         <h3 class="font-display font-bold mb-3">Contatti cliente</h3>
         <div class="grid sm:grid-cols-2 gap-3 text-sm">
           <div><div class="text-xs text-ink-500">Email</div><div><?= e($b['customer_email'] ?: '—') ?></div></div>
@@ -134,7 +134,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         </div>
       </div>
 
-      <div class="card p-5">
+      <div class="card p-4 sm:p-5">
         <div class="flex items-center justify-between mb-3">
           <h3 class="font-display font-bold">Pagamenti</h3>
         </div>
@@ -166,7 +166,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         </ul>
       </div>
 
-      <div class="card p-5">
+      <div class="card p-4 sm:p-5">
         <div class="flex items-center justify-between mb-3">
           <h3 class="font-display font-bold">Documenti cliente</h3>
           <form method="post" enctype="multipart/form-data">
@@ -194,14 +194,14 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
 
     <div class="space-y-5">
-      <div class="card p-5">
+      <div class="card p-4 sm:p-5">
         <h3 class="font-display font-bold mb-3">Pagamenti</h3>
         <div class="flex justify-between py-1.5 text-sm border-b border-ink-100 dark:border-ink-800"><span class="text-ink-500">Totale</span><span><?= fmtMoney((float)$b['total']) ?></span></div>
         <div class="flex justify-between py-1.5 text-sm border-b border-ink-100 dark:border-ink-800"><span class="text-ink-500">Incassato</span><span><?= fmtMoney((float)$b['paid']) ?></span></div>
         <div class="flex justify-between py-1.5 text-sm"><span class="text-ink-500">Saldo</span><span class="<?= $due > 0 ? 'text-amber-600 font-semibold' : 'text-emerald-600' ?>"><?= fmtMoney(max(0, $due)) ?></span></div>
       </div>
 
-      <div class="card p-5" x-data="messageSender(<?= e(json_encode($vars)) ?>, <?= e(json_encode($templates)) ?>)">
+      <div class="card p-4 sm:p-5" x-data="messageSender(<?= e(json_encode($vars)) ?>, <?= e(json_encode($templates)) ?>)">
         <h3 class="font-display font-bold mb-3">Messaggi rapidi</h3>
         <select class="input mb-3" x-model="key" @change="render()">
           <?php foreach ($templates as $t): ?><option value="<?= e($t['template_key']) ?>"><?= e($t['name']) ?></option><?php endforeach; ?>
@@ -214,7 +214,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         </div>
       </div>
 
-      <div class="card p-5 text-sm">
+      <div class="card p-4 sm:p-5 text-sm">
         <h3 class="font-display font-bold mb-3">Stampa & contratto</h3>
         <a href="/admin/contratto.php?id=<?= e($b['id']) ?>" target="_blank" class="btn-outline w-full justify-center">📄 Contratto soggiorno</a>
         <a href="/admin/qr.php?id=<?= e($b['id']) ?>" target="_blank" class="btn-outline w-full justify-center mt-2">🔗 QR check-in</a>

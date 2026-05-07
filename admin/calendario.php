@@ -55,7 +55,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 <div class="space-y-5" x-data="{ showBlock: false }">
   <div class="flex items-center justify-between flex-wrap gap-3">
     <div>
-      <h1 class="font-display text-3xl font-bold">Calendario</h1>
+      <h1 class="font-display text-2xl sm:text-3xl font-bold">Calendario</h1>
       <p class="text-ink-500 mt-1">Vista mensile, blocchi, prenotazioni in tempo reale.</p>
     </div>
     <div class="flex items-center gap-2 flex-wrap">
@@ -104,7 +104,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   </div>
 
   <?php if ($blocks): ?>
-    <div class="card p-5">
+    <div class="card p-4 sm:p-5">
       <h3 class="font-display font-bold mb-3">Date bloccate</h3>
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">
         <?php foreach ($blocks as $b): ?>
@@ -126,7 +126,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   <?php endif; ?>
 
   <div x-show="showBlock" x-cloak class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" @click="showBlock=false" style="display:none">
-    <form method="post" class="card p-5 w-full max-w-md" @click.stop>
+    <form method="post" class="card p-4 sm:p-5 w-full max-w-md" @click.stop>
       <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
       <input type="hidden" name="action" value="block_add">
       <input type="hidden" name="apartment_id" value="<?= e($aptId) ?>">

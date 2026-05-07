@@ -49,23 +49,23 @@ require __DIR__ . '/../partials/head.php';
 require __DIR__ . '/../partials/admin-shell-top.php';
 ?>
 <div class="space-y-5">
-  <div class="flex items-center justify-between flex-wrap gap-3">
-    <div>
-      <h1 class="font-display text-3xl font-bold">Spese & bilancio</h1>
-      <p class="text-ink-500 mt-1">Tracciatura completa di costi e ricavi.</p>
+  <div class="flex items-end justify-between flex-wrap gap-3">
+    <div class="min-w-0">
+      <h1 class="font-display text-2xl sm:text-3xl font-bold">Spese & bilancio</h1>
+      <p class="text-ink-500 mt-1 text-sm sm:text-base">Tracciatura completa di costi e ricavi.</p>
     </div>
-    <form method="get" class="flex items-center gap-2">
-      <select name="apt" class="input">
+    <form method="get" class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+      <select name="apt" class="input flex-1 sm:flex-none min-w-0">
         <option value="all" <?= $aptFilter === 'all' ? 'selected' : '' ?>>Tutti</option>
         <?php foreach ($apartments as $a): ?><option value="<?= e($a['id']) ?>" <?= $aptFilter === $a['id'] ? 'selected' : '' ?>><?= e($a['name']) ?></option><?php endforeach; ?>
       </select>
-      <select name="year" class="input">
+      <select name="year" class="input flex-1 sm:flex-none">
         <?php for ($y = (int)date('Y') - 2; $y <= (int)date('Y') + 2; $y++): ?>
           <option value="<?= $y ?>" <?= $y === $year ? 'selected' : '' ?>><?= $y ?></option>
         <?php endfor; ?>
       </select>
-      <button class="btn-outline">Filtra</button>
-      <a href="/admin/export-spese.php?year=<?= $year ?>&apt=<?= e($aptFilter) ?>" class="btn-outline"><i data-lucide="download" class="size-[16px]"></i> CSV</a>
+      <button class="btn-outline text-sm">Filtra</button>
+      <a href="/admin/export-spese.php?year=<?= $year ?>&apt=<?= e($aptFilter) ?>" class="btn-outline text-sm"><i data-lucide="download" class="size-[16px]"></i> CSV</a>
     </form>
   </div>
 
@@ -76,7 +76,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       ['Spese', fmtMoney($totalExp), 'bg-rose-500'],
       ['Utile', fmtMoney($totalRev - $totalExp), 'bg-brand-500'],
     ] as $s): ?>
-      <div class="card p-5">
+      <div class="card p-4 sm:p-5">
         <div class="text-xs font-medium uppercase tracking-wide text-ink-500"><?= e($s[0]) ?></div>
         <div class="text-2xl font-display font-bold mt-1"><?= e($s[1]) ?></div>
         <div class="h-1 rounded-full mt-2 <?= $s[2] ?>"></div>
@@ -84,7 +84,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <?php endforeach; ?>
   </div>
 
-  <div class="card p-5">
+  <div class="card p-4 sm:p-5">
     <h3 class="font-display font-bold mb-3">Andamento <?= $year ?></h3>
     <div class="relative h-[220px] sm:h-[260px] lg:h-[300px]"><canvas id="barChart"></canvas></div>
   </div>
@@ -103,7 +103,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   </form>
 
   <div class="grid lg:grid-cols-3 gap-5">
-    <div class="card p-5 lg:col-span-2 overflow-x-auto">
+    <div class="card p-4 sm:p-5 lg:col-span-2 overflow-x-auto">
       <h3 class="font-display font-bold mb-3">Voci</h3>
       <table class="table-base">
         <thead><tr><th>Data</th><th>Categoria</th><th>Appartamento</th><th>Importo</th><th></th></tr></thead>
@@ -128,7 +128,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       </table>
       <?php if (!$expenses): ?><div class="p-6 text-sm text-ink-500 text-center">Nessuna spesa registrata.</div><?php endif; ?>
     </div>
-    <div class="card p-5">
+    <div class="card p-4 sm:p-5">
       <h3 class="font-display font-bold mb-3">Per categoria</h3>
       <?php if (!$byCat): ?><div class="text-sm text-ink-500">Nessun dato.</div><?php else: ?>
         <ul class="space-y-2">

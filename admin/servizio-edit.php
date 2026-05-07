@@ -124,7 +124,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   </div>
 
   <div class="grid lg:grid-cols-2 gap-5">
-    <div class="card p-5 space-y-3">
+    <div class="card p-4 sm:p-5 space-y-3">
       <h3 class="font-display font-bold">Tipo & informazioni</h3>
       <label class="block"><span class="label">Tipo servizio</span>
         <select name="type" x-model="type" class="input">
@@ -147,7 +147,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
 
     <!-- NOLEGGIO -->
-    <div class="card p-5 space-y-3" x-show="['car','golf_cart','scooter','escooter'].includes(type)">
+    <div class="card p-4 sm:p-5 space-y-3" x-show="['car','golf_cart','scooter','escooter'].includes(type)">
       <h3 class="font-display font-bold">Tariffe noleggio</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">€/giorno</span><input class="input" type="number" step="0.01" name="daily_price" value="<?= e((string)$f['daily_price']) ?>"></label>
@@ -178,7 +178,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
 
     <!-- ESCURSIONE -->
-    <div class="card p-5 space-y-3" x-show="['boat_excursion','desert_excursion','diving','tour','spa','other_excursion'].includes(type)">
+    <div class="card p-4 sm:p-5 space-y-3" x-show="['boat_excursion','desert_excursion','diving','tour','spa','other_excursion'].includes(type)">
       <h3 class="font-display font-bold">Tariffe escursione</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">€/persona</span><input class="input" type="number" step="0.01" name="price_per_person" value="<?= e((string)$f['price_per_person']) ?>"></label>
@@ -196,7 +196,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
 
     <!-- TRANSFER -->
-    <div class="card p-5 space-y-3" x-show="type === 'transfer'">
+    <div class="card p-4 sm:p-5 space-y-3" x-show="type === 'transfer'">
       <h3 class="font-display font-bold">Transfer</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Da</span><input class="input" name="from_location" value="<?= e($f['from_location']) ?>"></label>

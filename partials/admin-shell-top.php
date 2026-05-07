@@ -100,7 +100,7 @@ $pageMeta = $titles[$path] ?? ['Admin', ''];
       <a href="/" target="_blank" title="Vai al sito" class="h-10 w-10 sm:w-auto sm:px-3.5 rounded-xl flex items-center justify-center sm:gap-2 border border-ink-200 dark:border-ink-700/80 text-ink-700 dark:text-ink-200 hover:bg-ink-50 dark:hover:bg-ink-800 transition text-sm"><i data-lucide="external-link" class="size-[16px]"></i> <span class="hidden sm:inline">Sito</span></a>
     </div>
   </header>
-  <main class="p-5 lg:p-8 animate-fade-in">
+  <main class="p-4 sm:p-5 lg:p-8 animate-fade-in">
   <?php $f = flash(); if ($f): ?>
     <div class="mb-5 p-3.5 rounded-xl border flex items-center gap-2.5 animate-slide-down <?= $f['type'] === 'error' ? 'bg-red-50 border-red-200 text-red-700 dark:bg-red-500/10 dark:border-red-500/30 dark:text-red-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-300' ?>">
       <i data-lucide="<?= $f['type'] === 'error' ? 'alert-circle' : 'check-circle-2' ?>" class="size-[18px]"></i>

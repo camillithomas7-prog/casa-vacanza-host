@@ -118,7 +118,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   </div>
 
   <div class="grid lg:grid-cols-2 gap-5">
-    <div class="card p-5 space-y-3">
+    <div class="card p-4 sm:p-5 space-y-3">
       <h3 class="font-display font-bold">Dati principali</h3>
       <label class="block"><span class="label">Nome</span><input class="input" name="name" required value="<?= e($f['name']) ?>"></label>
       <label class="block"><span class="label">Slug</span><input class="input" name="slug" value="<?= e($f['slug']) ?>" placeholder="auto dal nome"></label>
@@ -131,7 +131,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       </div>
     </div>
 
-    <div class="card p-5 space-y-3">
+    <div class="card p-4 sm:p-5 space-y-3">
       <h3 class="font-display font-bold">Capacità & spazi</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Ospiti</span><input class="input" type="number" min="1" name="guests" value="<?= (int)$f['guests'] ?>"></label>
@@ -146,7 +146,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       <label class="block"><span class="label">Regole della casa</span><textarea class="input min-h-[100px]" name="rules"><?= e($f['rules']) ?></textarea></label>
     </div>
 
-    <div class="card p-5 space-y-3">
+    <div class="card p-4 sm:p-5 space-y-3">
       <h3 class="font-display font-bold">Prezzi</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Per notte (€)</span><input class="input" type="number" step="0.01" name="base_price" value="<?= e((string)$f['base_price']) ?>" required></label>
@@ -164,7 +164,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       </div>
     </div>
 
-    <div class="card p-5 space-y-3">
+    <div class="card p-4 sm:p-5 space-y-3">
       <h3 class="font-display font-bold">Tasse & fee</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Pulizie (€)</span><input class="input" type="number" step="0.01" name="cleaning_fee" value="<?= e((string)$f['cleaning_fee']) ?>"></label>
@@ -181,7 +181,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 </form>
 
 <?php if ($apt): ?>
-<div class="card p-5 mt-5">
+<div class="card p-4 sm:p-5 mt-5">
   <h3 class="font-display font-bold mb-3">Galleria foto</h3>
   <form method="post" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-3 mb-4">
     <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">

@@ -66,7 +66,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
   <div class="grid lg:grid-cols-3 gap-5">
     <div class="lg:col-span-2 space-y-5">
-      <div class="card p-5">
+      <div class="card p-4 sm:p-5">
         <h3 class="font-display font-bold mb-3">Servizio</h3>
         <div class="flex items-center gap-4 p-3 rounded-xl bg-ink-50 dark:bg-ink-900/40">
           <?php if ($b['service_image']): ?><img src="<?= e($b['service_image']) ?>" class="h-16 w-24 object-cover rounded-lg"><?php endif; ?>
@@ -77,7 +77,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         </div>
       </div>
 
-      <div class="card p-5">
+      <div class="card p-4 sm:p-5">
         <h3 class="font-display font-bold mb-3">Dettagli prenotazione</h3>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
           <div><div class="text-xs text-ink-500">Data inizio</div><div><?= fmtDate($b['start_date']) ?></div></div>
@@ -91,7 +91,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <?php if ($b['notes']): ?><div class="text-sm mt-4 p-3 rounded-xl bg-ink-50 dark:bg-ink-900"><?= e($b['notes']) ?></div><?php endif; ?>
       </div>
 
-      <div class="card p-5">
+      <div class="card p-4 sm:p-5">
         <h3 class="font-display font-bold mb-3">Cliente</h3>
         <div class="grid sm:grid-cols-2 gap-3 text-sm">
           <div><div class="text-xs text-ink-500">Nome</div><div><?= e($b['customer_name']) ?></div></div>
@@ -108,7 +108,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
 
     <div class="space-y-5">
-      <div class="card p-5">
+      <div class="card p-4 sm:p-5">
         <h3 class="font-display font-bold mb-3">Importi</h3>
         <div class="space-y-1.5">
           <div class="flex justify-between py-1.5 text-sm border-b border-ink-100 dark:border-ink-800"><span class="text-ink-500">Base</span><span class="tabular-nums"><?= fmtMoney((float)$b['base_price']) ?></span></div>

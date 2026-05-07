@@ -25,9 +25,9 @@ require __DIR__ . '/../partials/head.php';
 require __DIR__ . '/../partials/admin-shell-top.php';
 ?>
 <div class="space-y-5">
-  <h1 class="font-display text-3xl font-bold">Recensioni</h1>
+  <h1 class="font-display text-2xl sm:text-3xl font-bold">Recensioni</h1>
 
-  <form method="post" class="card p-5 grid sm:grid-cols-6 gap-2">
+  <form method="post" class="card p-4 sm:p-5 grid sm:grid-cols-6 gap-2">
     <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
     <input type="hidden" name="action" value="add">
     <select class="input" name="apartment_id" required>
@@ -45,7 +45,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
   <div class="grid md:grid-cols-2 gap-4">
     <?php foreach ($reviews as $r): ?>
-      <div class="card p-5">
+      <div class="card p-4 sm:p-5">
         <div class="flex items-center justify-between">
           <div>
             <div class="font-semibold"><?= e($r['author_name']) ?> <span class="text-xs text-ink-500">· <?= e($r['apartment_name']) ?></span></div>

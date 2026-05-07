@@ -24,12 +24,12 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 <?php $deviceCount = (int)val('SELECT COUNT(*) FROM push_subscriptions'); ?>
 <div class="space-y-5">
   <div class="flex items-center justify-between">
-    <h1 class="font-display text-3xl font-bold">Notifiche & attività</h1>
+    <h1 class="font-display text-2xl sm:text-3xl font-bold">Notifiche & attività</h1>
     <form method="post"><input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>"><input type="hidden" name="action" value="mark_all"><button class="btn-outline text-sm"><i data-lucide="check" class="size-[14px]"></i> Segna tutte come lette</button></form>
   </div>
 
   <!-- Push notifications card -->
-  <div class="card p-5" x-data="pushPanel()" x-init="init()">
+  <div class="card p-4 sm:p-5" x-data="pushPanel()" x-init="init()">
     <div class="flex items-start gap-4 flex-wrap">
       <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center shrink-0">
         <i data-lucide="bell-ring" class="size-[22px]"></i>
@@ -274,7 +274,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     }
   </script>
   <div class="grid lg:grid-cols-2 gap-5">
-    <div class="card p-5">
+    <div class="card p-4 sm:p-5">
       <h3 class="font-display font-bold mb-3">Notifiche</h3>
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">
         <?php foreach ($notifications as $n): ?>
@@ -292,7 +292,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <?php if (!$notifications): ?><li class="text-sm text-ink-500 py-4 text-center">Nessuna notifica.</li><?php endif; ?>
       </ul>
     </div>
-    <div class="card p-5">
+    <div class="card p-4 sm:p-5">
       <h3 class="font-display font-bold mb-3">Attività recente</h3>
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">
         <?php foreach ($logs as $l): ?>

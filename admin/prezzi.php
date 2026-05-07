@@ -41,7 +41,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   <div class="flex items-center justify-between flex-wrap gap-3">
     <div>
       <div class="flex items-center gap-2">
-        <h1 class="font-display text-3xl font-bold">Prezzi avanzati</h1>
+        <h1 class="font-display text-2xl sm:text-3xl font-bold">Prezzi avanzati</h1>
         <button type="button" @click="helpOpen = true"
           class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-600 hover:bg-orange-200 transition"
           title="Cosa significa? Clicca per la guida"
@@ -120,7 +120,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
   </div>
 
-  <form method="post" class="card p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
+  <form method="post" class="card p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
     <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
     <input type="hidden" name="action" value="add">
     <input class="input col-span-full lg:col-span-2" placeholder="Nome (es. Agosto)" name="name" required>
@@ -160,7 +160,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   </div>
 
   <?php if (count($apartments) > 1 && $rules): ?>
-    <div class="card p-5">
+    <div class="card p-4 sm:p-5">
       <h3 class="font-display font-bold mb-3">Copia regole verso un altro appartamento</h3>
       <div class="flex gap-2 flex-wrap">
         <?php foreach ($apartments as $a): if ($a['id'] === $aptId) continue; ?>

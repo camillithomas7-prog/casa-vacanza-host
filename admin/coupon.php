@@ -24,9 +24,9 @@ require __DIR__ . '/../partials/head.php';
 require __DIR__ . '/../partials/admin-shell-top.php';
 ?>
 <div class="space-y-5">
-  <h1 class="font-display text-3xl font-bold">Coupon & sconti</h1>
+  <h1 class="font-display text-2xl sm:text-3xl font-bold">Coupon & sconti</h1>
 
-  <form method="post" class="card p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2">
+  <form method="post" class="card p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2">
     <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
     <input type="hidden" name="action" value="add">
     <input class="input uppercase" name="code" placeholder="CODICE" required>
