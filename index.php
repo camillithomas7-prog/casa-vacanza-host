@@ -67,24 +67,17 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
       </div>
     </div>
 
-    <!-- HERO COLLAGE -->
+    <!-- HERO COLLAGE - Sharm El Sheikh locations -->
     <div class="lg:col-span-5 relative h-[440px] lg:h-[540px] hidden md:block animate-blur-in">
-      <?php $heroImgs = array_slice(array_filter(array_column($apartments, 'cover_image')), 0, 3); ?>
-      <?php if (count($heroImgs) >= 1): ?>
-        <div class="absolute top-0 right-0 w-[68%] h-[68%] rounded-3xl overflow-hidden shadow-pop ring-4 ring-white dark:ring-ink-900 animate-float">
-          <img src="<?= e($heroImgs[0]) ?>" class="h-full w-full object-cover">
-        </div>
-      <?php endif; ?>
-      <?php if (count($heroImgs) >= 2): ?>
-        <div class="absolute bottom-0 left-0 w-[58%] h-[55%] rounded-3xl overflow-hidden shadow-pop ring-4 ring-white dark:ring-ink-900 animate-float" style="animation-delay:-2s">
-          <img src="<?= e($heroImgs[1]) ?>" class="h-full w-full object-cover">
-        </div>
-      <?php endif; ?>
-      <?php if (count($heroImgs) >= 3): ?>
-        <div class="absolute top-[35%] left-[15%] w-[34%] h-[34%] rounded-2xl overflow-hidden shadow-pop ring-4 ring-white dark:ring-ink-900 animate-float" style="animation-delay:-4s">
-          <img src="<?= e($heroImgs[2]) ?>" class="h-full w-full object-cover">
-        </div>
-      <?php endif; ?>
+      <div class="absolute top-0 right-0 w-[68%] h-[68%] rounded-3xl overflow-hidden shadow-pop ring-4 ring-white dark:ring-ink-900 animate-float">
+        <img src="/assets/sharm/naama_bay.jpg" alt="Naama Bay, Sharm El Sheikh" class="h-full w-full object-cover">
+      </div>
+      <div class="absolute bottom-0 left-0 w-[58%] h-[55%] rounded-3xl overflow-hidden shadow-pop ring-4 ring-white dark:ring-ink-900 animate-float" style="animation-delay:-2s">
+        <img src="/assets/sharm/sinai_sunset.jpg" alt="Sinai desert sunset" class="h-full w-full object-cover">
+      </div>
+      <div class="absolute top-[35%] left-[15%] w-[34%] h-[34%] rounded-2xl overflow-hidden shadow-pop ring-4 ring-white dark:ring-ink-900 animate-float" style="animation-delay:-4s">
+        <img src="/assets/sharm/ras_mohammed.jpg" alt="Ras Mohammed coral reef" class="h-full w-full object-cover">
+      </div>
       <div class="absolute -top-8 -left-4 h-32 w-32 rounded-full bg-brand-200/50 blur-2xl -z-10 pointer-events-none"></div>
       <div class="absolute -bottom-8 -right-4 h-40 w-40 rounded-full bg-sea-200/50 blur-2xl -z-10 pointer-events-none"></div>
     </div>
