@@ -3,7 +3,7 @@
   :class="scrolled ? 'backdrop-blur-xl bg-white/80 dark:bg-ink-950/85 border-b border-ink-100 dark:border-ink-800/60 shadow-soft' : 'bg-transparent'">
   <div class="container-wide h-[68px] flex items-center justify-between">
     <a href="/" class="flex items-center gap-2 group">
-      <img src="/assets/logo-256.png" alt="<?= e(cfg('site.name')) ?>" class="h-12 w-auto group-hover:scale-[1.04] transition-transform" />
+      <img src="/assets/logo-256.png?v=2" alt="<?= e(cfg('site.name')) ?>" class="h-12 w-auto group-hover:scale-[1.04] transition-transform" />
     </a>
     <nav class="hidden md:flex items-center gap-1 text-sm font-medium">
       <?php foreach ([['/','Home'],['/appartamenti.php','Appartamenti'],['/noleggi.php','Noleggi'],['/escursioni.php','Escursioni'],['/transfer.php','Transfer'],['/contatti.php','Contatti']] as $n): ?>
@@ -24,7 +24,7 @@
 <div x-data="{ open: false }" @toggle-menu.window="open = !open" x-show="open" x-cloak
      class="md:hidden fixed inset-0 z-50 bg-white dark:bg-ink-950 p-6 animate-fade-in" @click.self="open=false">
   <div class="flex items-center justify-between">
-    <img src="/assets/logo-256.png" alt="<?= e(cfg('site.name')) ?>" class="h-10 w-auto">
+    <img src="/assets/logo-256.png?v=2" alt="<?= e(cfg('site.name')) ?>" class="h-10 w-auto">
     <button @click="open=false" class="btn-ghost"><i data-lucide="x" class="size-[20px]"></i></button>
   </div>
   <div class="flex flex-col gap-1 mt-8 text-lg">

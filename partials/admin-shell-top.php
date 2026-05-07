@@ -38,7 +38,7 @@ $pageMeta = $titles[$path] ?? ['Admin', ''];
 <aside class="fixed lg:sticky inset-y-0 left-0 z-40 w-72 bg-white dark:bg-ink-900/95 dark:backdrop-blur-xl border-r border-ink-100 dark:border-ink-800/80 transition-transform lg:translate-x-0 flex flex-col" :class="open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
   <div class="h-20 px-5 flex items-center justify-between border-b border-ink-100 dark:border-ink-800/80 shrink-0">
     <a href="/admin/index.php" class="flex items-center group">
-      <img src="/assets/logo-256.png" alt="<?= e(cfg('site.name')) ?>" class="h-14 w-auto">
+      <img src="/assets/logo-256.png?v=2" alt="<?= e(cfg('site.name')) ?>" class="h-14 w-auto">
     </a>
     <button class="lg:hidden btn-ghost p-2" @click="open=false"><i data-lucide="x" class="size-[18px]"></i></button>
   </div>

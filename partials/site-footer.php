@@ -1,7 +1,7 @@
 <footer class="mt-32 border-t border-ink-100 dark:border-ink-800/80 bg-ink-50/40 dark:bg-ink-950/60">
   <div class="container-wide py-16 grid lg:grid-cols-12 gap-10">
     <div class="lg:col-span-5">
-      <img src="/assets/logo-256.png" alt="<?= e(cfg('site.name')) ?>" class="h-20 w-auto">
+      <img src="/assets/logo-256.png?v=2" alt="<?= e(cfg('site.name')) ?>" class="h-20 w-auto">
       <p class="text-ink-500 dark:text-ink-400 mt-4 max-w-md text-pretty">
         Appartamenti selezionati a Sharm El Sheikh: Naama Bay, Hadaba, Sharks Bay, Old Market e Nabq. Gestione diretta in italiano, soggiorni curati, prezzi trasparenti.
       </p>

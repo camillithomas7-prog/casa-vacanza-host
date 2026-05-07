@@ -27,7 +27,7 @@ require __DIR__ . '/../partials/head.php';
 
     <div class="relative">
       <div class="h-16 w-16 rounded-2xl bg-white p-1.5 shadow-pop flex items-center justify-center">
-        <img src="/assets/logo-256.png" alt="<?= e(cfg('site.name')) ?>" class="h-full w-full object-contain">
+        <img src="/assets/logo-256.png?v=2" alt="<?= e(cfg('site.name')) ?>" class="h-full w-full object-contain">
       </div>
     </div>
 
@@ -63,7 +63,7 @@ require __DIR__ . '/../partials/head.php';
 
     <form method="post" class="w-full max-w-sm animate-slide-up">
       <div class="lg:hidden mb-8">
-        <img src="/assets/logo-256.png" alt="<?= e(cfg('site.name')) ?>" class="h-16 w-auto">
+        <img src="/assets/logo-256.png?v=2" alt="<?= e(cfg('site.name')) ?>" class="h-16 w-auto">
       </div>
       <div class="badge-brand mb-3">Area riservata</div>
       <h2 class="font-serif text-4xl font-semibold tracking-tight">Bentornato.</h2>

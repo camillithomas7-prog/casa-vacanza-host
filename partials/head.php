@@ -12,9 +12,9 @@ $pageTitle = $title ?? $siteName;
 <meta name="description" content="<?= e($metaDesc ?? 'Appartamenti a Sharm El Sheikh selezionati e gestiti direttamente in italiano. Naama Bay, Hadaba, Sharks Bay, Old Market, Nabq.') ?>">
 <meta name="theme-color" content="#f04e00">
 <link rel="icon" type="image/svg+xml" href="/assets/logo-mark.svg">
-<link rel="icon" type="image/png" sizes="192x192" href="/assets/logo-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/assets/logo-512.png">
-<link rel="apple-touch-icon" href="/assets/logo-256.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/logo-192.png?v=2">
+<link rel="icon" type="image/png" sizes="512x512" href="/assets/logo-512.png?v=2">
+<link rel="apple-touch-icon" href="/assets/logo-256.png?v=2">
 <link rel="manifest" href="/manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
