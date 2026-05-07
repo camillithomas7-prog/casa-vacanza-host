@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../lib/db.php';
 require_once __DIR__ . '/../lib/utils.php';
 require_once __DIR__ . '/../lib/services.php';
+require_once __DIR__ . '/../lib/notify.php';
 
 header('Content-Type: application/json');
 $body = json_decode(file_get_contents('php://input'), true) ?: [];
@@ -53,7 +54,6 @@ q('INSERT INTO service_bookings (id, code, service_id, customer_id, start_date, 
     $q['nightlyTotal'] ?? $q['base'] ?? 0, $q['extras'] ?? 0, $q['discount'] ?? 0, $q['total'],
     $couponCode, 'pending', 'direct', cfg('site.currency') ?: 'EUR', $body['notes'] ?? null]);
 
-q('INSERT INTO notifications (id, type, title, body, link) VALUES (?, ?, ?, ?, ?)',
-    [newId(), 'new_service_booking', 'Nuovo servizio richiesto', "{$body['name']} ha richiesto {$s['name']}", "/admin/servizi-prenotazioni.php"]);
+notify('new_service_booking', 'Nuovo servizio richiesto', "{$body['name']} ha richiesto {$s['name']}", "/admin/servizi-prenotazioni.php?id=$bookingId");
 
 echo json_encode(['ok' => true, 'code' => $code, 'id' => $bookingId]);

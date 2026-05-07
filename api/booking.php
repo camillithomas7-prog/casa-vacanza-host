@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../lib/db.php';
 require_once __DIR__ . '/../lib/pricing.php';
+require_once __DIR__ . '/../lib/notify.php';
 
 header('Content-Type: application/json');
 
@@ -39,7 +40,6 @@ q('INSERT INTO bookings (id, code, apartment_id, customer_id, check_in, check_ou
      $quote['nightlyTotal'], $quote['cleaningFee'], $quote['cityTax'], $quote['discount'], $quote['total'],
      $couponCode, 'pending', 'direct', cfg('site.currency') ?: 'EUR']);
 
-q('INSERT INTO notifications (id, type, title, body, link) VALUES (?, ?, ?, ?, ?)',
-    [newId(), 'new_booking', 'Nuova richiesta', "{$body['name']} ha richiesto {$apt['name']} dal $from al $to", "/admin/prenotazione.php?id=$bookingId"]);
+notify('new_booking', 'Nuova prenotazione', "{$body['name']} ha richiesto {$apt['name']} dal $from al $to", "/admin/prenotazione.php?id=$bookingId");
 
 echo json_encode(['ok' => true, 'code' => bookingCode($seq), 'id' => $bookingId]);
