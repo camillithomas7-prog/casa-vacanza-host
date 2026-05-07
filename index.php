@@ -394,6 +394,70 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
 </section>
 <?php endif; ?>
 
+<!-- ABOUT PATRIZIA -->
+<section class="container-wide py-16 sm:py-20">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+    <div class="relative">
+      <div class="absolute -inset-4 bg-gradient-to-br from-brand-100 via-brand-50 to-sand-100 dark:from-brand-500/10 dark:via-brand-500/5 dark:to-transparent rounded-[2.5rem] -z-10 blur-xl opacity-70"></div>
+      <div class="absolute -top-3 -left-3 h-24 w-24 rounded-2xl bg-brand-500/15 -z-10"></div>
+      <div class="absolute -bottom-3 -right-3 h-32 w-32 rounded-3xl bg-sea-300/30 dark:bg-sea-500/15 -z-10"></div>
+      <img src="/assets/patrizia-portrait.jpg?v=1"
+           alt="Patrizia Mancini"
+           loading="lazy"
+           class="relative w-full h-auto rounded-3xl shadow-pop object-cover">
+      <div class="absolute bottom-5 left-5 bg-white/95 dark:bg-ink-900/95 backdrop-blur-sm rounded-2xl px-4 py-2.5 shadow-card flex items-center gap-2.5">
+        <span class="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-sm font-medium">Disponibile su WhatsApp</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="badge-brand mb-4"><i data-lucide="user-round" class="size-[14px]"></i> La fondatrice</div>
+      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight text-balance">
+        Mi chiamo <span class="text-gradient-brand">Patrizia</span>, e a Sharm ci vivo.
+      </h2>
+
+      <div class="mt-6 space-y-4 text-ink-700 dark:text-ink-300 text-[17px] leading-relaxed text-pretty">
+        <p>
+          Da oltre <b>vent'anni vivo a Sharm El Sheikh</b> e da quindici accolgo qui i miei ospiti italiani.
+          Gli appartamenti che vedete sul sito non sono un catalogo: li ho <b>scelti uno per uno</b>,
+          li conosco, conosco i vicini, il portinaio, le piscine, gli orari migliori per evitare il sole forte.
+        </p>
+        <p>
+          Naama Bay, Hadaba, Sharks Bay, Nabq, Old Market: ci sono cresciuta professionalmente.
+          So a chi rivolgermi se vi serve un <b>transfer all'alba</b>, un'<b>escursione last-minute</b>
+          o semplicemente un consiglio su dove cenare bene la prima sera. Niente call center: con me avete
+          un <b>riferimento italiano sempre presente</b>, che risponde subito anche di notte.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 mt-8">
+        <div>
+          <div class="font-display text-3xl font-bold text-brand-600 tabular-nums">20+</div>
+          <div class="text-xs text-ink-500 uppercase tracking-wider mt-0.5">anni a Sharm</div>
+        </div>
+        <div>
+          <div class="font-display text-3xl font-bold text-brand-600 tabular-nums">5.000+</div>
+          <div class="text-xs text-ink-500 uppercase tracking-wider mt-0.5">ospiti accolti</div>
+        </div>
+        <div>
+          <div class="font-display text-3xl font-bold text-brand-600 tabular-nums">4,8/5</div>
+          <div class="text-xs text-ink-500 uppercase tracking-wider mt-0.5">soddisfazione</div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3 mt-8">
+        <a href="/contatti.php<?= $_lp ?>" class="btn-primary"><i data-lucide="message-circle" class="size-[16px]"></i> Scrivimi su WhatsApp</a>
+        <a href="/appartamenti.php<?= $_lp ?>" class="btn-outline"><i data-lucide="building-2" class="size-[16px]"></i> Vedi gli appartamenti</a>
+      </div>
+
+      <blockquote class="mt-8 pl-5 border-l-2 border-brand-500 italic text-ink-600 dark:text-ink-400 text-pretty">
+        «Vorrei che torniate a casa raccontando a un amico che a Sharm avete trovato una persona, non un'agenzia.»
+      </blockquote>
+    </div>
+  </div>
+</section>
+
 <!-- CTA FINALE -->
 <section class="container-wide py-16">
   <div class="relative isolate overflow-hidden p-10 md:p-16 text-center rounded-3xl shadow-pop bg-gradient-to-br from-brand-500 via-brand-600 to-brand-700">
