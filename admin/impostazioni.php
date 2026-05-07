@@ -8,8 +8,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrfCheck($_POST['csrf'] ?? null);
     $action = $_POST['action'] ?? '';
     if ($action === 'save_settings') {
-        foreach (['site_name','contact_email','contact_phone','currency','language','timezone'] as $k) {
-            $v = $_POST[$k] ?? '';
+        foreach (['site_name','contact_email','contact_phone','currency','language','timezone',
+                 'social_facebook','social_instagram','social_tiktok'] as $k) {
+            $v = trim($_POST[$k] ?? '');
             q('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)', [$k, $v]);
         }
         $msg = 'Impostazioni salvate';
@@ -64,6 +65,24 @@ require __DIR__ . '/../partials/admin-shell-top.php';
           </select>
         </label>
         <label class="block col-span-2"><span class="label">Timezone</span><input class="input" name="timezone" value="<?= e($settings['timezone'] ?? cfg('site.timezone')) ?>"></label>
+      </div>
+      <div class="pt-3 border-t border-ink-100 dark:border-ink-800/80">
+        <h3 class="font-display font-bold flex items-center gap-2 mb-3"><i data-lucide="share-2" class="size-[18px]"></i> Social</h3>
+        <p class="text-xs text-ink-500 mb-3">URL completi (es. https://instagram.com/patrizia.mancini). Lascia vuoto per nascondere.</p>
+        <div class="space-y-2.5">
+          <label class="block">
+            <span class="label flex items-center gap-1.5"><i data-lucide="facebook" class="size-[14px] text-[#1877f2]"></i> Facebook</span>
+            <input class="input" name="social_facebook" placeholder="https://facebook.com/..." value="<?= e($settings['social_facebook'] ?? '') ?>">
+          </label>
+          <label class="block">
+            <span class="label flex items-center gap-1.5"><i data-lucide="instagram" class="size-[14px] text-[#e4405f]"></i> Instagram</span>
+            <input class="input" name="social_instagram" placeholder="https://instagram.com/..." value="<?= e($settings['social_instagram'] ?? '') ?>">
+          </label>
+          <label class="block">
+            <span class="label flex items-center gap-1.5"><i data-lucide="music" class="size-[14px]"></i> TikTok</span>
+            <input class="input" name="social_tiktok" placeholder="https://tiktok.com/@..." value="<?= e($settings['social_tiktok'] ?? '') ?>">
+          </label>
+        </div>
       </div>
       <button class="btn-primary"><i data-lucide="save" class="size-[16px]"></i> Salva</button>
     </form>

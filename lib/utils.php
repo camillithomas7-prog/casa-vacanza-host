@@ -1,6 +1,19 @@
 <?php
 function e(?string $s): string { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
 
+function setting(string $key, ?string $default = null): ?string {
+    static $cache = null;
+    if ($cache === null) {
+        $cache = [];
+        try {
+            foreach (rows('SELECT setting_key, setting_value FROM settings') as $s) {
+                $cache[$s['setting_key']] = $s['setting_value'];
+            }
+        } catch (Throwable $e) {}
+    }
+    return $cache[$key] ?? $default;
+}
+
 function fmtMoney(float $amount, ?string $cur = null): string {
     $cur = $cur ?: cfg('site.currency') ?: 'EUR';
     $f = new NumberFormatter('it_IT', NumberFormatter::CURRENCY);
