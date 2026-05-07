@@ -615,7 +615,8 @@ if ($count > 0 && !$reset) {
        'cover_image'=>'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200&q=80',
        'gallery'=>json_encode([
          'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200&q=80',
-         'https://images.unsplash.com/photo-1547155728-a9b58a4f0a91?w=1200&q=80',
+         'https://images.unsplash.com/photo-1571679654681-ba01b9e1e117?w=1200&q=80',
+         'https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=1200&q=80',
        ]),
        'price_per_person'=>35, 'duration_hours'=>5, 'group_size_min'=>1, 'group_size_max'=>20,
        'meeting_point'=>'Pickup hotel ore 14:30',
@@ -625,8 +626,12 @@ if ($count > 0 && !$reset) {
 
       ['slug'=>'beduino-cammelli-cena', 'type'=>'desert_excursion', 'name'=>'Beduini, cammelli e cena nel deserto',
        'description'=>"Esperienza tradizionale: dorso del cammello al tramonto, cena tipica beduina sotto le stelle, musica dal vivo e narghilè.",
-       'cover_image'=>'https://images.unsplash.com/photo-1547155728-a9b58a4f0a91?w=1200&q=80',
-       'gallery'=>json_encode(['https://images.unsplash.com/photo-1547155728-a9b58a4f0a91?w=1200&q=80']),
+       'cover_image'=>'https://images.unsplash.com/photo-1571679654681-ba01b9e1e117?w=1200&q=80',
+       'gallery'=>json_encode([
+         'https://images.unsplash.com/photo-1571679654681-ba01b9e1e117?w=1200&q=80',
+         'https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=1200&q=80',
+         'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200&q=80',
+       ]),
        'price_per_person'=>30, 'duration_hours'=>5, 'group_size_min'=>1, 'group_size_max'=>30,
        'meeting_point'=>'Pickup hotel ore 16:00',
        'includes'=>json_encode(['Pickup','Cammello','Cena tipica','Spettacolo','Narghilè']),
@@ -646,10 +651,11 @@ if ($count > 0 && !$reset) {
       // ============ TOUR CULTURALI ============
       ['slug'=>'cairo-piramidi-day-trip', 'type'=>'tour', 'name'=>'Cairo & Piramidi · Day trip',
        'description'=>"Volo a/r in giornata al Cairo: Piramidi di Giza, Sfinge, Museo Egizio, mercato Khan El Khalili. Guida italiana dedicata.",
-       'cover_image'=>'https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=1200&q=80',
+       'cover_image'=>'https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=1200&q=80',
        'gallery'=>json_encode([
-         'https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=1200&q=80',
          'https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=1200&q=80',
+         'https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?w=1200&q=80',
+         'https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?w=1200&q=80',
        ]),
        'price_per_person'=>250, 'duration_hours'=>16, 'group_size_min'=>2, 'group_size_max'=>15,
        'meeting_point'=>'Aeroporto Sharm ore 4:00 (pickup hotel ore 3:00)',
@@ -659,8 +665,11 @@ if ($count > 0 && !$reset) {
 
       ['slug'=>'monte-sinai-alba', 'type'=>'tour', 'name'=>'Monte Sinai · Alba sulla cima',
        'description'=>"Salita notturna al Monte Sinai per assistere all'alba, visita al Monastero di Santa Caterina. Esperienza unica.",
-       'cover_image'=>'https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=1200&q=80',
-       'gallery'=>json_encode(['https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=1200&q=80']),
+       'cover_image'=>'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80',
+       'gallery'=>json_encode([
+         'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80',
+         'https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6?w=1200&q=80',
+       ]),
        'price_per_person'=>55, 'duration_hours'=>14, 'group_size_min'=>2, 'group_size_max'=>20,
        'meeting_point'=>'Pickup hotel ore 22:00',
        'includes'=>json_encode(['Pickup','Guida','Ingresso monastero','Tè caldo']),
