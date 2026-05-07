@@ -414,35 +414,36 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
     <div>
       <div class="badge-brand mb-4"><i data-lucide="user-round" class="size-[14px]"></i> La fondatrice</div>
       <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight text-balance">
-        Mi chiamo <span class="text-gradient-brand">Patrizia</span>, e a Sharm ci vivo.
+        <span class="text-gradient-brand">Patrizia Mancini</span>, il vostro riferimento a Sharm.
       </h2>
 
       <div class="mt-6 space-y-4 text-ink-700 dark:text-ink-300 text-[17px] leading-relaxed text-pretty">
         <p>
-          Da oltre <b>vent'anni vivo a Sharm El Sheikh</b> e da quindici accolgo qui i miei ospiti italiani.
-          Gli appartamenti che vedete sul sito non sono un catalogo: li ho <b>scelti uno per uno</b>,
-          li conosco, conosco i vicini, il portinaio, le piscine, gli orari migliori per evitare il sole forte.
+          Mi occupo <b>personalmente</b> di ogni ospite, dal primo messaggio fino al rientro a casa.
+          Gli appartamenti che vedete sul sito li ho <b>selezionati uno per uno</b>, in zone che conosco
+          a fondo: posizione, qualità, sicurezza e rapporto qualità-prezzo sono verificati di persona,
+          non delegati a una piattaforma.
         </p>
         <p>
-          Naama Bay, Hadaba, Sharks Bay, Nabq, Old Market: ci sono cresciuta professionalmente.
-          So a chi rivolgermi se vi serve un <b>transfer all'alba</b>, un'<b>escursione last-minute</b>
-          o semplicemente un consiglio su dove cenare bene la prima sera. Niente call center: con me avete
-          un <b>riferimento italiano sempre presente</b>, che risponde subito anche di notte.
+          Vi seguo con <b>assistenza in italiano sempre disponibile</b>, anche fuori orario: per un
+          dubbio sul check-in, un transfer da organizzare, un'escursione da prenotare o semplicemente
+          il consiglio giusto su dove mangiare bene. Trovate una <b>professionista presente, discreta
+          e rapida</b>, non un call center.
         </p>
       </div>
 
       <div class="grid grid-cols-3 gap-4 mt-8">
         <div>
-          <div class="font-display text-3xl font-bold text-brand-600 tabular-nums">20+</div>
-          <div class="text-xs text-ink-500 uppercase tracking-wider mt-0.5">anni a Sharm</div>
+          <div class="flex items-center gap-2"><i data-lucide="check-circle-2" class="size-[20px] text-brand-600"></i><div class="font-display text-base sm:text-lg font-bold">Selezione personale</div></div>
+          <div class="text-xs text-ink-500 mt-1">ogni appartamento verificato</div>
         </div>
         <div>
-          <div class="font-display text-3xl font-bold text-brand-600 tabular-nums">5.000+</div>
-          <div class="text-xs text-ink-500 uppercase tracking-wider mt-0.5">ospiti accolti</div>
+          <div class="flex items-center gap-2"><i data-lucide="message-circle" class="size-[20px] text-brand-600"></i><div class="font-display text-base sm:text-lg font-bold">Assistenza H24</div></div>
+          <div class="text-xs text-ink-500 mt-1">in italiano, anche di notte</div>
         </div>
         <div>
-          <div class="font-display text-3xl font-bold text-brand-600 tabular-nums">4,8/5</div>
-          <div class="text-xs text-ink-500 uppercase tracking-wider mt-0.5">soddisfazione</div>
+          <div class="flex items-center gap-2"><i data-lucide="map-pin" class="size-[20px] text-brand-600"></i><div class="font-display text-base sm:text-lg font-bold">Conoscenza locale</div></div>
+          <div class="text-xs text-ink-500 mt-1">consigli su misura</div>
         </div>
       </div>
 
@@ -452,7 +453,7 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
       </div>
 
       <blockquote class="mt-8 pl-5 border-l-2 border-brand-500 italic text-ink-600 dark:text-ink-400 text-pretty">
-        «Vorrei che torniate a casa raccontando a un amico che a Sharm avete trovato una persona, non un'agenzia.»
+        «Il mio obiettivo è semplice: che ogni ospite torni a casa serenamente, con la sensazione di essere stato seguito da una persona di fiducia.»
       </blockquote>
     </div>
   </div>
