@@ -72,7 +72,7 @@ require __DIR__ . '/partials/site-header.php';
 </div>
 
 <div class="container-wide pb-20">
-  <div class="grid lg:grid-cols-3 gap-10">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
     <div class="lg:col-span-2 space-y-10">
       <!-- INFO STRIP -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -131,7 +131,7 @@ require __DIR__ . '/partials/site-header.php';
               <?= number_format($rating, 1) ?> · <?= count($reviews) ?> recensioni
             </h2>
           </div>
-          <div class="grid sm:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <?php foreach ($reviews as $r):
               $parts = explode(' ', trim($r['author_name']));
               $initials = mb_strtoupper(mb_substr($parts[0] ?? '·', 0, 1) . (isset($parts[1]) ? mb_substr($parts[1], 0, 1) : ''));

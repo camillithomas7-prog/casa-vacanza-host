@@ -33,7 +33,7 @@ require __DIR__ . '/partials/site-header.php';
   <div class="container-wide pt-12 md:pt-16 pb-8">
     <div class="max-w-3xl">
       <div class="badge-brand mb-3">La collezione</div>
-      <h1 class="font-serif text-5xl md:text-6xl font-semibold tracking-tight text-balance">Trova la casa giusta.</h1>
+      <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-balance">Trova la casa giusta.</h1>
       <p class="text-ink-600 dark:text-ink-300 mt-3 text-lg max-w-xl text-pretty">Filtra per zona di Sharm, date, ospiti e prezzo. Ogni casa è ispezionata personalmente.</p>
     </div>
 
@@ -82,7 +82,7 @@ require __DIR__ . '/partials/site-header.php';
     <div class="text-sm text-ink-500 mb-4"><strong class="text-ink-900 dark:text-white"><?= count($apartments) ?></strong> case disponibili</div>
   <?php endif; ?>
 
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <?php foreach ($apartments as $a):
       $cover = $a['cover_image'] ?: (rows('SELECT url FROM photos WHERE apartment_id = ? ORDER BY position ASC LIMIT 1', [$a['id']])[0]['url'] ?? '');
       $morePics = rows('SELECT url FROM photos WHERE apartment_id = ? ORDER BY position ASC LIMIT 4', [$a['id']]);

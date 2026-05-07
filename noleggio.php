@@ -43,7 +43,7 @@ require __DIR__ . '/partials/site-header.php';
 </div>
 
 <div class="container-wide pb-20">
-  <div class="grid lg:grid-cols-3 gap-10">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
     <div class="lg:col-span-2 space-y-8">
       <div>
         <h2 class="font-serif text-3xl font-semibold tracking-tight mb-3">Descrizione</h2>
@@ -66,7 +66,7 @@ require __DIR__ . '/partials/site-header.php';
 
       <div class="card p-6">
         <h2 class="font-serif text-2xl font-semibold tracking-tight mb-4">Tariffe</h2>
-        <div class="grid sm:grid-cols-2 gap-3 text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <?php
           $rates = [
             ['Giornaliera', $s['daily_price']],

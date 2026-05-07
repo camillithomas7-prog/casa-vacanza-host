@@ -47,7 +47,7 @@ require __DIR__ . '/partials/site-header.php';
 </div>
 
 <div class="container-wide pb-20">
-  <div class="grid lg:grid-cols-3 gap-10">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
     <div class="lg:col-span-2 space-y-8">
       <div>
         <h2 class="font-serif text-3xl font-semibold tracking-tight mb-3">L'esperienza</h2>
@@ -55,7 +55,7 @@ require __DIR__ . '/partials/site-header.php';
       </div>
 
       <?php if ($includes || $excludes): ?>
-        <div class="grid sm:grid-cols-2 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <?php if ($includes): ?>
             <div class="card p-5">
               <div class="font-display font-bold mb-3 flex items-center gap-2 text-emerald-600"><i data-lucide="check-circle-2" class="size-[16px]"></i> Incluso</div>

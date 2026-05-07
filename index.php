@@ -161,7 +161,7 @@ require __DIR__ . '/partials/site-header.php';
     </div>
     <a href="/appartamenti.php" class="btn-outline hidden sm:inline-flex">Vedi tutto <i data-lucide="arrow-right" class="size-[14px]"></i></a>
   </div>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <?php foreach ($apartments as $i => $a):
       $cover = $a['cover_image'] ?: (rows('SELECT url FROM photos WHERE apartment_id = ? ORDER BY position ASC LIMIT 1', [$a['id']])[0]['url'] ?? '');
       $reviews = rows('SELECT rating FROM reviews WHERE apartment_id = ? AND approved = 1', [$a['id']]);
@@ -196,7 +196,7 @@ require __DIR__ . '/partials/site-header.php';
 
 <!-- BANNER SERVIZI EXTRA -->
 <section class="container-wide py-12">
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <?php foreach ([
       ['key-round', 'Noleggi', 'Auto, scooter, golf cart, monopattini', '/noleggi.php', 'Da €15/g'],
       ['compass', 'Escursioni', 'Ras Mohammed, deserto, Cairo, Sinai', '/escursioni.php', 'Da €30/p'],
@@ -227,7 +227,7 @@ require __DIR__ . '/partials/site-header.php';
     </div>
     <a href="/noleggi.php" class="btn-outline hidden sm:inline-flex">Tutti i noleggi <i data-lucide="arrow-right" class="size-[14px]"></i></a>
   </div>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <?php foreach ($rentals as $i => $s): ?>
       <a href="/noleggio.php?slug=<?= e($s['slug']) ?>" class="group block animate-slide-up" style="animation-delay:<?= $i * 50 ?>ms">
         <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-ink-100 dark:bg-ink-900 relative shadow-card">
@@ -265,7 +265,7 @@ require __DIR__ . '/partials/site-header.php';
     </div>
     <a href="/escursioni.php" class="btn-outline hidden sm:inline-flex">Tutte le escursioni <i data-lucide="arrow-right" class="size-[14px]"></i></a>
   </div>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <?php foreach ($experiences as $i => $s): ?>
       <a href="/escursione.php?slug=<?= e($s['slug']) ?>" class="group block animate-slide-up" style="animation-delay:<?= $i * 50 ?>ms">
         <div class="aspect-[4/5] rounded-2xl overflow-hidden bg-ink-100 dark:bg-ink-900 relative shadow-card">
@@ -302,7 +302,7 @@ require __DIR__ . '/partials/site-header.php';
     </div>
     <a href="/transfer.php" class="btn-outline hidden sm:inline-flex">Tutte le tratte <i data-lucide="arrow-right" class="size-[14px]"></i></a>
   </div>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
     <?php foreach ($transfers as $i => $s): ?>
       <a href="/transfer.php?slug=<?= e($s['slug']) ?>" class="card overflow-hidden p-0 card-hover group animate-slide-up" style="animation-delay:<?= $i * 50 ?>ms">
         <div class="aspect-[16/10] bg-ink-100 dark:bg-ink-900 relative">
@@ -332,7 +332,7 @@ require __DIR__ . '/partials/site-header.php';
     <div class="badge-brand mb-3">Come funziona</div>
     <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Tre passi, zero stress.</h2>
   </div>
-  <div class="grid md:grid-cols-3 gap-5 relative">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-5 relative">
     <div class="hidden md:block absolute top-12 left-[16%] right-[16%] h-px border-t-2 border-dashed border-brand-300/50"></div>
     <?php foreach ([
       ['1','search', 'Trova', 'Sfoglia la collezione, filtra per zona, date e ospiti. Vedi disponibilità live.'],
@@ -351,7 +351,7 @@ require __DIR__ . '/partials/site-header.php';
 
 <!-- BENEFIT STRIP -->
 <section class="container-wide py-12">
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <?php foreach ([
       ['shield-check', 'Pagamenti sicuri', 'Acconto e saldo trasparenti, ricevuta sempre.'],
       ['key-round', 'Check-in semplice', 'Istruzioni chiare, supporto WhatsApp 7/7.'],
@@ -374,7 +374,7 @@ require __DIR__ . '/partials/site-header.php';
     <div class="badge-brand mb-3">Cosa dicono di noi</div>
     <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Recensioni vere, da clienti veri.</h2>
   </div>
-  <div class="grid md:grid-cols-3 gap-5">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
     <?php foreach ($topReviews as $r):
       $parts = explode(' ', trim($r['author_name']));
       $initials = mb_strtoupper(mb_substr($parts[0] ?? '·', 0, 1) . (isset($parts[1]) ? mb_substr($parts[1], 0, 1) : ''));

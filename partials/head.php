@@ -69,10 +69,11 @@ try { var t = localStorage.getItem('cv-theme'); if (t === 'dark' || (!t && windo
 </script>
 <style type="text/tailwindcss">
 @layer base {
-  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
-  body { @apply bg-white text-ink-900 dark:bg-ink-950 dark:text-ink-50; font-feature-settings: 'cv11','ss01','ss03'; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; overflow-x: hidden; }
+  body { @apply bg-white text-ink-900 dark:bg-ink-950 dark:text-ink-50; font-feature-settings: 'cv11','ss01','ss03'; overflow-x: hidden; max-width: 100vw; }
   ::selection { @apply bg-brand-500/30; }
   [x-cloak] { display: none !important; }
+  img, video { max-width: 100%; height: auto; }
 }
 @layer components {
   .container-wide { @apply max-w-[1240px] mx-auto px-5 sm:px-6 lg:px-8; }

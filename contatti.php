@@ -11,14 +11,14 @@ require __DIR__ . '/partials/site-header.php';
   <div class="container-narrow pt-16 md:pt-20 pb-10">
     <div class="max-w-2xl">
       <div class="badge-brand mb-3">Parla con noi</div>
-      <h1 class="font-serif text-5xl md:text-6xl font-semibold tracking-tight text-balance">Una mano, sempre.</h1>
+      <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-balance">Una mano, sempre.</h1>
       <p class="text-ink-600 dark:text-ink-300 mt-4 text-lg max-w-xl text-pretty">Per prenotazioni, modifiche o consigli sul tuo soggiorno a Sharm El Sheikh: rispondiamo in italiano entro poche ore, sette giorni su sette.</p>
     </div>
   </div>
 </section>
 
 <section class="container-wide pb-20">
-  <div class="grid lg:grid-cols-3 gap-5">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
     <?php foreach ([
       ['mail', 'Email', cfg('site.email'), 'mailto:' . cfg('site.email'), 'Risposta entro poche ore'],
       ['phone', 'Telefono / WhatsApp', cfg('site.phone'), 'https://wa.me/' . preg_replace('/\D/', '', cfg('site.phone') ?: ''), 'Lun-Dom 9-22'],

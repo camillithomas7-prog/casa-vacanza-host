@@ -19,7 +19,7 @@ require __DIR__ . '/partials/site-header.php';
   <div class="absolute inset-0 -z-10 bg-gradient-to-b from-transparent to-white dark:to-ink-950"></div>
   <div class="container-wide pt-12 md:pt-16 pb-8">
     <div class="badge-brand mb-3"><i data-lucide="plane-takeoff" class="size-[12px]"></i> Transfer</div>
-    <h1 class="font-serif text-5xl md:text-6xl font-semibold tracking-tight text-balance">Dal volo al letto.</h1>
+    <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-balance">Dal volo al letto.</h1>
     <p class="text-ink-600 dark:text-ink-300 mt-3 text-lg max-w-xl text-pretty">Transfer privato dall'aeroporto di Sharm El Sheikh a qualsiasi villaggio o appartamento. Auto fino a 4 persone o minibus 7 posti.</p>
   </div>
 </section>

@@ -21,7 +21,7 @@ require __DIR__ . '/partials/site-header.php';
   <div class="absolute inset-0 -z-10 bg-gradient-to-b from-transparent to-white dark:to-ink-950"></div>
   <div class="container-wide pt-12 md:pt-16 pb-8">
     <div class="badge-brand mb-3"><i data-lucide="compass" class="size-[12px]"></i> Escursioni</div>
-    <h1 class="font-serif text-5xl md:text-6xl font-semibold tracking-tight text-balance">Vivi Sharm.</h1>
+    <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-balance">Vivi Sharm.</h1>
     <p class="text-ink-600 dark:text-ink-300 mt-3 text-lg max-w-xl text-pretty">Snorkeling al reef di Ras Mohammed, quad nel deserto, beduini con cammelli, Cairo e piramidi. Tutto con guida italiana e transfer dall'hotel.</p>
 
     <div class="mt-8 flex flex-wrap gap-2">
@@ -39,7 +39,7 @@ require __DIR__ . '/partials/site-header.php';
 </section>
 
 <section class="container-wide py-10">
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <?php foreach ($items as $i => $s): ?>
       <a href="/escursione.php?slug=<?= e($s['slug']) ?>" class="group block animate-slide-up" style="animation-delay:<?= $i * 50 ?>ms">
         <div class="aspect-[4/5] rounded-2xl overflow-hidden bg-ink-100 dark:bg-ink-900 relative shadow-card">
