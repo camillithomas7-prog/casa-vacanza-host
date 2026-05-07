@@ -125,7 +125,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       <label class="block"><span class="label">Descrizione</span><textarea class="input min-h-[120px]" name="description"><?= e($f['description']) ?></textarea></label>
       <div class="grid grid-cols-2 gap-3">
         <label class="block"><span class="label">Indirizzo</span><input class="input" name="address" value="<?= e($f['address']) ?>"></label>
-        <label class="block"><span class="label">Città</span><input class="input" name="city" value="<?= e($f['city']) ?>"></label>
+        <label class="block"><span class="label">Zona di Sharm</span><input class="input" name="city" value="<?= e($f['city']) ?>" placeholder="es. Naama Bay, Hadaba, Sharks Bay…"></label>
         <label class="block"><span class="label">Paese</span><input class="input" name="country" value="<?= e($f['country']) ?>"></label>
         <label class="block"><span class="label">URL foto cover</span><input class="input" name="cover_image" value="<?= e($f['cover_image']) ?>"></label>
       </div>

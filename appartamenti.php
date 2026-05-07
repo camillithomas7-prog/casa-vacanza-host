@@ -34,7 +34,7 @@ require __DIR__ . '/partials/site-header.php';
     <div class="max-w-3xl">
       <div class="badge-brand mb-3">La collezione</div>
       <h1 class="font-serif text-5xl md:text-6xl font-semibold tracking-tight text-balance">Trova la casa giusta.</h1>
-      <p class="text-ink-600 dark:text-ink-300 mt-3 text-lg max-w-xl text-pretty">Filtra per città, date, ospiti e prezzo. Ogni casa è ispezionata personalmente.</p>
+      <p class="text-ink-600 dark:text-ink-300 mt-3 text-lg max-w-xl text-pretty">Filtra per zona di Sharm, date, ospiti e prezzo. Ogni casa è ispezionata personalmente.</p>
     </div>
 
     <form method="get" class="mt-8 card-elev p-2 grid grid-cols-1 md:grid-cols-[1.4fr_1fr_1fr_0.9fr_auto] gap-1">
@@ -43,7 +43,7 @@ require __DIR__ . '/partials/site-header.php';
         <div class="flex-1">
           <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Dove</div>
           <select name="city" class="w-full bg-transparent outline-none text-sm font-medium">
-            <option value="">Tutte le città</option>
+            <option value="">Tutte le zone</option>
             <?php foreach ($cities as $c): ?><option value="<?= e($c) ?>" <?= ($_GET['city'] ?? '') === $c ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?>
           </select>
         </div>

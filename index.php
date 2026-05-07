@@ -97,7 +97,7 @@ require __DIR__ . '/partials/site-header.php';
         <div class="flex-1">
           <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Dove</div>
           <select name="city" class="w-full bg-transparent outline-none text-sm font-medium">
-            <option value="">Tutte le città</option>
+            <option value="">Tutte le zone</option>
             <?php foreach ($cities as $c): ?><option value="<?= e($c) ?>"><?= e($c) ?></option><?php endforeach; ?>
           </select>
         </div>
@@ -127,8 +127,9 @@ require __DIR__ . '/partials/site-header.php';
 <section class="container-wide py-16">
   <div class="flex items-end justify-between mb-8">
     <div>
-      <div class="badge-brand mb-2">Destinazioni</div>
-      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Scegli una città.</h2>
+      <div class="badge-brand mb-2">Zone di Sharm El Sheikh</div>
+      <h2 class="font-serif text-4xl md:text-5xl font-semibold tracking-tight">Scegli la tua zona.</h2>
+      <p class="text-ink-500 mt-2">Naama Bay, Hadaba, Sharks Bay, Nabq Bay e Old Market.</p>
     </div>
     <a href="/appartamenti.php" class="hidden sm:inline-flex text-sm text-brand-600 font-medium hover:underline">Vedi tutte →</a>
   </div>
@@ -142,7 +143,7 @@ require __DIR__ . '/partials/site-header.php';
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
         <div class="absolute bottom-0 left-0 right-0 p-5 text-white">
           <div class="font-serif font-semibold text-2xl"><?= e($city) ?></div>
-          <div class="text-xs text-white/80 mt-1"><?= $cityCount ?> <?= $cityCount === 1 ? 'casa' : 'case' ?></div>
+          <div class="text-xs text-white/80 mt-1"><?= $cityCount ?> <?= $cityCount === 1 ? 'appartamento' : 'appartamenti' ?></div>
         </div>
       </a>
     <?php endforeach; ?>
@@ -334,7 +335,7 @@ require __DIR__ . '/partials/site-header.php';
   <div class="grid md:grid-cols-3 gap-5 relative">
     <div class="hidden md:block absolute top-12 left-[16%] right-[16%] h-px border-t-2 border-dashed border-brand-300/50"></div>
     <?php foreach ([
-      ['1','search', 'Trova', 'Sfoglia la collezione, filtra per città, date e ospiti. Vedi disponibilità live.'],
+      ['1','search', 'Trova', 'Sfoglia la collezione, filtra per zona, date e ospiti. Vedi disponibilità live.'],
       ['2','calendar-check', 'Prenota', 'Compila il modulo. Ricevi conferma immediata via WhatsApp/Email con tutto il necessario.'],
       ['3','key-round', 'Soggiorna', 'Check-in semplice, istruzioni chiare. Siamo qui per qualsiasi cosa, 7/7.'],
     ] as $i => $s): ?>
