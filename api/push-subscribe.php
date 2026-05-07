@@ -2,9 +2,11 @@
 require_once __DIR__ . '/../lib/db.php';
 require_once __DIR__ . '/../lib/utils.php';
 require_once __DIR__ . '/../lib/auth.php';
+require_once __DIR__ . '/../lib/notify.php';
 
 header('Content-Type: application/json');
 requireAdmin();
+ensurePushSchema();
 
 $body = json_decode(file_get_contents('php://input'), true) ?: [];
 $endpoint = $body['endpoint'] ?? null;

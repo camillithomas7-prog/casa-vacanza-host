@@ -4,6 +4,29 @@ require_once __DIR__ . '/utils.php';
 require_once __DIR__ . '/webpush.php';
 
 /**
+ * Idempotently ensure the push_subscriptions table exists.
+ * Cached per request so it runs at most once.
+ */
+function ensurePushSchema(): void {
+    static $done = false;
+    if ($done) return;
+    try {
+        db()->exec("CREATE TABLE IF NOT EXISTS push_subscriptions (
+          id VARCHAR(32) PRIMARY KEY,
+          endpoint TEXT NOT NULL,
+          p256dh VARCHAR(255) NOT NULL,
+          auth VARCHAR(255) NOT NULL,
+          user_agent VARCHAR(500),
+          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE KEY uniq_endpoint (endpoint(255))
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    } catch (Throwable $e) {
+        error_log('ensurePushSchema failed: ' . $e->getMessage());
+    }
+    $done = true;
+}
+
+/**
  * Create an in-app notification AND send a push to all subscribed devices.
  * Use this instead of inserting directly into `notifications`.
  */
@@ -50,6 +73,7 @@ function vapidKeys(): array {
  * Drops subscriptions that return 404/410 (gone).
  */
 function sendPushToAll(array $payload): array {
+    ensurePushSchema();
     $keys = vapidKeys();
     $subject = setting('push_subject') ?: ('mailto:' . (cfg('site.email') ?: 'admin@casavacanza.it'));
     try {
