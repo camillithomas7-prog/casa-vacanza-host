@@ -139,6 +139,7 @@ try { if (localStorage.getItem('cv-theme') === 'dark') document.documentElement.
   .mask-fade-b { mask-image: linear-gradient(to bottom, black 70%, transparent); }
 }
 <style>
+#cv-pwa-splash { display: none; }
 @media all and (display-mode: standalone) {
   #cv-pwa-splash {
     position: fixed; inset: 0; z-index: 99999;
