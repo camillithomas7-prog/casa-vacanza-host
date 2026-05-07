@@ -279,6 +279,19 @@ CREATE TABLE IF NOT EXISTS services (
   INDEX idx_slug (slug)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS zones (
+  id VARCHAR(32) PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  slug VARCHAR(120) NOT NULL,
+  kind VARCHAR(20) NOT NULL DEFAULT 'zone',
+  description TEXT,
+  image VARCHAR(500),
+  position INT NOT NULL DEFAULT 0,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_slug (slug)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS push_subscriptions (
   id VARCHAR(32) PRIMARY KEY,
   endpoint TEXT NOT NULL,
@@ -347,6 +360,22 @@ foreach (defaultTemplates() as $t) {
         [newId(), $t['key'], $t['name'], $t['channel'], $t['subject'], $t['body']]);
 }
 echo "✓ Template messaggi caricati\n";
+
+// Seed zone/villaggi default (idempotente)
+$defaultZones = [
+    ['name' => 'Naama Bay',   'slug' => 'naama-bay',   'kind' => 'zone',     'image' => '/assets/sharm/zone_naama_bay.jpg',  'position' => 1],
+    ['name' => 'Hadaba',      'slug' => 'hadaba',      'kind' => 'zone',     'image' => '/assets/sharm/zone_hadaba.jpg',     'position' => 2],
+    ['name' => 'Sharks Bay',  'slug' => 'sharks-bay',  'kind' => 'zone',     'image' => '/assets/sharm/zone_sharks_bay.jpg', 'position' => 3],
+    ['name' => 'Nabq Bay',    'slug' => 'nabq-bay',    'kind' => 'villaggio','image' => '/assets/sharm/zone_nabq_bay.jpg',   'position' => 4],
+    ['name' => 'Old Market',  'slug' => 'old-market',  'kind' => 'zone',     'image' => '/assets/sharm/zone_old_market.jpg', 'position' => 5],
+];
+foreach ($defaultZones as $z) {
+    $exists = row('SELECT id FROM zones WHERE slug = ?', [$z['slug']]);
+    if ($exists) continue;
+    q('INSERT INTO zones (id, name, slug, kind, image, position) VALUES (?, ?, ?, ?, ?, ?)',
+        [newId(), $z['name'], $z['slug'], $z['kind'], $z['image'], $z['position']]);
+}
+echo "✓ Zone/villaggi caricati\n";
 
 $count = (int)val('SELECT COUNT(*) FROM apartments');
 if ($count > 0 && !$reset) {

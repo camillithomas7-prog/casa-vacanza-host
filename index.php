@@ -13,7 +13,19 @@ if (!tableExists('apartments')) {
 require_once __DIR__ . '/lib/services.php';
 
 $apartments = rows('SELECT a.* FROM apartments a WHERE a.active = 1 ORDER BY a.created_at DESC LIMIT 6');
-$cities = array_filter(array_unique(array_column($apartments, 'city')));
+
+// Carica zone dalla tabella admin (con fallback a derivazione automatica dagli appartamenti se la tabella non esiste o è vuota)
+$zones = [];
+try {
+    $zones = rows('SELECT * FROM zones WHERE active = 1 ORDER BY position ASC, name ASC');
+} catch (Throwable $e) {}
+if (!$zones) {
+    $cityNames = array_filter(array_unique(array_column($apartments, 'city')));
+    foreach ($cityNames as $cn) {
+        $zones[] = ['name' => $cn, 'kind' => 'zone', 'image' => null, 'description' => null];
+    }
+}
+$cities = array_column($zones, 'name');
 $totalApartments = (int)val('SELECT COUNT(*) FROM apartments WHERE active = 1');
 $avgRating = (float)val('SELECT AVG(rating) FROM reviews WHERE approved = 1');
 $totalReviews = (int)val('SELECT COUNT(*) FROM reviews WHERE approved = 1');
@@ -131,27 +143,24 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
     </div>
     <a href="/appartamenti.php<?= $_lp ?>" class="hidden sm:inline-flex text-sm text-brand-600 font-medium hover:underline"><?= e(t('common.see_all_arrow')) ?></a>
   </div>
-  <?php
-    // Mappa città → immagine reale della zona di Sharm El Sheikh
-    $zoneImages = [
-        'Naama Bay'   => '/assets/sharm/zone_naama_bay.jpg',
-        'Hadaba'      => '/assets/sharm/zone_hadaba.jpg',
-        'Sharks Bay'  => '/assets/sharm/zone_sharks_bay.jpg',
-        'Old Market'  => '/assets/sharm/zone_old_market.jpg',
-        'Nabq Bay'    => '/assets/sharm/zone_nabq_bay.jpg',
-    ];
-  ?>
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <?php foreach (array_slice($cities, 0, 4) as $city):
-      $cityCover = $zoneImages[$city] ?? val('SELECT cover_image FROM apartments WHERE city = ? AND cover_image IS NOT NULL LIMIT 1', [$city]);
-      $cityCount = (int)val('SELECT COUNT(*) FROM apartments WHERE city = ? AND active = 1', [$city]);
+    <?php foreach (array_slice($zones, 0, 4) as $z):
+      $zCover = $z['image'] ?? null;
+      if (!$zCover) {
+        // Fallback: prima foto di un appartamento in quella città
+        $zCover = val('SELECT cover_image FROM apartments WHERE city = ? AND cover_image IS NOT NULL LIMIT 1', [$z['name']]);
+      }
+      $zCount = (int)val('SELECT COUNT(*) FROM apartments WHERE city = ? AND active = 1', [$z['name']]);
     ?>
-      <a href="/appartamenti.php?city=<?= urlencode($city) ?><?= $_lp ? '&lang=' . urlencode(currentLang()) : '' ?>" class="relative aspect-[4/5] rounded-2xl overflow-hidden group shadow-card">
-        <?php if ($cityCover): ?><img src="<?= e($cityCover) ?>" alt="<?= e($city) ?>" loading="lazy" class="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition duration-700 ease-out-expo"><?php endif; ?>
+      <a href="/appartamenti.php?city=<?= urlencode($z['name']) ?><?= $_lp ? '&lang=' . urlencode(currentLang()) : '' ?>" class="relative aspect-[4/5] rounded-2xl overflow-hidden group shadow-card">
+        <?php if ($zCover): ?><img src="<?= e($zCover) ?>" alt="<?= e($z['name']) ?>" loading="lazy" class="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition duration-700 ease-out-expo"><?php endif; ?>
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
         <div class="absolute bottom-0 left-0 right-0 p-5 text-white">
-          <div class="font-serif font-semibold text-2xl"><?= e($city) ?></div>
-          <div class="text-xs text-white/80 mt-1"><?= $cityCount ?> <?= $cityCount === 1 ? e(t('home.zones.unit_one')) : e(t('home.zones.unit_many')) ?></div>
+          <?php if (!empty($z['kind']) && $z['kind'] !== 'zone'): ?>
+            <div class="text-[10px] uppercase tracking-wider text-white/70 mb-1"><?= e(t('home.zones.kind_' . $z['kind'])) ?></div>
+          <?php endif; ?>
+          <div class="font-serif font-semibold text-2xl"><?= e($z['name']) ?></div>
+          <div class="text-xs text-white/80 mt-1"><?= $zCount ?> <?= $zCount === 1 ? e(t('home.zones.unit_one')) : e(t('home.zones.unit_many')) ?></div>
         </div>
       </a>
     <?php endforeach; ?>

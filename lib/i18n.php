@@ -169,23 +169,36 @@ $TRANSLATIONS = [
 
 // ========== HOME SECTIONS ==========
 'home.zones.badge' => [
-    'it' => 'Zone di Sharm El Sheikh', 'en' => 'Sharm El Sheikh areas', 'ru' => 'Районы Шарм-эль-Шейха', 'es' => 'Zonas de Sharm El Sheikh', 'de' => 'Gebiete in Sharm El Sheikh',
+    'it' => 'Zone & villaggi', 'en' => 'Areas & resorts', 'ru' => 'Районы и курорты', 'es' => 'Zonas y resorts', 'de' => 'Gebiete & Resorts',
 ],
 'home.zones.title' => [
-    'it' => 'Scegli la tua zona.', 'en' => 'Pick your spot.', 'ru' => 'Выберите свой район.', 'es' => 'Elige tu zona.', 'de' => 'Wähl dein Gebiet.',
+    'it' => 'Le nostre destinazioni.',
+    'en' => 'Our destinations.',
+    'ru' => 'Наши направления.',
+    'es' => 'Nuestros destinos.',
+    'de' => 'Unsere Reiseziele.',
 ],
 'home.zones.sub' => [
-    'it' => 'Naama Bay, Hadaba, Sharks Bay, Nabq Bay e Old Market.',
-    'en' => 'Naama Bay, Hadaba, Sharks Bay, Nabq Bay and Old Market.',
-    'ru' => 'Naama Bay, Hadaba, Sharks Bay, Nabq Bay и Old Market.',
-    'es' => 'Naama Bay, Hadaba, Sharks Bay, Nabq Bay y Old Market.',
-    'de' => 'Naama Bay, Hadaba, Sharks Bay, Nabq Bay und Old Market.',
+    'it' => 'Zone di Sharm El Sheikh e villaggi/resort selezionati.',
+    'en' => 'Hand-picked Sharm El Sheikh areas and resort villages.',
+    'ru' => 'Отобранные районы Шарм-эль-Шейха и курортные комплексы.',
+    'es' => 'Zonas de Sharm El Sheikh y villas/resorts seleccionados.',
+    'de' => 'Ausgewählte Gebiete in Sharm El Sheikh sowie Resort-Dörfer.',
 ],
 'home.zones.unit_one' => [
     'it' => 'appartamento', 'en' => 'apartment', 'ru' => 'апартамент', 'es' => 'apartamento', 'de' => 'Apartment',
 ],
 'home.zones.unit_many' => [
     'it' => 'appartamenti', 'en' => 'apartments', 'ru' => 'апартаментов', 'es' => 'apartamentos', 'de' => 'Apartments',
+],
+'home.zones.kind_zone' => [
+    'it' => 'Zona', 'en' => 'Area', 'ru' => 'Район', 'es' => 'Zona', 'de' => 'Gebiet',
+],
+'home.zones.kind_villaggio' => [
+    'it' => 'Villaggio', 'en' => 'Resort village', 'ru' => 'Курорт', 'es' => 'Resort', 'de' => 'Resort',
+],
+'home.zones.kind_quartiere' => [
+    'it' => 'Quartiere', 'en' => 'Neighborhood', 'ru' => 'Квартал', 'es' => 'Barrio', 'de' => 'Viertel',
 ],
 'home.featured.badge' => [
     'it' => 'In evidenza', 'en' => 'Featured', 'ru' => 'Рекомендуем', 'es' => 'Destacados', 'de' => 'Im Fokus',

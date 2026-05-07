@@ -21,6 +21,8 @@ $titles = [
   '/admin/prenotazione.php' => ['Prenotazione', 'Dettaglio'],
   '/admin/prenotazione-nuova.php' => ['Nuova prenotazione', 'Crea manualmente'],
   '/admin/prezzi.php' => ['Prezzi avanzati', 'Regole stagionali'],
+  '/admin/zone.php' => ['Zone & villaggi', 'Destinazioni'],
+  '/admin/zone-edit.php' => ['Zona', 'Modifica scheda'],
   '/admin/spese.php' => ['Spese & bilancio', 'Costi e ricavi'],
   '/admin/template.php' => ['Template messaggi', 'WhatsApp & Email'],
   '/admin/recensioni.php' => ['Recensioni', 'Modera i feedback'],
@@ -46,6 +48,7 @@ $pageMeta = $titles[$path] ?? ['Admin', ''];
     <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 px-3 pb-1.5 pt-2">Menu</div>
     <?php navItem('/admin/index.php', 'bar-chart-3', 'Dashboard', $path); ?>
     <?php navItem('/admin/appartamenti.php', 'building-2', 'Appartamenti', $path); ?>
+    <?php navItem('/admin/zone.php', 'map-pin', 'Zone & villaggi', $path); ?>
     <?php navItem('/admin/calendario.php', 'calendar', 'Calendario', $path); ?>
     <?php navItem('/admin/prenotazioni.php', 'bookmark-check', 'Prenotazioni', $path); ?>
     <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 px-3 pb-1.5 pt-4">Servizi extra</div>
