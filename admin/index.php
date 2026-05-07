@@ -37,101 +37,161 @@ foreach ($bookings as $b) {
 usort($by_apt, fn($a, $b) => $b['total'] <=> $a['total']);
 $top = array_slice($by_apt, 0, 5);
 
-$upcoming = rows('SELECT b.*, a.name as apartment_name, c.name as customer_name FROM bookings b JOIN apartments a ON b.apartment_id = a.id JOIN customers c ON b.customer_id = c.id WHERE b.status IN ("confirmed","checked_in") AND b.check_in >= CURRENT_DATE ORDER BY b.check_in ASC LIMIT 6');
+$upcoming = rows('SELECT b.*, a.name as apartment_name, a.cover_image as apartment_cover, c.name as customer_name, c.phone as customer_phone FROM bookings b JOIN apartments a ON b.apartment_id = a.id JOIN customers c ON b.customer_id = c.id WHERE b.status IN ("confirmed","checked_in") AND b.check_in >= CURRENT_DATE ORDER BY b.check_in ASC LIMIT 5');
 $recent = rows('SELECT b.*, a.name as apartment_name, c.name as customer_name FROM bookings b JOIN apartments a ON b.apartment_id = a.id JOIN customers c ON b.customer_id = c.id ORDER BY b.created_at DESC LIMIT 6');
 $pending_count = (int)val('SELECT COUNT(*) FROM bookings WHERE status = "pending"');
+
+$revRecent = array_sum(array_slice(array_column($series, 'rev'), -6));
+$revPrev = array_sum(array_slice(array_column($series, 'rev'), -12, 6));
+$revTrend = $revPrev > 0 ? round((($revRecent - $revPrev) / $revPrev) * 100) : 0;
 
 $title = 'Dashboard';
 require __DIR__ . '/../partials/head.php';
 require __DIR__ . '/../partials/admin-shell-top.php';
 ?>
 <div class="space-y-6">
-  <div>
-    <h1 class="font-display text-3xl font-bold">Dashboard</h1>
-    <p class="text-ink-500 mt-1">Panoramica completa del tuo gestionale.</p>
-  </div>
-
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    <?php foreach ([
-      ['Fatturato', fmtMoney($revenue), count($bookings) . ' prenotazioni', 'trending-up', 'bg-emerald-500'],
-      ['Saldo da incassare', fmtMoney($due), $due > 0 ? 'da sollecitare' : 'tutto incassato', 'clock', 'bg-amber-500'],
-      ['Spese totali', fmtMoney($exp_total), count($expenses) . ' voci', 'wallet', 'bg-rose-500'],
-      ['Utile netto', fmtMoney($profit), 'ricavi − spese', 'trending-up', 'bg-brand-500'],
-    ] as $s): ?>
-      <div class="card p-5 flex items-center gap-4">
-        <div class="h-12 w-12 rounded-2xl flex items-center justify-center text-white <?= $s[4] ?>"><i data-lucide="<?= $s[3] ?>" class="size-[20px]"></i></div>
-        <div>
-          <div class="text-xs font-medium uppercase tracking-wide text-ink-500"><?= e($s[0]) ?></div>
-          <div class="text-2xl font-display font-bold mt-0.5"><?= e($s[1]) ?></div>
-          <div class="text-xs text-ink-500 mt-0.5"><?= e($s[2]) ?></div>
-        </div>
-      </div>
-    <?php endforeach; ?>
-  </div>
-
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    <?php foreach ([
-      ['Appartamenti attivi', $apt_count, 'building-2', 'bg-sky-500'],
-      ['Prossimi check-in', count($upcoming), 'bookmark-check', 'bg-violet-500'],
-      ['Prenotazioni totali', count($bookings), 'bookmark-check', 'bg-indigo-500'],
-      ['In attesa di conferma', $pending_count, 'alert-triangle', 'bg-amber-500'],
-    ] as $s): ?>
-      <div class="card p-5 flex items-center gap-4">
-        <div class="h-12 w-12 rounded-2xl flex items-center justify-center text-white <?= $s[3] ?>"><i data-lucide="<?= $s[2] ?>" class="size-[20px]"></i></div>
-        <div>
-          <div class="text-xs font-medium uppercase tracking-wide text-ink-500"><?= e($s[0]) ?></div>
-          <div class="text-2xl font-display font-bold mt-0.5"><?= e($s[1]) ?></div>
-        </div>
-      </div>
-    <?php endforeach; ?>
-  </div>
-
-  <div class="grid lg:grid-cols-3 gap-6">
-    <div class="card p-5 lg:col-span-2">
-      <h2 class="font-display font-bold text-lg mb-3">Andamento mensile</h2>
-      <canvas id="lineChart" height="100"></canvas>
+  <div class="flex items-end justify-between flex-wrap gap-3">
+    <div>
+      <h1 class="font-serif text-4xl font-semibold tracking-tight">Buongiorno 👋</h1>
+      <p class="text-ink-500 mt-1 text-pretty">Ecco com'è andata la tua attività di recente.</p>
     </div>
-    <div class="card p-5">
-      <h2 class="font-display font-bold text-lg mb-3">Top appartamenti</h2>
+    <div class="flex gap-2">
+      <a href="/admin/prenotazione-nuova.php" class="btn-secondary"><i data-lucide="plus" class="size-[16px]"></i> Nuova prenotazione</a>
+      <a href="/admin/appartamento-edit.php" class="btn-outline"><i data-lucide="building-2" class="size-[16px]"></i> Nuovo appartamento</a>
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <?php
+      $kpis = [
+        ['Fatturato', fmtMoney($revenue), count($bookings) . ' prenotazioni', 'trending-up', 'from-emerald-400 to-emerald-600', $revTrend],
+        ['Saldo da incassare', fmtMoney($due), $due > 0 ? 'da sollecitare' : 'tutto incassato', 'clock', 'from-amber-400 to-amber-600', null],
+        ['Spese totali', fmtMoney($exp_total), count($expenses) . ' voci', 'wallet', 'from-rose-400 to-rose-600', null],
+        ['Utile netto', fmtMoney($profit), 'ricavi − spese', 'sparkles', 'from-brand-400 to-brand-600', null],
+      ];
+      foreach ($kpis as $i => $k):
+    ?>
+      <div class="card p-5 card-hover relative overflow-hidden animate-slide-up" style="animation-delay:<?= $i * 60 ?>ms">
+        <div class="flex items-start justify-between">
+          <div class="h-12 w-12 rounded-2xl bg-gradient-to-br <?= $k[4] ?> text-white flex items-center justify-center shadow-md"><i data-lucide="<?= $k[3] ?>" class="size-[20px]"></i></div>
+          <?php if ($k[5] !== null): ?>
+            <span class="badge-soft <?= $k[5] >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300' ?> tabular-nums"><i data-lucide="<?= $k[5] >= 0 ? 'trending-up' : 'trending-down' ?>" class="size-[12px]"></i> <?= ($k[5] >= 0 ? '+' : '') . $k[5] ?>%</span>
+          <?php endif; ?>
+        </div>
+        <div class="mt-4">
+          <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e($k[0]) ?></div>
+          <div class="text-[28px] font-display font-bold tracking-tight mt-0.5 tabular-nums"><?= e($k[1]) ?></div>
+          <div class="text-xs text-ink-500 mt-1"><?= e($k[2]) ?></div>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
+
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <?php foreach ([
+      ['Appartamenti attivi', $apt_count, 'building-2', 'text-sky-500 bg-sky-500/10'],
+      ['Prossimi check-in', count($upcoming), 'log-in', 'text-violet-500 bg-violet-500/10'],
+      ['Prenotazioni totali', count($bookings), 'bookmark-check', 'text-indigo-500 bg-indigo-500/10'],
+      ['In attesa di conferma', $pending_count, 'alert-triangle', 'text-amber-500 bg-amber-500/10'],
+    ] as $s): ?>
+      <div class="card p-4 flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl flex items-center justify-center <?= $s[3] ?>"><i data-lucide="<?= $s[2] ?>" class="size-[18px]"></i></div>
+        <div>
+          <div class="text-xs text-ink-500"><?= e($s[0]) ?></div>
+          <div class="font-display font-bold text-xl tabular-nums"><?= (int)$s[1] ?></div>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
+
+  <!-- CHART -->
+  <div class="grid lg:grid-cols-3 gap-5">
+    <div class="card p-6 lg:col-span-2">
+      <div class="flex items-end justify-between mb-4">
+        <div>
+          <h2 class="font-serif text-xl font-semibold tracking-tight">Andamento mensile</h2>
+          <p class="text-xs text-ink-500 mt-0.5">Ultimi 12 mesi · ricavi vs spese vs utile</p>
+        </div>
+        <div class="flex gap-3 text-xs">
+          <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Ricavi</span>
+          <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span> Spese</span>
+          <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-brand-500"></span> Utile</span>
+        </div>
+      </div>
+      <div class="h-72"><canvas id="lineChart"></canvas></div>
+    </div>
+    <div class="card p-6">
+      <h2 class="font-serif text-xl font-semibold tracking-tight">Top appartamenti</h2>
+      <p class="text-xs text-ink-500 mt-0.5 mb-4">per fatturato</p>
       <?php if (!$top): ?><div class="text-sm text-ink-500">Nessun dato.</div><?php else: ?>
-        <canvas id="pieChart" height="200"></canvas>
-      <?php endif; ?>
-    </div>
-  </div>
-
-  <div class="grid lg:grid-cols-2 gap-6">
-    <div class="card p-5">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="font-display text-lg font-bold">Prossimi arrivi</h2>
-        <a href="/admin/calendario.php" class="text-sm text-brand-600">Calendario →</a>
-      </div>
-      <?php if (!$upcoming): ?><p class="text-sm text-ink-500">Nessun arrivo programmato.</p><?php else: ?>
-        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
-          <?php foreach ($upcoming as $b): ?>
-            <li class="py-3 flex items-center justify-between">
-              <div>
-                <div class="font-medium"><?= e($b['customer_name']) ?></div>
-                <div class="text-xs text-ink-500"><?= e($b['apartment_name']) ?> · <?= fmtDate($b['check_in']) ?> → <?= fmtDate($b['check_out']) ?></div>
-              </div>
-              <a href="/admin/prenotazione.php?id=<?= e($b['id']) ?>" class="text-sm text-brand-600">Apri</a>
+        <div class="h-56 mb-4"><canvas id="pieChart"></canvas></div>
+        <ul class="space-y-1.5 text-sm">
+          <?php foreach ($top as $i => $t): ?>
+            <li class="flex items-center justify-between">
+              <span class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full" style="background:<?= ['#ff6a0a','#f04e00','#9c300d','#ff8a32','#ffb56c'][$i] ?>"></span><span class="truncate"><?= e($t['name']) ?></span></span>
+              <span class="font-semibold tabular-nums"><?= fmtMoney((float)$t['total']) ?></span>
             </li>
           <?php endforeach; ?>
         </ul>
       <?php endif; ?>
     </div>
-    <div class="card p-5">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="font-display text-lg font-bold">Ultime prenotazioni</h2>
-        <a href="/admin/prenotazioni.php" class="text-sm text-brand-600">Tutte →</a>
+  </div>
+
+  <!-- LISTE -->
+  <div class="grid lg:grid-cols-2 gap-5">
+    <div class="card p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-serif text-xl font-semibold tracking-tight">Prossimi arrivi</h2>
+        <a href="/admin/calendario.php" class="text-sm text-brand-600 font-medium hover:underline">Calendario →</a>
       </div>
-      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
-        <?php foreach ($recent as $b): ?>
-          <li class="py-3 flex items-center justify-between">
-            <div>
-              <div class="font-medium"><?= e($b['customer_name']) ?> <span class="text-xs text-ink-500 font-normal">· <?= e($b['code']) ?></span></div>
-              <div class="text-xs text-ink-500"><?= e($b['apartment_name']) ?> · <?= fmtMoney((float)$b['total']) ?></div>
-            </div>
-            <a href="/admin/prenotazione.php?id=<?= e($b['id']) ?>" class="text-sm text-brand-600">Apri</a>
+      <?php if (!$upcoming): ?>
+        <div class="text-center py-8">
+          <div class="h-14 w-14 mx-auto rounded-2xl bg-ink-100 dark:bg-ink-800 flex items-center justify-center text-ink-400 mb-3"><i data-lucide="calendar-x" class="size-[24px]"></i></div>
+          <p class="text-sm text-ink-500">Nessun arrivo programmato.</p>
+        </div>
+      <?php else: ?>
+        <ul class="space-y-2.5">
+          <?php foreach ($upcoming as $b):
+            $days = floor((strtotime($b['check_in']) - strtotime('today')) / 86400);
+            $parts = explode(' ', trim($b['customer_name']));
+            $initials = mb_strtoupper(mb_substr($parts[0] ?? '·', 0, 1) . (isset($parts[1]) ? mb_substr($parts[1], 0, 1) : ''));
+          ?>
+            <li>
+              <a href="/admin/prenotazione.php?id=<?= e($b['id']) ?>" class="flex items-center gap-3 p-3 rounded-xl hover:bg-ink-50 dark:hover:bg-ink-900/40 transition group">
+                <span class="h-11 w-11 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-semibold text-sm"><?= e($initials) ?></span>
+                <div class="flex-1 min-w-0">
+                  <div class="font-medium text-sm truncate"><?= e($b['customer_name']) ?></div>
+                  <div class="text-xs text-ink-500 truncate"><?= e($b['apartment_name']) ?> · <?= fmtDate($b['check_in']) ?> → <?= fmtDate($b['check_out']) ?></div>
+                </div>
+                <span class="badge-soft tabular-nums"><?= $days <= 0 ? 'oggi' : ($days == 1 ? 'domani' : "tra {$days}gg") ?></span>
+              </a>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
+    </div>
+    <div class="card p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-serif text-xl font-semibold tracking-tight">Ultime prenotazioni</h2>
+        <a href="/admin/prenotazioni.php" class="text-sm text-brand-600 font-medium hover:underline">Tutte →</a>
+      </div>
+      <ul class="space-y-2.5">
+        <?php foreach ($recent as $b):
+          $statusMap = ['pending' => ['warning', 'In attesa'], 'confirmed' => ['info', 'Confermata'], 'checked_in' => ['success', 'Check-in'], 'completed' => ['soft', 'Completata'], 'cancelled' => ['danger', 'Cancellata']];
+          $st = $statusMap[$b['status']] ?? ['soft', $b['status']];
+        ?>
+          <li>
+            <a href="/admin/prenotazione.php?id=<?= e($b['id']) ?>" class="flex items-center gap-3 p-3 rounded-xl hover:bg-ink-50 dark:hover:bg-ink-900/40 transition">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium text-sm truncate"><?= e($b['customer_name']) ?></span>
+                  <span class="text-xs font-mono text-ink-400"><?= e($b['code']) ?></span>
+                </div>
+                <div class="text-xs text-ink-500 truncate"><?= e($b['apartment_name']) ?> · <?= fmtMoney((float)$b['total']) ?></div>
+              </div>
+              <span class="badge-<?= $st[0] ?>"><?= e($st[1]) ?></span>
+            </a>
           </li>
         <?php endforeach; ?>
       </ul>
@@ -144,23 +204,35 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 const series = <?= json_encode($series) ?>;
 const top = <?= json_encode($top) ?>;
 const eur = v => new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(v || 0);
-new Chart(document.getElementById('lineChart'), {
+const isDark = () => document.documentElement.classList.contains('dark');
+const grid = () => isDark() ? '#2f303d' : '#eeeef1';
+const tick = () => isDark() ? '#737486' : '#9293a2';
+
+const lineCtx = document.getElementById('lineChart').getContext('2d');
+const gradRev = lineCtx.createLinearGradient(0, 0, 0, 280);
+gradRev.addColorStop(0, 'rgba(16,185,129,.25)'); gradRev.addColorStop(1, 'rgba(16,185,129,0)');
+new Chart(lineCtx, {
   type: 'line',
   data: {
     labels: series.map(s => s.month),
     datasets: [
-      { label: 'Ricavi', data: series.map(s => s.rev), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,.1)', tension: 0.3, fill: true },
-      { label: 'Spese', data: series.map(s => s.exp), borderColor: '#ef4444', tension: 0.3 },
-      { label: 'Utile', data: series.map(s => s.profit), borderColor: '#ff6a0a', tension: 0.3 },
+      { label: 'Ricavi', data: series.map(s => s.rev), borderColor: '#10b981', backgroundColor: gradRev, tension: 0.4, fill: true, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 6 },
+      { label: 'Spese', data: series.map(s => s.exp), borderColor: '#ef4444', tension: 0.4, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 6 },
+      { label: 'Utile', data: series.map(s => s.profit), borderColor: '#ff6a0a', tension: 0.4, borderWidth: 2.5, borderDash: [], pointRadius: 0, pointHoverRadius: 6 },
     ]
   },
-  options: { plugins: { tooltip: { callbacks: { label: c => c.dataset.label + ': ' + eur(c.parsed.y) } } } }
+  options: { responsive: true, maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a1b25', borderRadius: 12, padding: 12, displayColors: true, boxPadding: 4, callbacks: { label: c => '  ' + c.dataset.label + ': ' + eur(c.parsed.y) } } },
+    scales: { x: { grid: { display: false }, ticks: { color: tick() } }, y: { grid: { color: grid(), drawBorder: false }, ticks: { color: tick(), callback: v => '€' + (v/1000 >= 1 ? (v/1000) + 'k' : v) } } }
+  }
 });
+
 if (top.length) {
   new Chart(document.getElementById('pieChart'), {
     type: 'doughnut',
-    data: { labels: top.map(t => t.name), datasets: [{ data: top.map(t => t.total), backgroundColor: ['#ff6a0a','#f04e00','#9c300d','#ff8a32','#ffb56c'] }] },
-    options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } }, tooltip: { callbacks: { label: c => c.label + ': ' + eur(c.parsed) } } } }
+    data: { labels: top.map(t => t.name), datasets: [{ data: top.map(t => t.total), backgroundColor: ['#ff6a0a','#f04e00','#9c300d','#ff8a32','#ffb56c'], borderWidth: 0, borderRadius: 8, spacing: 4 }] },
+    options: { cutout: '70%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => '  ' + c.label + ': ' + eur(c.parsed) } } } }
   });
 }
 </script>
