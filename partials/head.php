@@ -144,6 +144,22 @@ try { if (localStorage.getItem('cv-theme') === 'dark') document.documentElement.
   try {
     var isPwa = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
     if (!isPwa) return;
+
+    // Mostra la splash SOLO al primo caricamento della sessione app (cold start),
+    // non ad ogni navigazione di pagina. sessionStorage si svuota alla chiusura dell'app.
+    if (sessionStorage.getItem('cv-pwa-splash-shown')) return;
+
+    // Se la pagina è caricata via navigazione interna (Back/Forward o link cliccato
+    // dopo che la app era già aperta), non è una vera apertura.
+    try {
+      var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+      if (nav && nav.type !== 'reload' && nav.type !== 'navigate') return;
+      // Anche su navigate puro: se è una sotto-navigazione dopo un primo load, skip.
+      // Lo gestiamo col flag sessionStorage che impostiamo qui sotto.
+    } catch(e){}
+
+    sessionStorage.setItem('cv-pwa-splash-shown', '1');
+
     var s = document.createElement('div');
     s.id = 'cv-pwa-splash';
     s.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#1a0d05 url(/assets/sharm/splash_bg.jpg) center/cover no-repeat;display:flex;align-items:center;justify-content:center;transition:opacity .5s;';
