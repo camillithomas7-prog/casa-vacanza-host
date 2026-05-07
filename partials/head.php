@@ -67,7 +67,7 @@ tailwind.config = {
     transitionTimingFunction: { 'out-expo': 'cubic-bezier(.16,1,.3,1)' }
   } }
 };
-try { var t = localStorage.getItem('cv-theme'); if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark'); } catch(e){}
+try { if (localStorage.getItem('cv-theme') === 'dark') document.documentElement.classList.add('dark'); } catch(e){}
 </script>
 <style type="text/tailwindcss">
 @layer base {
