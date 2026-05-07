@@ -33,8 +33,8 @@ require __DIR__ . '/../partials/head.php';
 
     <div class="relative">
       <h1 class="font-serif text-5xl xl:text-6xl font-semibold leading-[1.05] tracking-tight text-balance">
-        Gestisci ogni casa<br>
-        <span class="italic font-medium">come fosse la tua.</span>
+        I tuoi appartamenti<br>
+        <span class="italic font-medium">a Sharm, in ordine.</span>
       </h1>
       <p class="mt-6 text-white/80 text-lg max-w-md text-pretty">
         Calendario, prenotazioni, prezzi, spese, bilancio e messaggistica WhatsApp/Email automatica. Tutto in un unico posto.

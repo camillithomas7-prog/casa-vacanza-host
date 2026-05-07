@@ -35,7 +35,7 @@ require __DIR__ . '/partials/site-header.php';
           <svg class="absolute -bottom-2 left-0 w-full" height="16" viewBox="0 0 240 16" fill="none"><path d="M2 9 C 80 1, 160 1, 238 9" stroke="#ff6a0a" stroke-width="3" stroke-linecap="round" fill="none"/></svg>
         </span> inizia<br> qui.
       </h1>
-      <p class="text-lg text-ink-600 dark:text-ink-300 mt-6 max-w-xl text-pretty">Appartamenti curati personalmente, dalla costiera amalfitana al cuore di Milano. Check-in semplice, prezzi trasparenti, ospitalità che si sente.</p>
+      <p class="text-lg text-ink-600 dark:text-ink-300 mt-6 max-w-xl text-pretty">Appartamenti selezionati personalmente a Sharm El Sheikh: Naama Bay, Hadaba, Nabq, Sharks Bay e Old Market. Check-in fluido, assistenza in italiano, ospitalità che si sente.</p>
       <div class="flex flex-wrap gap-3 mt-8">
         <a href="/appartamenti.php" class="btn-primary h-12 px-6 text-base">Esplora appartamenti <i data-lucide="arrow-right" class="size-[16px]"></i></a>
         <a href="#come-funziona" class="btn-outline h-12 px-6 text-base">Come funziona</a>

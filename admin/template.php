@@ -19,7 +19,7 @@ foreach ($templates as $t) if ($t['id'] === $activeId) $tpl = $t;
 $VARS = ['{{nome}}','{{appartamento}}','{{indirizzo}}','{{checkin}}','{{checkout}}','{{ora_checkin}}','{{ora_checkout}}','{{ospiti}}','{{totale}}','{{acconto}}','{{saldo}}','{{codice}}','{{telefono}}'];
 
 $preview = $tpl ? preg_replace_callback('/\{\{\s*(\w+)\s*\}\}/', function($m) {
-  return ['nome'=>'Mario Rossi','appartamento'=>'Villa Sole','indirizzo'=>'Via Roma 1','checkin'=>'10 ago 2026','checkout'=>'17 ago 2026','ora_checkin'=>'15:00','ora_checkout'=>'11:00','ospiti'=>'2','totale'=>'€820,00','acconto'=>'€200,00','saldo'=>'€620,00','codice'=>'CV-2026-0001','telefono'=>'+39...'][$m[1]] ?? '';
+  return ['nome'=>'Mario Rossi','appartamento'=>'Naama Bay Sea View','indirizzo'=>'Naama Bay Promenade, Sharm El Sheikh','checkin'=>'10 ago 2026','checkout'=>'17 ago 2026','ora_checkin'=>'15:00','ora_checkout'=>'11:00','ospiti'=>'2','totale'=>'€665,00','acconto'=>'€200,00','saldo'=>'€465,00','codice'=>'PM-2026-0001','telefono'=>'+39...'][$m[1]] ?? '';
 }, $tpl['body']) : '';
 
 $title = 'Template messaggi';

@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'description' => $_POST['description'] ?? '',
         'address' => $_POST['address'] ?? '',
         'city' => $_POST['city'] ?? '',
-        'country' => $_POST['country'] ?? 'Italia',
+        'country' => $_POST['country'] ?? 'Egitto',
         'guests' => (int)($_POST['guests'] ?? 2),
         'bedrooms' => (int)($_POST['bedrooms'] ?? 1),
         'bathrooms' => (int)($_POST['bathrooms'] ?? 1),
@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $photos = $apt ? rows('SELECT * FROM photos WHERE apartment_id = ? ORDER BY position ASC', [$apt['id']]) : [];
 $amenitiesStr = $apt ? implode(', ', parseAmenities($apt['amenities'])) : '';
-$f = $apt ?? ['name'=>'','slug'=>'','description'=>'','address'=>'','city'=>'','country'=>'Italia','guests'=>2,'bedrooms'=>1,'bathrooms'=>1,'beds'=>1,'size_sqm'=>'','rules'=>'','check_in_time'=>'15:00','check_out_time'=>'11:00','base_price'=>80,'weekly_price'=>'','biweekly_price'=>'','triweekly_price'=>'','monthly_price'=>'','weekend_price'=>'','cleaning_fee'=>35,'security_deposit'=>0,'city_tax'=>2,'city_tax_max_nights'=>5,'long_stay_discount_7'=>5,'long_stay_discount_14'=>10,'long_stay_discount_30'=>20,'active'=>1,'under_maintenance'=>0,'cover_image'=>''];
+$f = $apt ?? ['name'=>'','slug'=>'','description'=>'','address'=>'','city'=>'','country'=>'Egitto','guests'=>2,'bedrooms'=>1,'bathrooms'=>1,'beds'=>1,'size_sqm'=>'','rules'=>'','check_in_time'=>'15:00','check_out_time'=>'11:00','base_price'=>80,'weekly_price'=>'','biweekly_price'=>'','triweekly_price'=>'','monthly_price'=>'','weekend_price'=>'','cleaning_fee'=>35,'security_deposit'=>0,'city_tax'=>2,'city_tax_max_nights'=>5,'long_stay_discount_7'=>5,'long_stay_discount_14'=>10,'long_stay_discount_30'=>20,'active'=>1,'under_maintenance'=>0,'cover_image'=>''];
 
 $title = $apt ? 'Modifica appartamento' : 'Nuovo appartamento';
 require __DIR__ . '/../partials/head.php';

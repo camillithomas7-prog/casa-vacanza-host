@@ -9,7 +9,7 @@ $pageTitle = $title ?? $siteName;
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title><?= e($pageTitle) ?> · <?= e($siteName) ?></title>
-<meta name="description" content="<?= e($metaDesc ?? 'Affitti brevi premium gestiti con cura. Prenota la tua prossima casa per le vacanze.') ?>">
+<meta name="description" content="<?= e($metaDesc ?? 'Appartamenti a Sharm El Sheikh selezionati e gestiti direttamente in italiano. Naama Bay, Hadaba, Sharks Bay, Old Market, Nabq.') ?>">
 <meta name="theme-color" content="#f04e00">
 <link rel="icon" type="image/svg+xml" href="/assets/logo-mark.svg">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/logo-192.png">

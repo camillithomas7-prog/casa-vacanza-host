@@ -3,7 +3,7 @@
     <div class="lg:col-span-5">
       <img src="/assets/logo-256.png" alt="<?= e(cfg('site.name')) ?>" class="h-20 w-auto">
       <p class="text-ink-500 dark:text-ink-400 mt-4 max-w-md text-pretty">
-        Affitti brevi gestiti con cura. Una collezione di case selezionate, dal centro di Roma alla costiera amalfitana, per chi cerca soggiorni autentici e curati nel dettaglio.
+        Appartamenti selezionati a Sharm El Sheikh: Naama Bay, Hadaba, Sharks Bay, Old Market e Nabq. Gestione diretta in italiano, soggiorni curati, prezzi trasparenti.
       </p>
       <div class="flex items-center gap-3 mt-6">
         <a href="#" class="h-10 w-10 rounded-xl border border-ink-200 dark:border-ink-700/80 flex items-center justify-center text-ink-500 hover:text-brand-600 hover:border-brand-300 transition"><i data-lucide="instagram" class="size-[16px]"></i></a>

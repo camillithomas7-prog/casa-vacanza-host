@@ -46,7 +46,7 @@ function daysRange(string $from, string $to): array {
 }
 
 function bookingCode(int $seq): string {
-    return 'CV-' . date('Y') . '-' . str_pad((string)$seq, 4, '0', STR_PAD_LEFT);
+    return 'PM-' . date('Y') . '-' . str_pad((string)$seq, 4, '0', STR_PAD_LEFT);
 }
 
 function slugify(string $s): string {

@@ -6,6 +6,7 @@ require_once __DIR__ . '/lib/messages.php';
 header('Content-Type: text/plain; charset=utf-8');
 
 $pdo = db();
+$reset = isset($_GET['reset']) && $_GET['reset'] === 'YES';
 
 $schema = <<<SQL
 CREATE TABLE IF NOT EXISTS users (
@@ -24,7 +25,7 @@ CREATE TABLE IF NOT EXISTS apartments (
   description TEXT,
   address VARCHAR(255) DEFAULT '',
   city VARCHAR(120) DEFAULT '',
-  country VARCHAR(120) DEFAULT 'Italia',
+  country VARCHAR(120) DEFAULT 'Egitto',
   guests INT NOT NULL DEFAULT 2,
   bedrooms INT NOT NULL DEFAULT 1,
   bathrooms INT NOT NULL DEFAULT 1,
@@ -236,12 +237,21 @@ foreach (preg_split('/;\s*\n/', $schema) as $stmt) {
     $stmt = trim($stmt);
     if ($stmt) $pdo->exec($stmt);
 }
-echo "✓ Schema creato\n";
+echo "✓ Schema creato/verificato\n";
+
+if ($reset) {
+    echo "⚠ RESET RICHIESTO — pulizia dati...\n";
+    $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+    foreach (['payments','documents','bookings','customers','date_blocks','price_rules','photos','reviews','expenses','notifications','activity_logs','coupons','apartments','message_templates','settings'] as $t) {
+        $pdo->exec("TRUNCATE TABLE $t");
+    }
+    $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
+    echo "✓ Dati cancellati\n";
+}
 
 ensureAdminUser();
 echo "✓ Utente admin: " . cfg('admin_default.email') . " / " . cfg('admin_default.password') . "\n";
 
-// Templates default
 foreach (defaultTemplates() as $t) {
     $existing = row('SELECT id FROM message_templates WHERE template_key = ?', [$t['key']]);
     if ($existing) continue;
@@ -250,68 +260,85 @@ foreach (defaultTemplates() as $t) {
 }
 echo "✓ Template messaggi caricati\n";
 
-// Seed demo se vuoto
 $count = (int)val('SELECT COUNT(*) FROM apartments');
-if ($count > 0) {
-    echo "✓ Dati demo già presenti ($count appartamenti)\n";
+if ($count > 0 && !$reset) {
+    echo "✓ Dati demo già presenti ($count appartamenti) — usa /setup.php?reset=YES per ricaricare\n";
 } else {
     $demos = [
-        ['slug' => 'villa-sole-amalfi', 'name' => 'Villa Sole · Amalfi Coast',
-         'description' => "Splendida villa con piscina e vista mozzafiato sul golfo di Amalfi. Tre camere, due bagni, cucina attrezzata e ampia terrazza per cene al tramonto.\n\nA pochi passi dal centro, perfetta per coppie e famiglie.",
-         'address' => 'Via dei Limoni 12, Amalfi', 'city' => 'Amalfi',
-         'guests' => 6, 'bedrooms' => 3, 'bathrooms' => 2, 'beds' => 4, 'size_sqm' => 110,
-         'amenities' => json_encode(['WiFi','Aria condizionata','Piscina','Cucina','Parcheggio','TV','Lavatrice','Vista mare']),
-         'rules' => "Vietato fumare\nNo feste\nAnimali ammessi su richiesta\nCheck-in dalle 15:00",
-         'base_price' => 220, 'weekend_price' => 250, 'weekly_price' => 1400, 'monthly_price' => 4800,
-         'cleaning_fee' => 80, 'city_tax' => 3, 'city_tax_max_nights' => 7, 'security_deposit' => 300,
-         'cover_image' => 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80',
+        ['slug' => 'naama-bay-sea-view', 'name' => 'Naama Bay Sea View',
+         'description' => "Splendido appartamento sul lungomare di Naama Bay con balcone vista mare e tramonto sul Mar Rosso. A 2 minuti a piedi dalla spiaggia e dai migliori ristoranti della Promenade.\n\nIdeale per coppie e piccole famiglie che vogliono il cuore di Sharm a portata di mano.",
+         'address' => 'Naama Bay Promenade, Sharm El Sheikh', 'city' => 'Naama Bay', 'country' => 'Egitto',
+         'guests' => 4, 'bedrooms' => 2, 'bathrooms' => 1, 'beds' => 3, 'size_sqm' => 75,
+         'amenities' => json_encode(['WiFi','Aria condizionata','Vista mare','Cucina','TV','Smart TV','Balcone','Lavatrice','Asciugamani','Phon']),
+         'rules' => "Vietato fumare\nNo feste rumorose\nCheck-in dalle 15:00\nCheck-out entro le 11:00\nDocumento d'identità obbligatorio",
+         'base_price' => 95, 'weekend_price' => 110, 'weekly_price' => 600, 'biweekly_price' => 1100, 'monthly_price' => 2200,
+         'cleaning_fee' => 35, 'city_tax' => 0, 'city_tax_max_nights' => 0, 'security_deposit' => 100,
+         'cover_image' => 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&q=80',
          'photos' => [
+            'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&q=80',
+            'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80',
             'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80',
+            'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=1200&q=80',
+            'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&q=80',
+         ]],
+        ['slug' => 'hadaba-pool-residence', 'name' => 'Hadaba Pool Residence',
+         'description' => "Bilocale moderno in residence con piscina ad Hadaba, zona elegante e tranquilla in collina con vista sulla baia. Accesso libero alla piscina e alla spiaggia privata del residence (navetta gratuita).\n\nPerfetto per coppie che cercano relax e privacy.",
+         'address' => 'Hadaba, Ras Um Sid, Sharm El Sheikh', 'city' => 'Hadaba', 'country' => 'Egitto',
+         'guests' => 2, 'bedrooms' => 1, 'bathrooms' => 1, 'beds' => 1, 'size_sqm' => 50,
+         'amenities' => json_encode(['WiFi','Aria condizionata','Piscina','Spiaggia privata','Cucina','TV','Parcheggio','Balcone']),
+         'rules' => "No fumo\nUso piscina 8-22\nNavetta spiaggia su prenotazione",
+         'base_price' => 70, 'weekend_price' => 85, 'weekly_price' => 440, 'monthly_price' => 1600,
+         'cleaning_fee' => 30, 'city_tax' => 0, 'city_tax_max_nights' => 0, 'security_deposit' => 100,
+         'cover_image' => 'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=1200&q=80',
+         'photos' => [
+            'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=1200&q=80',
+            'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&q=80',
+            'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=1200&q=80',
+            'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&q=80',
+         ]],
+        ['slug' => 'sharks-bay-suite', 'name' => 'Sharks Bay Diving Suite',
+         'description' => "Suite a Sharks Bay, paradiso del diving. Piscina infinity, accesso diretto al reef, perfetta per chi ama snorkeling e immersioni. Centro diving convenzionato a 100m.\n\nAria condizionata in ogni stanza, terrazza panoramica.",
+         'address' => 'Sharks Bay, Sharm El Sheikh', 'city' => 'Sharks Bay', 'country' => 'Egitto',
+         'guests' => 3, 'bedrooms' => 1, 'bathrooms' => 1, 'beds' => 2, 'size_sqm' => 60,
+         'amenities' => json_encode(['WiFi','Aria condizionata','Piscina','Vista mare','Cucina','TV','Diving center']),
+         'base_price' => 110, 'weekend_price' => 130, 'weekly_price' => 700, 'monthly_price' => 2500,
+         'cleaning_fee' => 40, 'city_tax' => 0, 'city_tax_max_nights' => 0, 'security_deposit' => 150,
+         'cover_image' => 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&q=80',
+         'photos' => [
+            'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&q=80',
+            'https://images.unsplash.com/photo-1559599189-fe84dea4eb79?w=1200&q=80',
+            'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=1200&q=80',
+            'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&q=80',
+         ]],
+        ['slug' => 'old-market-boho', 'name' => 'Old Market Boho · Sharm Old Town',
+         'description' => "Caratteristico appartamento nel cuore di Old Market, tra spezie, bazar e atmosfera autentica egiziana. Tetti curati, archi tipici, arredamento boho con tessuti locali.\n\nA pochi passi dai migliori ristoranti tradizionali e dal mercato.",
+         'address' => 'Old Market (Sok El Kadeem), Sharm El Sheikh', 'city' => 'Old Market', 'country' => 'Egitto',
+         'guests' => 4, 'bedrooms' => 2, 'bathrooms' => 1, 'beds' => 2, 'size_sqm' => 65,
+         'amenities' => json_encode(['WiFi','Aria condizionata','Cucina','TV','Lavatrice']),
+         'base_price' => 55, 'weekend_price' => 65, 'weekly_price' => 350, 'monthly_price' => 1300,
+         'cleaning_fee' => 25, 'city_tax' => 0, 'city_tax_max_nights' => 0, 'security_deposit' => 80,
+         'cover_image' => 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80',
+         'photos' => [
+            'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80',
+            'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80',
+            'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200&q=80',
+            'https://images.unsplash.com/photo-1567016376408-0226e4d0c1ea?w=1200&q=80',
+         ]],
+        ['slug' => 'nabq-bay-family', 'name' => 'Nabq Bay Family',
+         'description' => "Spazioso appartamento per famiglie a Nabq Bay, zona tranquilla con spiagge bianche e mare cristallino. Tre camere, due bagni, salotto enorme. A 5 minuti dalle migliori escursioni nel deserto.\n\nIdeale per gruppi e famiglie con bambini.",
+         'address' => 'Nabq Bay Resort Area, Sharm El Sheikh', 'city' => 'Nabq Bay', 'country' => 'Egitto',
+         'guests' => 6, 'bedrooms' => 3, 'bathrooms' => 2, 'beds' => 5, 'size_sqm' => 110,
+         'amenities' => json_encode(['WiFi','Aria condizionata','Piscina','Vista mare','Cucina','TV','Smart TV','Lavatrice','Parcheggio','Lettino bimbi','Asciugamani']),
+         'rules' => "Bambini benvenuti\nAnimali su richiesta\nNo feste",
+         'base_price' => 130, 'weekend_price' => 150, 'weekly_price' => 820, 'biweekly_price' => 1500, 'monthly_price' => 2800,
+         'cleaning_fee' => 50, 'city_tax' => 0, 'city_tax_max_nights' => 0, 'security_deposit' => 200,
+         'cover_image' => 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80',
+         'photos' => [
             'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80',
             'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80',
             'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=1200&q=80',
             'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1200&q=80',
-         ]],
-        ['slug' => 'loft-navigli-milano', 'name' => 'Loft Navigli · Milano Design',
-         'description' => "Loft di design nel cuore dei Navigli. Ideale per coppie e business traveler, vicino a metro e principali attrazioni.",
-         'address' => 'Ripa di Porta Ticinese 23, Milano', 'city' => 'Milano',
-         'guests' => 2, 'bedrooms' => 1, 'bathrooms' => 1, 'beds' => 1, 'size_sqm' => 55,
-         'amenities' => json_encode(['WiFi','Aria condizionata','Cucina','TV','Lavatrice','Smart TV','Asciugamani']),
-         'base_price' => 110, 'weekend_price' => 130, 'weekly_price' => 700, 'monthly_price' => 2200,
-         'cleaning_fee' => 40, 'city_tax' => 5, 'city_tax_max_nights' => 14, 'security_deposit' => 150,
-         'cover_image' => 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80',
-         'photos' => [
-            'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80',
-            'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200&q=80',
-            'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=1200&q=80',
-            'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=80',
-         ]],
-        ['slug' => 'casetta-trastevere-roma', 'name' => 'Casetta Trastevere · Roma',
-         'description' => "Caratteristica casa nel quartiere più autentico di Roma. Travi a vista, mattoncini a vista, atmosfera unica.",
-         'address' => 'Vicolo del Cinque 8, Roma', 'city' => 'Roma',
-         'guests' => 4, 'bedrooms' => 2, 'bathrooms' => 1, 'beds' => 3, 'size_sqm' => 70,
-         'amenities' => json_encode(['WiFi','Cucina','TV','Lavatrice','Riscaldamento']),
-         'base_price' => 140, 'weekend_price' => 160, 'weekly_price' => 850,
-         'cleaning_fee' => 50, 'city_tax' => 4, 'city_tax_max_nights' => 10,
-         'cover_image' => 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80',
-         'photos' => [
-            'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80',
-            'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200&q=80',
-            'https://images.unsplash.com/photo-1567016376408-0226e4d0c1ea?w=1200&q=80',
-            'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80',
-         ]],
-        ['slug' => 'appartamento-portovenere', 'name' => 'Appartamento Vista Mare · Portovenere',
-         'description' => "Appartamento panoramico a 50 metri dal mare. Terrazza privata, perfetto per famiglie.",
-         'address' => 'Via Capellini 4, Portovenere', 'city' => 'Portovenere',
-         'guests' => 4, 'bedrooms' => 2, 'bathrooms' => 1, 'beds' => 2, 'size_sqm' => 65,
-         'amenities' => json_encode(['WiFi','Aria condizionata','Cucina','TV','Vista mare','Balcone']),
-         'base_price' => 160, 'weekend_price' => 180, 'weekly_price' => 980,
-         'cleaning_fee' => 50, 'city_tax' => 2, 'city_tax_max_nights' => 5,
-         'cover_image' => 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=1200&q=80',
-         'photos' => [
-            'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=1200&q=80',
-            'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80',
-            'https://images.unsplash.com/photo-1571055107559-3e67626fa8be?w=1200&q=80',
+            'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&q=80',
          ]],
     ];
 
@@ -326,58 +353,70 @@ if ($count > 0) {
             q('INSERT INTO photos (id, apartment_id, url, position) VALUES (?, ?, ?, ?)', [newId(), $id, $url, $i]);
         }
     }
-    echo "✓ " . count($demos) . " appartamenti demo creati\n";
+    echo "✓ " . count($demos) . " appartamenti Sharm El Sheikh creati\n";
 
     $c1 = newId(); q('INSERT INTO customers (id, name, email, phone, country) VALUES (?, ?, ?, ?, ?)', [$c1, 'Luca Bianchi', 'luca@example.com', '+393331112233', 'Italia']);
     $c2 = newId(); q('INSERT INTO customers (id, name, email, phone, country) VALUES (?, ?, ?, ?, ?)', [$c2, 'Sarah Müller', 'sarah@example.com', '+491701234567', 'Germania']);
     $c3 = newId(); q('INSERT INTO customers (id, name, email, phone, country) VALUES (?, ?, ?, ?, ?)', [$c3, 'Marco Rossi', 'marco@example.com', '+393344455667', 'Italia']);
+    $c4 = newId(); q('INSERT INTO customers (id, name, email, phone, country) VALUES (?, ?, ?, ?, ?)', [$c4, 'Famiglia Russo', 'russo@example.com', '+393355566778', 'Italia']);
 
     $today = strtotime('today');
     $bk = function($n) use ($today) { return date('Y-m-d', $today + $n * 86400); };
 
     $b1 = newId();
-    q('INSERT INTO bookings (id, code, apartment_id, customer_id, check_in, check_out, nights, guests, base_price, cleaning_fee, city_tax, total, paid, status, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [$b1, 'CV-2026-0001', $aptIds['villa-sole-amalfi'], $c1, $bk(7), $bk(12), 5, 4, 1100, 80, 60, 1240, 400, 'confirmed', 'direct']);
-    q('INSERT INTO payments (id, booking_id, amount, type, method) VALUES (?, ?, ?, ?, ?)', [newId(), $b1, 400, 'deposit', 'bank']);
+    q('INSERT INTO bookings (id, code, apartment_id, customer_id, check_in, check_out, nights, guests, base_price, cleaning_fee, total, paid, status, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [$b1, 'PM-2026-0001', $aptIds['naama-bay-sea-view'], $c1, $bk(7), $bk(14), 7, 4, 600, 35, 635, 200, 'confirmed', 'direct']);
+    q('INSERT INTO payments (id, booking_id, amount, type, method) VALUES (?, ?, ?, ?, ?)', [newId(), $b1, 200, 'deposit', 'bank']);
 
     $b2 = newId();
-    q('INSERT INTO bookings (id, code, apartment_id, customer_id, check_in, check_out, nights, guests, base_price, cleaning_fee, city_tax, discount, total, paid, status, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [$b2, 'CV-2026-0002', $aptIds['loft-navigli-milano'], $c2, $bk(-10), $bk(-3), 7, 2, 770, 40, 70, 70, 810, 810, 'completed', 'airbnb']);
-    q('INSERT INTO payments (id, booking_id, amount, type, method) VALUES (?, ?, ?, ?, ?)', [newId(), $b2, 810, 'balance', 'stripe']);
+    q('INSERT INTO bookings (id, code, apartment_id, customer_id, check_in, check_out, nights, guests, base_price, cleaning_fee, discount, total, paid, status, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [$b2, 'PM-2026-0002', $aptIds['hadaba-pool-residence'], $c2, $bk(-12), $bk(-5), 7, 2, 490, 30, 50, 470, 470, 'completed', 'airbnb']);
+    q('INSERT INTO payments (id, booking_id, amount, type, method) VALUES (?, ?, ?, ?, ?)', [newId(), $b2, 470, 'balance', 'stripe']);
 
-    q('INSERT INTO bookings (id, code, apartment_id, customer_id, check_in, check_out, nights, guests, base_price, cleaning_fee, city_tax, total, paid, status, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [newId(), 'CV-2026-0003', $aptIds['casetta-trastevere-roma'], $c3, $bk(20), $bk(23), 3, 2, 420, 50, 24, 494, 0, 'pending', 'direct']);
+    q('INSERT INTO bookings (id, code, apartment_id, customer_id, check_in, check_out, nights, guests, base_price, cleaning_fee, total, paid, status, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [newId(), 'PM-2026-0003', $aptIds['sharks-bay-suite'], $c3, $bk(20), $bk(27), 7, 2, 770, 40, 810, 0, 'pending', 'direct']);
+
+    $b4 = newId();
+    q('INSERT INTO bookings (id, code, apartment_id, customer_id, check_in, check_out, nights, guests, base_price, cleaning_fee, total, paid, status, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [$b4, 'PM-2026-0004', $aptIds['nabq-bay-family'], $c4, $bk(35), $bk(45), 10, 5, 1300, 50, 1350, 400, 'confirmed', 'booking']);
+    q('INSERT INTO payments (id, booking_id, amount, type, method) VALUES (?, ?, ?, ?, ?)', [newId(), $b4, 400, 'deposit', 'bank']);
 
     foreach ([
-        [$aptIds['villa-sole-amalfi'], 'pulizie', 80, $bk(-3), 'Pulizia post check-out'],
-        [$aptIds['villa-sole-amalfi'], 'manutenzione', 250, $bk(-30), 'Riparazione condizionatore'],
-        [$aptIds['loft-navigli-milano'], 'bollette', 95, $bk(-15), 'Energia + acqua'],
-        [$aptIds['loft-navigli-milano'], 'commissioni', 81, $bk(-3), 'Commissioni Airbnb 10%'],
-        [$aptIds['casetta-trastevere-roma'], 'internet', 35, $bk(-20), null],
+        [$aptIds['naama-bay-sea-view'], 'pulizie', 35, $bk(-5), 'Pulizia post check-out'],
+        [$aptIds['naama-bay-sea-view'], 'manutenzione', 180, $bk(-30), 'Riparazione condizionatore'],
+        [$aptIds['hadaba-pool-residence'], 'bollette', 65, $bk(-15), 'Energia + acqua'],
+        [$aptIds['hadaba-pool-residence'], 'commissioni', 47, $bk(-5), 'Commissioni Airbnb 10%'],
+        [$aptIds['old-market-boho'], 'internet', 25, $bk(-20), 'Internet mensile'],
+        [$aptIds['nabq-bay-family'], 'pulizie', 50, $bk(-10), null],
+        [$aptIds['sharks-bay-suite'], 'tasse', 120, $bk(-60), 'Imposte locali Q1'],
     ] as $e) {
         q('INSERT INTO expenses (id, apartment_id, category, amount, date, description) VALUES (?, ?, ?, ?, ?, ?)',
             array_merge([newId()], $e));
     }
 
     foreach ([
-        [$aptIds['villa-sole-amalfi'], 'Marco D.', 5, 'Esperienza fantastica', 'Vista incredibile e proprietari super disponibili. Torneremo!'],
-        [$aptIds['villa-sole-amalfi'], 'Laura B.', 5, 'Magico', 'Tramonti indimenticabili. La piscina è una favola.'],
-        [$aptIds['loft-navigli-milano'], 'Andrea P.', 4, null, 'Posizione perfetta, design curato.'],
-        [$aptIds['casetta-trastevere-roma'], 'Sofia R.', 5, null, 'Quartiere top, casa accogliente.'],
+        [$aptIds['naama-bay-sea-view'], 'Marco D.', 5, 'Tramonti indimenticabili', 'Vista pazzesca, posizione perfetta sulla Promenade. Patrizia super disponibile, ci ha consigliato i ristoranti migliori. Torneremo sicuro!'],
+        [$aptIds['naama-bay-sea-view'], 'Laura B.', 5, 'Esattamente come nelle foto', 'Tutto curato nei dettagli, balcone vista mare da sogno. Aria condizionata perfetta anche ad agosto.'],
+        [$aptIds['hadaba-pool-residence'], 'Andrea P.', 5, 'Relax assoluto', 'Piscina pulitissima, residence super tranquillo. La navetta per la spiaggia è una comodità incredibile.'],
+        [$aptIds['sharks-bay-suite'], 'Sofia R.', 5, null, 'Per fare diving non c\'è posto migliore. Centro diving a 2 passi, reef incredibile direttamente dalla spiaggia.'],
+        [$aptIds['old-market-boho'], 'Giulia & Marco', 4, 'Sharm autentica', 'Un\'esperienza diversa dai soliti resort, immersi nella vera Sharm. Il bazar a 50m è una favola.'],
+        [$aptIds['nabq-bay-family'], 'Famiglia Conti', 5, 'Perfetto per famiglie', 'Spazioso, con tutto il necessario per i bambini. Nabq è ideale per chi cerca tranquillità ma vuole essere vicino alle escursioni.'],
     ] as $r) {
         q('INSERT INTO reviews (id, apartment_id, author_name, rating, title, body, approved) VALUES (?, ?, ?, ?, ?, ?, 1)',
             array_merge([newId()], $r));
     }
+    echo "✓ Recensioni demo caricate\n";
 
-    q('INSERT INTO coupons (id, code, type, value, max_uses) VALUES (?, ?, ?, ?, ?)', [newId(), 'SUMMER10', 'percent', 10, 100]);
+    q('INSERT INTO coupons (id, code, type, value, max_uses) VALUES (?, ?, ?, ?, ?)', [newId(), 'SHARM10', 'percent', 10, 100]);
     q('INSERT INTO coupons (id, code, type, value, max_uses) VALUES (?, ?, ?, ?, ?)', [newId(), 'WELCOME50', 'fixed', 50, 50]);
 
     q('INSERT INTO notifications (id, type, title, body, link) VALUES (?, ?, ?, ?, ?)',
-        [newId(), 'new_booking', 'Nuova prenotazione', 'Marco Rossi ha richiesto Casetta Trastevere', '/admin/prenotazioni.php']);
+        [newId(), 'new_booking', 'Nuova prenotazione', 'Marco Rossi ha richiesto Sharks Bay Diving Suite', '/admin/prenotazioni.php']);
 
-    echo "✓ Dati demo caricati\n";
+    echo "✓ Coupon e notifiche pronti\n";
 }
 
 echo "\n✅ Setup completato!\n";
 echo "   Login admin: " . cfg('admin_default.email') . " / " . cfg('admin_default.password') . "\n";
-echo "   Sito: /\n   Admin: /admin/\n";
+echo "   Sito pubblico: /\n   Area admin: /admin/\n";
+if ($reset) echo "\n⚠ Ricordati di rimuovere il parametro ?reset=YES dall'URL.\n";
