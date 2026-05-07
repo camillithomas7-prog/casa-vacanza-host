@@ -1,0 +1,15 @@
+{
+  "name": "Patrizia Mancini · Casa Vacanza",
+  "short_name": "Patrizia Mancini",
+  "description": "Gestione appartamenti casa vacanza",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f04e00",
+  "icons": [
+    { "src": "/assets/logo-mark.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/assets/logo-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/assets/logo-256.png", "sizes": "256x256", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

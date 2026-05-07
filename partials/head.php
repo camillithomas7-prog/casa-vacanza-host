@@ -10,8 +10,12 @@ $pageTitle = $title ?? $siteName;
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title><?= e($pageTitle) ?> · <?= e($siteName) ?></title>
 <meta name="description" content="<?= e($metaDesc ?? 'Affitti brevi premium gestiti con cura. Prenota la tua prossima casa per le vacanze.') ?>">
-<meta name="theme-color" content="#0d0e15">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0%25' stop-color='%23ff8a32'/><stop offset='100%25' stop-color='%23f04e00'/></linearGradient></defs><rect width='32' height='32' rx='9' fill='url(%23g)'/><path d='M8 18l8-8 8 8v6a2 2 0 0 1-2 2h-3v-6h-6v6h-3a2 2 0 0 1-2-2v-6z' fill='%23fff'/></svg>">
+<meta name="theme-color" content="#f04e00">
+<link rel="icon" type="image/svg+xml" href="/assets/logo-mark.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/logo-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/assets/logo-512.png">
+<link rel="apple-touch-icon" href="/assets/logo-256.png">
+<link rel="manifest" href="/manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">

@@ -1,12 +1,7 @@
 <footer class="mt-32 border-t border-ink-100 dark:border-ink-800/80 bg-ink-50/40 dark:bg-ink-950/60">
   <div class="container-wide py-16 grid lg:grid-cols-12 gap-10">
     <div class="lg:col-span-5">
-      <div class="flex items-center gap-2.5">
-        <span class="h-10 w-10 rounded-2xl bg-gradient-to-br from-brand-400 via-brand-500 to-brand-700 text-white flex items-center justify-center shadow-[0_8px_24px_-8px_rgba(240,78,0,.55)]">
-          <i data-lucide="home" class="size-[18px]"></i>
-        </span>
-        <span class="font-display font-extrabold text-lg"><?= e(cfg('site.name')) ?></span>
-      </div>
+      <img src="/assets/logo-256.png" alt="<?= e(cfg('site.name')) ?>" class="h-20 w-auto">
       <p class="text-ink-500 dark:text-ink-400 mt-4 max-w-md text-pretty">
         Affitti brevi gestiti con cura. Una collezione di case selezionate, dal centro di Roma alla costiera amalfitana, per chi cerca soggiorni autentici e curati nel dettaglio.
       </p>

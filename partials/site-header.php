@@ -2,12 +2,8 @@
   class="sticky top-0 z-40 transition-all duration-300"
   :class="scrolled ? 'backdrop-blur-xl bg-white/80 dark:bg-ink-950/85 border-b border-ink-100 dark:border-ink-800/60 shadow-soft' : 'bg-transparent'">
   <div class="container-wide h-[68px] flex items-center justify-between">
-    <a href="/" class="flex items-center gap-2.5 group">
-      <span class="relative h-10 w-10 rounded-2xl bg-gradient-to-br from-brand-400 via-brand-500 to-brand-700 text-white flex items-center justify-center shadow-[0_8px_24px_-8px_rgba(240,78,0,.6)] group-hover:scale-105 transition-transform">
-        <i data-lucide="home" class="size-[18px]"></i>
-        <span class="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/30"></span>
-      </span>
-      <span class="font-display font-extrabold text-lg tracking-tight"><?= e(cfg('site.name')) ?></span>
+    <a href="/" class="flex items-center gap-2 group">
+      <img src="/assets/logo-256.png" alt="<?= e(cfg('site.name')) ?>" class="h-12 w-auto group-hover:scale-[1.04] transition-transform" />
     </a>
     <nav class="hidden md:flex items-center gap-1 text-sm font-medium">
       <?php foreach ([['/','Home'],['/appartamenti.php','Appartamenti'],['/contatti.php','Contatti']] as $n): ?>
@@ -28,7 +24,7 @@
 <div x-data="{ open: false }" @toggle-menu.window="open = !open" x-show="open" x-cloak
      class="md:hidden fixed inset-0 z-50 bg-white dark:bg-ink-950 p-6 animate-fade-in" @click.self="open=false">
   <div class="flex items-center justify-between">
-    <span class="font-display font-extrabold text-lg"><?= e(cfg('site.name')) ?></span>
+    <img src="/assets/logo-256.png" alt="<?= e(cfg('site.name')) ?>" class="h-10 w-auto">
     <button @click="open=false" class="btn-ghost"><i data-lucide="x" class="size-[20px]"></i></button>
   </div>
   <div class="flex flex-col gap-1 mt-8 text-lg">

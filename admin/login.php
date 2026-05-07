@@ -25,9 +25,10 @@ require __DIR__ . '/../partials/head.php';
     <div class="absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-full bg-sea-400/20 blur-3xl animate-glow-pulse pointer-events-none" style="animation-delay:-1.5s"></div>
     <div class="absolute inset-0 opacity-[0.05] pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 24px 24px;"></div>
 
-    <div class="relative flex items-center gap-2.5">
-      <span class="h-10 w-10 rounded-2xl bg-white text-brand-600 flex items-center justify-center shadow-pop"><i data-lucide="home" class="size-[18px]"></i></span>
-      <span class="font-display font-extrabold text-lg"><?= e(cfg('site.name')) ?></span>
+    <div class="relative">
+      <div class="h-16 w-16 rounded-2xl bg-white p-1.5 shadow-pop flex items-center justify-center">
+        <img src="/assets/logo-256.png" alt="<?= e(cfg('site.name')) ?>" class="h-full w-full object-contain">
+      </div>
     </div>
 
     <div class="relative">
@@ -61,9 +62,8 @@ require __DIR__ . '/../partials/head.php';
     </div>
 
     <form method="post" class="w-full max-w-sm animate-slide-up">
-      <div class="lg:hidden flex items-center gap-2 mb-8">
-        <span class="h-10 w-10 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center"><i data-lucide="home" class="size-[18px]"></i></span>
-        <span class="font-display font-extrabold text-lg"><?= e(cfg('site.name')) ?></span>
+      <div class="lg:hidden mb-8">
+        <img src="/assets/logo-256.png" alt="<?= e(cfg('site.name')) ?>" class="h-16 w-auto">
       </div>
       <div class="badge-brand mb-3">Area riservata</div>
       <h2 class="font-serif text-4xl font-semibold tracking-tight">Bentornato.</h2>

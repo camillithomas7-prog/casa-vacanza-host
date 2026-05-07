@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Sun -->
+  <circle cx="42" cy="14" r="6" fill="#f04e00"/>
+  <!-- Sun arc -->
+  <path d="M14 24 Q14 6 36 6 Q56 6 56 24" stroke="#f04e00" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Palm trunk -->
+  <path d="M16 44 Q16 36 18 28" stroke="#2f303d" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Palm leaves -->
+  <path d="M18 28 Q12 22 8 24" stroke="#2f303d" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M18 28 Q24 22 28 24" stroke="#2f303d" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M18 28 Q14 18 12 16" stroke="#2f303d" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M18 28 Q22 18 26 18" stroke="#2f303d" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- House -->
+  <path d="M26 44 L36 32 L46 44 L46 50 L26 50 Z" fill="none" stroke="#2f303d" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Window -->
+  <rect x="33" y="40" width="6" height="6" fill="#a98c46"/>
+  <line x1="36" y1="40" x2="36" y2="46" stroke="#fff" stroke-width="1"/>
+  <line x1="33" y1="43" x2="39" y2="43" stroke="#fff" stroke-width="1"/>
+  <!-- Wave -->
+  <path d="M6 56 Q14 52 22 56 T38 56 T54 56" stroke="#75c8c8" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>
