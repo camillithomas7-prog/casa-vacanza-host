@@ -17,7 +17,7 @@ $cities = array_filter(array_unique(array_column($apartments, 'city')));
 $totalApartments = (int)val('SELECT COUNT(*) FROM apartments WHERE active = 1');
 $avgRating = (float)val('SELECT AVG(rating) FROM reviews WHERE approved = 1');
 $totalReviews = (int)val('SELECT COUNT(*) FROM reviews WHERE approved = 1');
-$totalGuests = (int)val('SELECT COUNT(*) FROM bookings WHERE status IN ("completed","checked_in")');
+$totalGuests = '5.000+';
 $topReviews = rows('SELECT r.*, a.name AS apartment_name, a.city AS apartment_city FROM reviews r JOIN apartments a ON r.apartment_id = a.id WHERE r.approved = 1 ORDER BY r.rating DESC, r.created_at DESC LIMIT 3');
 
 $rentalTypes = "'" . implode("','", SERVICE_GROUPS['rental']) . "'";
@@ -60,7 +60,7 @@ require __DIR__ . '/partials/site-header.php';
           <div class="text-xs text-ink-500 mt-1"><?= $totalReviews ?: 'Nuove' ?> recensioni</div>
         </div>
         <div>
-          <div class="font-display font-bold text-3xl tabular-nums"><?= $totalGuests ?: '100+' ?></div>
+          <div class="font-display font-bold text-3xl tabular-nums"><?= e($totalGuests) ?></div>
           <div class="text-xs text-ink-500 mt-1">Ospiti accolti</div>
         </div>
       </div>
