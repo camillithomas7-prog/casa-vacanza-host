@@ -14,7 +14,7 @@ return [
         'name'     => 'Patrizia Mancini',
         'url'      => 'https://sienna-caribou-611155.hostingersite.com',
         'email'    => 'info@casavacanza.it',
-        'phone'    => '+39 000 000 0000',
+        'phone'    => '+39 371 352 4264',
         'currency' => 'EUR',
         'locale'   => 'it_IT',
         'timezone' => 'Europe/Rome',
