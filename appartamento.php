@@ -109,7 +109,7 @@ require __DIR__ . '/partials/site-header.php';
       <div id="calendar" class="scroll-mt-24">
         <h2 class="font-serif text-3xl font-semibold tracking-tight mb-2">Disponibilità</h2>
         <p class="text-ink-500 mb-5">Tocca le date verdi per selezionare check-in e check-out.</p>
-        <div class="card p-6">
+        <div class="card p-3 sm:p-6">
           <?php require __DIR__ . '/partials/calendar-public.php'; ?>
         </div>
       </div>
@@ -286,4 +286,24 @@ function bookingForm() {
   };
 }
 </script>
+
+<!-- STICKY MOBILE CTA -->
+<div class="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 dark:bg-ink-950/95 backdrop-blur-xl border-t border-ink-100 dark:border-ink-800/80 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-12px_rgba(0,0,0,.15)]">
+  <div class="flex items-center justify-between gap-3">
+    <div class="min-w-0">
+      <div class="flex items-baseline gap-1">
+        <span class="font-display text-xl font-bold"><?= fmtMoney((float)$a['base_price']) ?></span>
+        <span class="text-xs text-ink-500">/notte</span>
+      </div>
+      <?php if ($rating): ?>
+        <div class="text-xs text-ink-500 flex items-center gap-1 mt-0.5"><i data-lucide="star" class="size-[12px] fill-amber-400 text-amber-400"></i> <strong class="text-ink-900 dark:text-white"><?= number_format($rating, 1) ?></strong> · <?= count($reviews) ?> rec.</div>
+      <?php else: ?>
+        <div class="text-xs text-ink-500 mt-0.5">Conferma rapida</div>
+      <?php endif; ?>
+    </div>
+    <a href="#booking-form" class="btn-primary h-12 px-5 shrink-0">Prenota <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+  </div>
+</div>
+<div class="lg:hidden h-20"></div>
+
 <?php require __DIR__ . '/partials/site-footer.php';

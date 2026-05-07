@@ -34,7 +34,7 @@ $apt_id = (int)$a['id'];
   <div class="grid grid-cols-7 gap-1 text-[11px] font-semibold uppercase tracking-wider text-ink-500 mb-2">
     <?php foreach (['Lun','Mar','Mer','Gio','Ven','Sab','Dom'] as $d): ?><div class="text-center"><?= $d ?></div><?php endforeach; ?>
   </div>
-  <div class="grid grid-cols-7 gap-1.5">
+  <div class="grid grid-cols-7 gap-1 sm:gap-1.5">
     <?php foreach ($days as $ts):
       $in = (int)date('n',$ts) === $cal_month;
       $st = dayCellStatus($ts, $bookings, $blocks);
@@ -50,11 +50,11 @@ $apt_id = (int)$a['id'];
       $past_cls = 'text-ink-300 dark:text-ink-700 line-through';
     ?>
       <?php if ($clickable): ?>
-        <button type="button" @click="pick('<?= $d ?>')" :class="cellCls('<?= $d ?>', '<?= $base ?> hover:ring-2 hover:ring-emerald-500/40')" class="aspect-square flex items-center justify-center text-sm rounded-lg transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500">
+        <button type="button" @click="pick('<?= $d ?>')" :class="cellCls('<?= $d ?>', '<?= $base ?> hover:ring-2 hover:ring-emerald-500/40')" class="aspect-square min-h-[40px] flex items-center justify-center text-sm rounded-lg transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500">
           <?= (int)date('j', $ts) ?>
         </button>
       <?php else: ?>
-        <div class="aspect-square flex items-center justify-center text-sm rounded-lg <?= !$in ? $not_in_cls : ($past ? $past_cls : $base) ?>">
+        <div class="aspect-square min-h-[40px] flex items-center justify-center text-sm rounded-lg <?= !$in ? $not_in_cls : ($past ? $past_cls : $base) ?>">
           <?= (int)date('j', $ts) ?>
         </div>
       <?php endif; ?>

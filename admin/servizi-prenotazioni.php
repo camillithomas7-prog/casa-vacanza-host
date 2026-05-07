@@ -36,7 +36,8 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <?php endforeach; ?>
   </div>
 
-  <div class="card p-0 overflow-x-auto">
+  <!-- Tabella desktop -->
+  <div class="hidden md:block card p-0 overflow-x-auto">
     <table class="table-base">
       <thead><tr><th>Codice</th><th>Cliente</th><th>Servizio</th><th>Data</th><th>Persone</th><th class="text-right">Totale</th><th>Stato</th><th></th></tr></thead>
       <tbody>
@@ -73,6 +74,39 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       <div class="p-14 text-center">
         <div class="h-16 w-16 mx-auto rounded-2xl bg-ink-100 dark:bg-ink-800 text-ink-400 flex items-center justify-center mb-4"><i data-lucide="package-x" class="size-[28px]"></i></div>
         <div class="font-display font-bold text-lg">Nessuna prenotazione servizi</div>
+      </div>
+    <?php endif; ?>
+  </div>
+
+  <!-- Cards mobile -->
+  <div class="md:hidden space-y-3">
+    <?php foreach ($items as $b):
+      $parts = explode(' ', trim($b['customer_name']));
+      $initials = mb_strtoupper(mb_substr($parts[0] ?? '·', 0, 1) . (isset($parts[1]) ? mb_substr($parts[1], 0, 1) : ''));
+    ?>
+      <a href="/admin/servizi-prenotazione.php?id=<?= e($b['id']) ?>" class="card p-4 block active:scale-[0.99] transition">
+        <div class="flex items-start gap-3">
+          <span class="h-10 w-10 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-semibold text-sm shrink-0"><?= e($initials) ?></span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <div class="font-semibold truncate"><?= e($b['customer_name']) ?></div>
+              <?= svBadge($b['status']) ?>
+            </div>
+            <div class="text-xs text-ink-500 font-mono mt-0.5"><?= e($b['code']) ?></div>
+            <div class="text-sm mt-2 flex items-center gap-1.5 text-ink-700 dark:text-ink-300 truncate"><i data-lucide="<?= e(serviceTypeIcon($b['service_type'])) ?>" class="size-[12px] text-brand-500"></i> <?= e($b['service_name']) ?></div>
+            <div class="text-sm text-ink-700 dark:text-ink-300 mt-1 tabular-nums"><i data-lucide="calendar" class="size-[12px] inline -mt-0.5"></i> <?= fmtDateShort($b['start_date']) ?><?= $b['end_date'] && $b['end_date'] !== $b['start_date'] ? ' → ' . fmtDateShort($b['end_date']) : '' ?> · <?= (int)$b['participants'] ?>p</div>
+            <div class="flex items-center justify-between mt-3 pt-3 border-t border-ink-100 dark:border-ink-800/80">
+              <div class="text-xs text-ink-500">Totale</div>
+              <div class="font-display font-bold tabular-nums"><?= fmtMoney((float)$b['total']) ?></div>
+            </div>
+          </div>
+        </div>
+      </a>
+    <?php endforeach; ?>
+    <?php if (!$items): ?>
+      <div class="card p-10 text-center">
+        <div class="h-14 w-14 mx-auto rounded-2xl bg-ink-100 dark:bg-ink-800 text-ink-400 flex items-center justify-center mb-3"><i data-lucide="package-x" class="size-[24px]"></i></div>
+        <div class="font-display font-bold">Nessuna prenotazione</div>
       </div>
     <?php endif; ?>
   </div>

@@ -117,7 +117,7 @@ require __DIR__ . '/partials/site-header.php';
         <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Ospiti</div>
           <input type="number" name="guests" min="1" value="2" class="w-full bg-transparent outline-none text-sm font-medium"></div>
       </label>
-      <button class="btn-primary h-full px-6"><i data-lucide="search" class="size-[18px]"></i> <span class="hidden sm:inline">Cerca</span></button>
+      <button class="btn-primary h-12 md:h-full px-6 md:px-5"><i data-lucide="search" class="size-[18px]"></i> Cerca</button>
     </form>
   </div>
 </section>

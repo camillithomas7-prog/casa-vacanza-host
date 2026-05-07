@@ -67,14 +67,14 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
   </div>
 
-  <div class="card p-5">
+  <div class="card p-3 sm:p-5">
     <div class="flex items-center justify-between mb-4">
       <a href="?apt=<?= e($aptId) ?>&m=<?= $prev_m ?>" class="btn-ghost"><i data-lucide="chevron-left" class="size-[18px]"></i></a>
-      <div class="font-display text-xl font-bold"><?= $months_it[$cm-1] ?> <?= $cy ?></div>
+      <div class="font-display text-lg sm:text-xl font-bold"><?= $months_it[$cm-1] ?> <?= $cy ?></div>
       <a href="?apt=<?= e($aptId) ?>&m=<?= $next_m ?>" class="btn-ghost"><i data-lucide="chevron-right" class="size-[18px]"></i></a>
     </div>
-    <div class="grid grid-cols-7 gap-1 text-xs text-ink-500 mb-1">
-      <?php foreach (['Lun','Mar','Mer','Gio','Ven','Sab','Dom'] as $d): ?><div class="text-center font-medium px-2 py-1"><?= $d ?></div><?php endforeach; ?>
+    <div class="grid grid-cols-7 gap-1 text-[10px] sm:text-xs text-ink-500 mb-1">
+      <?php foreach (['Lun','Mar','Mer','Gio','Ven','Sab','Dom'] as $d): ?><div class="text-center font-medium px-1 sm:px-2 py-1"><?= $d ?></div><?php endforeach; ?>
     </div>
     <div class="grid grid-cols-7 gap-1">
       <?php foreach ($days as $ts): $in = (int)date('n',$ts) === $cm; $info = dayInfo($ts, $bookings, $blocks);
@@ -83,14 +83,15 @@ require __DIR__ . '/../partials/admin-shell-top.php';
                ($info['s'] === 'blocked' ? 'bg-ink-200 dark:bg-ink-800 border-ink-300' :
                'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200'));
       ?>
-        <div class="min-h-[80px] p-2 rounded-lg border <?= $in ? $cls : 'bg-ink-50/50 dark:bg-ink-900/30 border-transparent text-ink-300' ?>">
+        <div class="min-h-[52px] sm:min-h-[80px] p-1 sm:p-2 rounded-lg border <?= $in ? $cls : 'bg-ink-50/50 dark:bg-ink-900/30 border-transparent text-ink-300' ?>">
           <div class="text-xs font-medium"><?= (int)date('j', $ts) ?></div>
           <?php if ($info['b']): ?>
-            <a href="/admin/prenotazione.php?id=<?= e($info['b']['id']) ?>" class="block mt-1 text-[10px] truncate font-medium hover:underline">
+            <a href="/admin/prenotazione.php?id=<?= e($info['b']['id']) ?>" class="hidden sm:block mt-1 text-[10px] truncate font-medium hover:underline">
               <?= $info['s'] === 'check_in' ? '🟡 IN ' : ($info['s'] === 'check_out' ? '🟡 OUT ' : '') ?><?= e($info['b']['customer_name']) ?>
             </a>
+            <a href="/admin/prenotazione.php?id=<?= e($info['b']['id']) ?>" class="sm:hidden block mt-1" title="<?= e($info['b']['customer_name']) ?>"><i data-lucide="<?= $info['s'] === 'check_in' ? 'log-in' : ($info['s'] === 'check_out' ? 'log-out' : 'user') ?>" class="size-[11px]"></i></a>
           <?php endif; ?>
-          <?php if ($info['s'] === 'blocked'): ?><div class="mt-1 text-[10px] text-ink-500">Bloccato</div><?php endif; ?>
+          <?php if ($info['s'] === 'blocked'): ?><div class="mt-1 text-[10px] text-ink-500 hidden sm:block">Bloccato</div><?php endif; ?>
         </div>
       <?php endforeach; ?>
     </div>

@@ -86,10 +86,10 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
   <div class="card p-5">
     <h3 class="font-display font-bold mb-3">Andamento <?= $year ?></h3>
-    <div style="position:relative;height:300px"><canvas id="barChart"></canvas></div>
+    <div class="relative h-[220px] sm:h-[260px] lg:h-[300px]"><canvas id="barChart"></canvas></div>
   </div>
 
-  <form method="post" class="card p-5 grid sm:grid-cols-6 gap-2">
+  <form method="post" class="card p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2">
     <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
     <input type="hidden" name="action" value="add">
     <select class="input" name="apartment_id"><option value="">Generico</option>
@@ -98,8 +98,8 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <select class="input" name="category"><?php foreach ($cats as $c): ?><option value="<?= e($c) ?>"><?= e($c) ?></option><?php endforeach; ?></select>
     <input class="input" type="date" name="date" value="<?= date('Y-m-d') ?>" required>
     <input class="input" type="number" step="0.01" name="amount" placeholder="Importo €" required>
-    <input class="input" name="description" placeholder="Descrizione">
-    <button class="btn-primary"><i data-lucide="plus" class="size-[16px]"></i> Aggiungi</button>
+    <input class="input sm:col-span-2 lg:col-span-1" name="description" placeholder="Descrizione">
+    <button class="btn-primary sm:col-span-2 lg:col-span-1 h-12"><i data-lucide="plus" class="size-[16px]"></i> Aggiungi</button>
   </form>
 
   <div class="grid lg:grid-cols-3 gap-5">

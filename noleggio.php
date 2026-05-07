@@ -90,7 +90,7 @@ require __DIR__ . '/partials/site-header.php';
       </div>
     </div>
 
-    <aside class="lg:sticky lg:top-24 self-start" x-data="rentalForm()">
+    <aside id="booking-form" class="lg:sticky lg:top-24 self-start scroll-mt-24" x-data="rentalForm()">
       <div class="card-elev p-6">
         <div class="flex items-baseline gap-1 mb-4">
           <span class="font-display text-3xl font-bold"><?= fmtMoney((float)$s['daily_price']) ?></span>
@@ -181,4 +181,20 @@ function rentalForm() {
   };
 }
 </script>
+
+<!-- STICKY MOBILE CTA -->
+<div class="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 dark:bg-ink-950/95 backdrop-blur-xl border-t border-ink-100 dark:border-ink-800/80 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-12px_rgba(0,0,0,.15)]">
+  <div class="flex items-center justify-between gap-3">
+    <div class="min-w-0">
+      <div class="flex items-baseline gap-1">
+        <span class="font-display text-xl font-bold"><?= fmtMoney((float)$s['daily_price']) ?></span>
+        <span class="text-xs text-ink-500">/giorno</span>
+      </div>
+      <div class="text-xs text-ink-500 mt-0.5 truncate"><?= e($s['name']) ?></div>
+    </div>
+    <a href="#booking-form" class="btn-primary h-12 px-5 shrink-0">Noleggia <i data-lucide="arrow-right" class="size-[14px]"></i></a>
+  </div>
+</div>
+<div class="lg:hidden h-20"></div>
+
 <?php require __DIR__ . '/partials/site-footer.php';

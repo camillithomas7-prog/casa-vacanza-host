@@ -55,7 +55,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       <h1 class="font-serif text-4xl font-semibold tracking-tight">Buongiorno 👋</h1>
       <p class="text-ink-500 mt-1 text-pretty">Ecco com'è andata la tua attività di recente.</p>
     </div>
-    <div class="flex gap-2">
+    <div class="flex gap-2 flex-wrap">
       <a href="/admin/prenotazione-nuova.php" class="btn-secondary"><i data-lucide="plus" class="size-[16px]"></i> Nuova prenotazione</a>
       <a href="/admin/appartamento-edit.php" class="btn-outline"><i data-lucide="building-2" class="size-[16px]"></i> Nuovo appartamento</a>
     </div>
@@ -119,13 +119,13 @@ require __DIR__ . '/../partials/admin-shell-top.php';
           <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-brand-500"></span> Utile</span>
         </div>
       </div>
-      <div style="position:relative;height:300px"><canvas id="lineChart"></canvas></div>
+      <div class="relative h-[220px] sm:h-[260px] lg:h-[300px]"><canvas id="lineChart"></canvas></div>
     </div>
     <div class="card p-6">
       <h2 class="font-serif text-xl font-semibold tracking-tight">Top appartamenti</h2>
       <p class="text-xs text-ink-500 mt-0.5 mb-4">per fatturato</p>
       <?php if (!$top): ?><div class="text-sm text-ink-500">Nessun dato.</div><?php else: ?>
-        <div style="position:relative;height:220px" class="mb-4"><canvas id="pieChart"></canvas></div>
+        <div class="relative h-[180px] sm:h-[220px] mb-4"><canvas id="pieChart"></canvas></div>
         <ul class="space-y-1.5 text-sm">
           <?php foreach ($top as $i => $t): ?>
             <li class="flex items-center justify-between">
