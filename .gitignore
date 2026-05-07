@@ -1,0 +1,10 @@
+config.php
+uploads/photos/*
+uploads/documents/*
+!uploads/photos/.gitkeep
+!uploads/documents/.gitkeep
+.DS_Store
+*.log
+*.sqlite
+.idea
+.vscode
