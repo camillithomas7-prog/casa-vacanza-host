@@ -131,13 +131,23 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
     </div>
     <a href="/appartamenti.php<?= $_lp ?>" class="hidden sm:inline-flex text-sm text-brand-600 font-medium hover:underline"><?= e(t('common.see_all_arrow')) ?></a>
   </div>
+  <?php
+    // Mappa città → immagine reale della zona di Sharm El Sheikh
+    $zoneImages = [
+        'Naama Bay'   => '/assets/sharm/zone_naama_bay.jpg',
+        'Hadaba'      => '/assets/sharm/zone_hadaba.jpg',
+        'Sharks Bay'  => '/assets/sharm/zone_sharks_bay.jpg',
+        'Old Market'  => '/assets/sharm/zone_old_market.jpg',
+        'Nabq Bay'    => '/assets/sharm/zone_nabq_bay.jpg',
+    ];
+  ?>
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
     <?php foreach (array_slice($cities, 0, 4) as $city):
-      $cityCover = val('SELECT cover_image FROM apartments WHERE city = ? AND cover_image IS NOT NULL LIMIT 1', [$city]);
+      $cityCover = $zoneImages[$city] ?? val('SELECT cover_image FROM apartments WHERE city = ? AND cover_image IS NOT NULL LIMIT 1', [$city]);
       $cityCount = (int)val('SELECT COUNT(*) FROM apartments WHERE city = ? AND active = 1', [$city]);
     ?>
       <a href="/appartamenti.php?city=<?= urlencode($city) ?><?= $_lp ? '&lang=' . urlencode(currentLang()) : '' ?>" class="relative aspect-[4/5] rounded-2xl overflow-hidden group shadow-card">
-        <?php if ($cityCover): ?><img src="<?= e($cityCover) ?>" class="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition duration-700 ease-out-expo"><?php endif; ?>
+        <?php if ($cityCover): ?><img src="<?= e($cityCover) ?>" alt="<?= e($city) ?>" loading="lazy" class="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition duration-700 ease-out-expo"><?php endif; ?>
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
         <div class="absolute bottom-0 left-0 right-0 p-5 text-white">
           <div class="font-serif font-semibold text-2xl"><?= e($city) ?></div>
