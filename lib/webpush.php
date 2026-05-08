@@ -49,12 +49,15 @@ class WebPush {
      * @param int $ttl  Time to live in seconds
      * @return array{ok: bool, status: int, body: string}
      */
-    public function send(array $sub, ?string $payload = null, int $ttl = 86400): array {
+    public function send(array $sub, ?string $payload = null, int $ttl = 86400, string $urgency = 'high'): array {
         $endpoint = $sub['endpoint'];
         $audience = preg_replace('#^(https?://[^/]+).*$#', '$1', $endpoint);
 
+        // Urgency: high → bypassa Doze mode di Android, consegna immediata
+        // anche con schermo spento. Senza questo header FCM ritarda la consegna.
         $headers = [
             'TTL: ' . $ttl,
+            'Urgency: ' . $urgency,
             'Authorization: ' . $this->vapidAuthHeader($audience),
         ];
 

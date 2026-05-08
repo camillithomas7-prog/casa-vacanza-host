@@ -1,7 +1,7 @@
 // Service Worker for Patrizia Mancini Casa Vacanza
 // Handles push notifications and notification clicks.
 
-const SW_VERSION = 'v1';
+const SW_VERSION = 'v3';
 const ICON = '/assets/logo-512.png?v=2';
 const BADGE = '/assets/logo-192.png?v=2';
 
@@ -14,20 +14,45 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('push', (event) => {
-  let payload = { title: 'Casa Vacanza', body: 'Hai una nuova notifica', link: '/admin/notifiche.php' };
+  // IMPORTANTE: dobbiamo SEMPRE chiamare showNotification, anche se il payload
+  // è vuoto o malformato. Se il browser riceve un push e non vede una notifica
+  // visibile, dopo qualche tentativo annulla la subscription.
+  const showFallback = () => self.registration.showNotification('Casa Vacanza', {
+    body: 'Hai una nuova notifica',
+    icon: ICON,
+    badge: BADGE,
+    tag: 'cv-notif',
+    renotify: true,
+    requireInteraction: true,
+    vibrate: [200, 100, 200],
+    data: { link: '/admin/notifiche.php' },
+  });
+
+  let payload = null;
   if (event.data) {
-    try { payload = Object.assign(payload, event.data.json()); }
-    catch (e) { try { payload.body = event.data.text(); } catch (e2) {} }
+    try { payload = event.data.json(); }
+    catch (e) {
+      try { payload = { body: event.data.text() }; } catch (e2) {}
+    }
   }
 
+  if (!payload || typeof payload !== 'object') {
+    event.waitUntil(showFallback());
+    return;
+  }
+
+  const title = payload.title || 'Casa Vacanza';
   const options = {
-    body: payload.body,
+    body: payload.body || 'Hai una nuova notifica',
     icon: ICON,
     badge: BADGE,
     tag: payload.type || 'cv-notif',
     renotify: true,
-    requireInteraction: false,
-    vibrate: [100, 50, 100],
+    // requireInteraction = true: la notifica resta finché l'utente non la
+    // tocca. Importante su Android perché altrimenti schermo spento + schermata
+    // bloccata può farla scomparire troppo presto.
+    requireInteraction: true,
+    vibrate: [200, 100, 200],
     data: {
       link: payload.link || '/admin/notifiche.php',
       id: payload.id || null,
@@ -35,7 +60,32 @@ self.addEventListener('push', (event) => {
     },
   };
 
-  event.waitUntil(self.registration.showNotification(payload.title, options));
+  event.waitUntil(
+    self.registration.showNotification(title, options).catch(() => showFallback())
+  );
+});
+
+// Quando la subscription viene rinnovata dal browser (o invalidata), rifa il
+// subscribe e la rimanda al server. Senza questo handler, dopo un cambio di
+// endpoint il telefono smette di ricevere push.
+self.addEventListener('pushsubscriptionchange', (event) => {
+  event.waitUntil((async () => {
+    try {
+      const r = await fetch('/api/push-vapid-public.php', { credentials: 'include' });
+      const j = await r.json();
+      if (!j.publicKey) return;
+      const sub = await self.registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: Uint8Array.from(atob(j.publicKey.replace(/-/g,'+').replace(/_/g,'/')), c => c.charCodeAt(0)),
+      });
+      await fetch('/api/push-subscribe.php', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sub),
+      });
+    } catch (e) {}
+  })());
 });
 
 self.addEventListener('notificationclick', (event) => {
