@@ -26,7 +26,13 @@ $metaDesc = mb_substr(strip_tags($a['description']), 0, 160);
 require __DIR__ . '/partials/head.php';
 require __DIR__ . '/partials/site-header.php';
 ?>
-<div class="container-wide pt-8 pb-4" x-data="{ lightbox: null, photos: <?= e(json_encode(array_column($photos, 'url'))) ?> }">
+<?php
+  $mediaList = [];
+  foreach ($photos as $p) {
+      $mediaList[] = ['url' => $p['url'], 'isVideo' => isVideoUrl($p['url'])];
+  }
+?>
+<div class="container-wide pt-8 pb-4" x-data="{ lightbox: null, media: <?= e(json_encode($mediaList)) ?> }">
   <a href="/appartamenti.php" class="text-sm text-ink-500 hover:text-brand-600 inline-flex items-center gap-1"><i data-lucide="chevron-left" class="size-[14px]"></i> Tutti gli appartamenti</a>
   <div class="mt-4 flex items-end justify-between flex-wrap gap-4">
     <div>
@@ -43,31 +49,50 @@ require __DIR__ . '/partials/site-header.php';
   <!-- GALLERY -->
   <div class="grid grid-cols-4 grid-rows-2 gap-2.5 mt-6 rounded-3xl overflow-hidden h-[300px] sm:h-[440px]">
     <?php $vis = array_slice($photos, 0, 5); $main = $vis[0] ?? null; $thumbs = array_slice($vis, 1); ?>
-    <?php if ($main): ?>
+    <?php if ($main): $mainIsVideo = isVideoUrl($main['url']); ?>
       <button @click="lightbox=0" class="col-span-4 sm:col-span-2 row-span-2 relative group bg-ink-100 dark:bg-ink-900">
-        <img src="<?= e($main['url']) ?>" class="absolute inset-0 h-full w-full object-cover group-hover:scale-[1.03] transition duration-[700ms] ease-out-expo">
+        <?php if ($mainIsVideo): ?>
+          <video src="<?= e($main['url']) ?>" muted preload="metadata" class="absolute inset-0 h-full w-full object-cover"></video>
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="h-16 w-16 rounded-full bg-black/60 backdrop-blur flex items-center justify-center"><i data-lucide="play" class="size-[28px] text-white"></i></div>
+          </div>
+        <?php else: ?>
+          <img src="<?= e($main['url']) ?>" class="absolute inset-0 h-full w-full object-cover group-hover:scale-[1.03] transition duration-[700ms] ease-out-expo">
+        <?php endif; ?>
       </button>
     <?php endif; ?>
-    <?php foreach ($thumbs as $i => $p): ?>
+    <?php foreach ($thumbs as $i => $p): $tIsVideo = isVideoUrl($p['url']); ?>
       <button @click="lightbox=<?= $i + 1 ?>" class="hidden sm:block relative group bg-ink-100 dark:bg-ink-900 col-span-1 row-span-1">
-        <img src="<?= e($p['url']) ?>" class="absolute inset-0 h-full w-full object-cover group-hover:scale-[1.03] transition duration-[700ms] ease-out-expo">
+        <?php if ($tIsVideo): ?>
+          <video src="<?= e($p['url']) ?>" muted preload="metadata" class="absolute inset-0 h-full w-full object-cover"></video>
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="h-10 w-10 rounded-full bg-black/60 backdrop-blur flex items-center justify-center"><i data-lucide="play" class="size-[16px] text-white"></i></div>
+          </div>
+        <?php else: ?>
+          <img src="<?= e($p['url']) ?>" class="absolute inset-0 h-full w-full object-cover group-hover:scale-[1.03] transition duration-[700ms] ease-out-expo">
+        <?php endif; ?>
         <?php if ($i === count($thumbs) - 1 && count($photos) > 5): ?>
-          <span class="absolute inset-0 bg-black/45 text-white flex items-center justify-center font-semibold backdrop-blur-[2px]">+<?= count($photos) - 5 ?> foto</span>
+          <span class="absolute inset-0 bg-black/45 text-white flex items-center justify-center font-semibold backdrop-blur-[2px]">+<?= count($photos) - 5 ?></span>
         <?php endif; ?>
       </button>
     <?php endforeach; ?>
   </div>
   <button @click="lightbox=0" class="mt-3 inline-flex items-center gap-2 text-sm text-ink-600 dark:text-ink-300 hover:text-brand-600">
-    <i data-lucide="layout-grid" class="size-[14px]"></i> Mostra tutte le <?= count($photos) ?> foto
+    <i data-lucide="layout-grid" class="size-[14px]"></i> Mostra tutto (<?= count($photos) ?>)
   </button>
 
-  <!-- LIGHTBOX -->
+  <!-- LIGHTBOX (foto + video) -->
   <div x-show="lightbox !== null" x-cloak @click="lightbox=null" class="fixed inset-0 z-50 bg-ink-950/95 backdrop-blur-sm flex items-center justify-center" style="display:none">
     <button class="absolute top-5 right-5 h-10 w-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20" @click.stop="lightbox=null"><i data-lucide="x" class="size-[20px]"></i></button>
-    <button class="absolute left-5 h-12 w-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20" @click.stop="lightbox = (lightbox - 1 + photos.length) % photos.length"><i data-lucide="chevron-left" class="size-[24px]"></i></button>
-    <img :src="photos[lightbox]" class="max-h-[88vh] max-w-[88vw] object-contain rounded-2xl shadow-pop">
-    <button class="absolute right-5 h-12 w-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20" @click.stop="lightbox = (lightbox + 1) % photos.length"><i data-lucide="chevron-right" class="size-[24px]"></i></button>
-    <div class="absolute bottom-5 left-1/2 -translate-x-1/2 text-white/70 text-sm tabular-nums" x-text="(lightbox + 1) + ' / ' + photos.length"></div>
+    <button class="absolute left-5 h-12 w-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20" @click.stop="lightbox = (lightbox - 1 + media.length) % media.length"><i data-lucide="chevron-left" class="size-[24px]"></i></button>
+    <template x-if="lightbox !== null && media[lightbox] && media[lightbox].isVideo">
+      <video :src="media[lightbox].url" controls autoplay class="max-h-[88vh] max-w-[88vw] rounded-2xl shadow-pop bg-black" @click.stop></video>
+    </template>
+    <template x-if="lightbox !== null && media[lightbox] && !media[lightbox].isVideo">
+      <img :src="media[lightbox].url" class="max-h-[88vh] max-w-[88vw] object-contain rounded-2xl shadow-pop" @click.stop>
+    </template>
+    <button class="absolute right-5 h-12 w-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20" @click.stop="lightbox = (lightbox + 1) % media.length"><i data-lucide="chevron-right" class="size-[24px]"></i></button>
+    <div class="absolute bottom-5 left-1/2 -translate-x-1/2 text-white/70 text-sm tabular-nums" x-text="(lightbox + 1) + ' / ' + media.length"></div>
   </div>
 </div>
 

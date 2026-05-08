@@ -71,6 +71,12 @@ function slugify(string $s): string {
     return trim($s, '-');
 }
 
+function isVideoUrl(?string $url): bool {
+    if (!$url) return false;
+    $ext = strtolower(pathinfo(parse_url($url, PHP_URL_PATH) ?: $url, PATHINFO_EXTENSION));
+    return in_array($ext, ['mp4', 'webm', 'mov', 'm4v']);
+}
+
 function parseAmenities($raw): array {
     if (!$raw) return [];
     $v = json_decode($raw, true);

@@ -19,22 +19,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'photo_add' && $apt) {
+        $allowed = ['jpg','jpeg','png','webp','mp4','webm','mov','m4v'];
+        $added = 0; $skipped = 0;
         if (!empty($_FILES['photos']['tmp_name'][0])) {
             foreach ($_FILES['photos']['tmp_name'] as $i => $tmp) {
                 if (!is_uploaded_file($tmp)) continue;
                 $ext = strtolower(pathinfo($_FILES['photos']['name'][$i], PATHINFO_EXTENSION));
-                $fname = uniqid('p_') . '.' . preg_replace('/[^a-z0-9]/', '', $ext);
+                if (!in_array($ext, $allowed)) { $skipped++; continue; }
+                $isVideo = in_array($ext, ['mp4','webm','mov','m4v']);
+                $fname = ($isVideo ? 'v_' : 'p_') . uniqid() . '.' . preg_replace('/[^a-z0-9]/', '', $ext);
                 $dest = __DIR__ . '/../uploads/photos/' . $fname;
-                move_uploaded_file($tmp, $dest);
-                q('INSERT INTO photos (id, apartment_id, url, position) VALUES (?, ?, ?, (SELECT IFNULL(MAX(position),0)+1 FROM (SELECT position FROM photos WHERE apartment_id = ?) p))',
-                    [newId(), $apt['id'], '/uploads/photos/' . $fname, $apt['id']]);
+                if (move_uploaded_file($tmp, $dest)) {
+                    q('INSERT INTO photos (id, apartment_id, url, position) VALUES (?, ?, ?, (SELECT IFNULL(MAX(position),0)+1 FROM (SELECT position FROM photos WHERE apartment_id = ?) p))',
+                        [newId(), $apt['id'], '/uploads/photos/' . $fname, $apt['id']]);
+                    $added++;
+                }
             }
         }
-        if (!empty($_POST['photo_url'])) {
-            q('INSERT INTO photos (id, apartment_id, url, position) VALUES (?, ?, ?, (SELECT IFNULL(MAX(position),0)+1 FROM (SELECT position FROM photos WHERE apartment_id = ?) p))',
-                [newId(), $apt['id'], $_POST['photo_url'], $apt['id']]);
-        }
-        flash('Foto aggiunta');
+        flash($added . ' file caricat' . ($added === 1 ? 'o' : 'i') . ($skipped ? " · $skipped scartat" . ($skipped === 1 ? 'o' : 'i') . ' (formato non valido)' : ''));
         redirect('/admin/appartamento-edit.php?id=' . $apt['id']);
     }
 
@@ -266,17 +268,27 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
 <?php if ($apt): ?>
 <div class="card p-4 sm:p-5 mt-5">
-  <h3 class="font-display font-bold mb-3">Galleria foto</h3>
+  <h3 class="font-display font-bold mb-3">Galleria foto e video</h3>
   <form method="post" enctype="multipart/form-data" class="flex flex-wrap items-center gap-3 mb-4">
     <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
     <input type="hidden" name="action" value="photo_add">
-    <label class="btn-primary cursor-pointer"><i data-lucide="image-plus" class="size-[18px]"></i> Carica una o più foto<input type="file" name="photos[]" multiple accept="image/jpeg,image/png,image/webp" class="hidden" onchange="this.form.submit()"></label>
-    <span class="text-xs text-ink-500">JPG, PNG o WebP. Puoi selezionare più file insieme.</span>
+    <label class="btn-primary cursor-pointer"><i data-lucide="image-plus" class="size-[18px]"></i> Carica foto o video<input type="file" name="photos[]" multiple accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" class="hidden" onchange="this.form.submit()"></label>
+    <span class="text-xs text-ink-500">Foto: JPG, PNG, WebP. Video: MP4, WebM, MOV. Puoi selezionare più file insieme.</span>
   </form>
   <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-    <?php foreach ($photos as $p): ?>
+    <?php foreach ($photos as $p): $isVideo = isVideoUrl($p['url']); ?>
       <div class="relative group rounded-xl overflow-hidden aspect-[4/3] bg-ink-100 dark:bg-ink-900">
-        <img src="<?= e($p['url']) ?>" class="h-full w-full object-cover">
+        <?php if ($isVideo): ?>
+          <video src="<?= e($p['url']) ?>" class="h-full w-full object-cover" muted preload="metadata"></video>
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="h-12 w-12 rounded-full bg-black/60 backdrop-blur flex items-center justify-center">
+              <i data-lucide="play" class="size-[20px] text-white"></i>
+            </div>
+          </div>
+          <span class="absolute bottom-2 left-2 badge bg-black/70 text-white text-[10px]"><i data-lucide="video" class="size-[10px]"></i> Video</span>
+        <?php else: ?>
+          <img src="<?= e($p['url']) ?>" class="h-full w-full object-cover">
+        <?php endif; ?>
         <form method="post" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100">
           <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
           <input type="hidden" name="action" value="photo_delete">
@@ -285,7 +297,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         </form>
       </div>
     <?php endforeach; ?>
-    <?php if (!$photos): ?><div class="col-span-full text-sm text-ink-500 text-center py-6">Nessuna foto.</div><?php endif; ?>
+    <?php if (!$photos): ?><div class="col-span-full text-sm text-ink-500 text-center py-6">Nessuna foto o video.</div><?php endif; ?>
   </div>
 </div>
 <?php endif; ?>
