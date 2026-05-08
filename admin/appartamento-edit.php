@@ -96,6 +96,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $photos = $apt ? rows('SELECT * FROM photos WHERE apartment_id = ? ORDER BY position ASC', [$apt['id']]) : [];
 $amenitiesStr = $apt ? implode(', ', parseAmenities($apt['amenities'])) : '';
+
+// Carica zone/villaggi dalla tabella zones (con fallback se la tabella non esiste)
+$zonesList = [];
+try {
+    $zonesList = rows('SELECT name, kind FROM zones WHERE active = 1 ORDER BY kind ASC, position ASC, name ASC');
+} catch (Throwable $e) {}
 $defaults = ['name'=>'','slug'=>'','description'=>'','address'=>'','city'=>'','country'=>'Egitto','guests'=>2,'bedrooms'=>1,'bathrooms'=>1,'beds'=>1,'size_sqm'=>'','rules'=>'','check_in_time'=>'15:00','check_out_time'=>'11:00','base_price'=>80,'weekly_price'=>'','biweekly_price'=>'','triweekly_price'=>'','monthly_price'=>'','weekend_price'=>'','cleaning_fee'=>35,'security_deposit'=>0,'city_tax'=>2,'city_tax_max_nights'=>5,'long_stay_discount_7'=>5,'long_stay_discount_14'=>10,'long_stay_discount_30'=>20,'active'=>1,'under_maintenance'=>0,'cover_image'=>''];
 // Merge: i valori salvati sovrascrivono i default
 $f = $apt ? array_merge($defaults, $apt) : $defaults;
@@ -127,7 +133,36 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       <label class="block"><span class="label">Descrizione</span><textarea class="input min-h-[120px]" name="description"><?= e($f['description']) ?></textarea></label>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Indirizzo</span><input class="input" name="address" value="<?= e($f['address']) ?>"></label>
-        <label class="block"><span class="label">Zona di Sharm</span><input class="input" name="city" value="<?= e($f['city']) ?>" placeholder="es. Naama Bay, Hadaba, Sharks Bay…"></label>
+        <label class="block">
+          <span class="label">Zona / Villaggio</span>
+          <?php
+            $currentCity = $f['city'] ?? '';
+            $zoneNames = array_column($zonesList, 'name');
+            $cityInList = in_array($currentCity, $zoneNames, true);
+            // Raggruppa per kind
+            $byKind = [];
+            foreach ($zonesList as $z) { $byKind[$z['kind']][] = $z['name']; }
+            $kindLabels = ['zone' => 'Zone', 'villaggio' => 'Villaggi / Resort', 'quartiere' => 'Quartieri'];
+          ?>
+          <select class="input" name="city">
+            <option value="">— Nessuna —</option>
+            <?php foreach ($kindLabels as $k => $label): if (empty($byKind[$k])) continue; ?>
+              <optgroup label="<?= e($label) ?>">
+                <?php foreach ($byKind[$k] as $zname): ?>
+                  <option value="<?= e($zname) ?>" <?= $currentCity === $zname ? 'selected' : '' ?>><?= e($zname) ?></option>
+                <?php endforeach; ?>
+              </optgroup>
+            <?php endforeach; ?>
+            <?php if ($currentCity && !$cityInList): ?>
+              <option value="<?= e($currentCity) ?>" selected><?= e($currentCity) ?> (non in elenco)</option>
+            <?php endif; ?>
+          </select>
+          <?php if (!$zonesList): ?>
+            <span class="text-xs text-amber-600 mt-1 block">Nessuna zona creata. <a href="/admin/zone.php" class="underline">Creale qui</a> per poterle selezionare.</span>
+          <?php else: ?>
+            <span class="text-xs text-ink-500 mt-1 block">Per aggiungerne una nuova vai in <a href="/admin/zone.php" class="text-brand-600 underline">Zone & villaggi</a>.</span>
+          <?php endif; ?>
+        </label>
         <label class="block"><span class="label">Paese</span><input class="input" name="country" value="<?= e($f['country']) ?>"></label>
         <label class="block"><span class="label">URL foto cover</span><input class="input" name="cover_image" value="<?= e($f['cover_image']) ?>"></label>
       </div>
