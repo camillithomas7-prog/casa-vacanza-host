@@ -735,6 +735,159 @@ $TRANSLATIONS = [
 'common.dow.sat' => [ 'it' => 'Sab', 'en' => 'Sat', 'ru' => 'Сб', 'es' => 'Sáb', 'de' => 'Sa' ],
 'common.dow.sun' => [ 'it' => 'Dom', 'en' => 'Sun', 'ru' => 'Вс', 'es' => 'Dom', 'de' => 'So' ],
 
+// ========== MONTHS ==========
+'month.1'  => [ 'it' => 'Gennaio',   'en' => 'January',   'ru' => 'Январь',   'es' => 'Enero',      'de' => 'Januar'    ],
+'month.2'  => [ 'it' => 'Febbraio',  'en' => 'February',  'ru' => 'Февраль',  'es' => 'Febrero',    'de' => 'Februar'   ],
+'month.3'  => [ 'it' => 'Marzo',     'en' => 'March',     'ru' => 'Март',     'es' => 'Marzo',      'de' => 'März'      ],
+'month.4'  => [ 'it' => 'Aprile',    'en' => 'April',     'ru' => 'Апрель',   'es' => 'Abril',      'de' => 'April'     ],
+'month.5'  => [ 'it' => 'Maggio',    'en' => 'May',       'ru' => 'Май',      'es' => 'Mayo',       'de' => 'Mai'       ],
+'month.6'  => [ 'it' => 'Giugno',    'en' => 'June',      'ru' => 'Июнь',     'es' => 'Junio',      'de' => 'Juni'      ],
+'month.7'  => [ 'it' => 'Luglio',    'en' => 'July',      'ru' => 'Июль',     'es' => 'Julio',      'de' => 'Juli'      ],
+'month.8'  => [ 'it' => 'Agosto',    'en' => 'August',    'ru' => 'Август',   'es' => 'Agosto',     'de' => 'August'    ],
+'month.9'  => [ 'it' => 'Settembre', 'en' => 'September', 'ru' => 'Сентябрь', 'es' => 'Septiembre', 'de' => 'September' ],
+'month.10' => [ 'it' => 'Ottobre',   'en' => 'October',   'ru' => 'Октябрь',  'es' => 'Octubre',    'de' => 'Oktober'   ],
+'month.11' => [ 'it' => 'Novembre',  'en' => 'November',  'ru' => 'Ноябрь',   'es' => 'Noviembre',  'de' => 'November'  ],
+'month.12' => [ 'it' => 'Dicembre',  'en' => 'December',  'ru' => 'Декабрь',  'es' => 'Diciembre',  'de' => 'Dezember'  ],
+
+// ========== AMENITIES (mappa di traduzione automatica) ==========
+// Quando l'admin scrive una di queste parole comuni in italiano, il sito le
+// mostra tradotte. Match case-insensitive sul testo italiano.
+'amenity.wifi' => [
+    'it' => 'WiFi', 'en' => 'WiFi', 'ru' => 'Wi-Fi', 'es' => 'WiFi', 'de' => 'WLAN',
+],
+'amenity.aria_condizionata' => [
+    'it' => 'Aria condizionata', 'en' => 'Air conditioning', 'ru' => 'Кондиционер', 'es' => 'Aire acondicionado', 'de' => 'Klimaanlage',
+],
+'amenity.cucina' => [
+    'it' => 'Cucina', 'en' => 'Kitchen', 'ru' => 'Кухня', 'es' => 'Cocina', 'de' => 'Küche',
+],
+'amenity.tv' => [
+    'it' => 'TV', 'en' => 'TV', 'ru' => 'Телевизор', 'es' => 'TV', 'de' => 'TV',
+],
+'amenity.smart_tv' => [
+    'it' => 'Smart TV', 'en' => 'Smart TV', 'ru' => 'Smart TV', 'es' => 'Smart TV', 'de' => 'Smart TV',
+],
+'amenity.lavatrice' => [
+    'it' => 'Lavatrice', 'en' => 'Washing machine', 'ru' => 'Стиральная машина', 'es' => 'Lavadora', 'de' => 'Waschmaschine',
+],
+'amenity.lavastoviglie' => [
+    'it' => 'Lavastoviglie', 'en' => 'Dishwasher', 'ru' => 'Посудомоечная машина', 'es' => 'Lavavajillas', 'de' => 'Geschirrspüler',
+],
+'amenity.piscina' => [
+    'it' => 'Piscina', 'en' => 'Pool', 'ru' => 'Бассейн', 'es' => 'Piscina', 'de' => 'Pool',
+],
+'amenity.parcheggio' => [
+    'it' => 'Parcheggio', 'en' => 'Parking', 'ru' => 'Парковка', 'es' => 'Aparcamiento', 'de' => 'Parkplatz',
+],
+'amenity.vista_mare' => [
+    'it' => 'Vista mare', 'en' => 'Sea view', 'ru' => 'Вид на море', 'es' => 'Vista al mar', 'de' => 'Meerblick',
+],
+'amenity.balcone' => [
+    'it' => 'Balcone', 'en' => 'Balcony', 'ru' => 'Балкон', 'es' => 'Balcón', 'de' => 'Balkon',
+],
+'amenity.terrazza' => [
+    'it' => 'Terrazza', 'en' => 'Terrace', 'ru' => 'Терраса', 'es' => 'Terraza', 'de' => 'Terrasse',
+],
+'amenity.asciugamani' => [
+    'it' => 'Asciugamani', 'en' => 'Towels', 'ru' => 'Полотенца', 'es' => 'Toallas', 'de' => 'Handtücher',
+],
+'amenity.lenzuola' => [
+    'it' => 'Lenzuola', 'en' => 'Bed linen', 'ru' => 'Постельное бельё', 'es' => 'Sábanas', 'de' => 'Bettwäsche',
+],
+'amenity.riscaldamento' => [
+    'it' => 'Riscaldamento', 'en' => 'Heating', 'ru' => 'Отопление', 'es' => 'Calefacción', 'de' => 'Heizung',
+],
+'amenity.colazione' => [
+    'it' => 'Colazione', 'en' => 'Breakfast', 'ru' => 'Завтрак', 'es' => 'Desayuno', 'de' => 'Frühstück',
+],
+'amenity.frigorifero' => [
+    'it' => 'Frigorifero', 'en' => 'Fridge', 'ru' => 'Холодильник', 'es' => 'Frigorífico', 'de' => 'Kühlschrank',
+],
+'amenity.microonde' => [
+    'it' => 'Microonde', 'en' => 'Microwave', 'ru' => 'Микроволновка', 'es' => 'Microondas', 'de' => 'Mikrowelle',
+],
+'amenity.bollitore' => [
+    'it' => 'Bollitore', 'en' => 'Kettle', 'ru' => 'Чайник', 'es' => 'Hervidor', 'de' => 'Wasserkocher',
+],
+'amenity.macchina_caffe' => [
+    'it' => 'Macchina caffè', 'en' => 'Coffee maker', 'ru' => 'Кофемашина', 'es' => 'Cafetera', 'de' => 'Kaffeemaschine',
+],
+'amenity.ferro_da_stiro' => [
+    'it' => 'Ferro da stiro', 'en' => 'Iron', 'ru' => 'Утюг', 'es' => 'Plancha', 'de' => 'Bügeleisen',
+],
+'amenity.asciugacapelli' => [
+    'it' => 'Asciugacapelli', 'en' => 'Hairdryer', 'ru' => 'Фен', 'es' => 'Secador', 'de' => 'Haartrockner',
+],
+'amenity.cassaforte' => [
+    'it' => 'Cassaforte', 'en' => 'Safe', 'ru' => 'Сейф', 'es' => 'Caja fuerte', 'de' => 'Safe',
+],
+'amenity.ascensore' => [
+    'it' => 'Ascensore', 'en' => 'Elevator', 'ru' => 'Лифт', 'es' => 'Ascensor', 'de' => 'Aufzug',
+],
+'amenity.giardino' => [
+    'it' => 'Giardino', 'en' => 'Garden', 'ru' => 'Сад', 'es' => 'Jardín', 'de' => 'Garten',
+],
+'amenity.barbecue' => [
+    'it' => 'Barbecue', 'en' => 'Barbecue', 'ru' => 'Барбекю', 'es' => 'Barbacoa', 'de' => 'Grill',
+],
+'amenity.animali_ammessi' => [
+    'it' => 'Animali ammessi', 'en' => 'Pets allowed', 'ru' => 'Можно с животными', 'es' => 'Mascotas permitidas', 'de' => 'Haustiere erlaubt',
+],
+'amenity.fumatori' => [
+    'it' => 'Fumatori', 'en' => 'Smoking allowed', 'ru' => 'Можно курить', 'es' => 'Se permite fumar', 'de' => 'Rauchen erlaubt',
+],
+'amenity.non_fumatori' => [
+    'it' => 'Non fumatori', 'en' => 'No smoking', 'ru' => 'Не курить', 'es' => 'No fumadores', 'de' => 'Nichtraucher',
+],
+'amenity.spiaggia' => [
+    'it' => 'Spiaggia', 'en' => 'Beach', 'ru' => 'Пляж', 'es' => 'Playa', 'de' => 'Strand',
+],
+'amenity.palestra' => [
+    'it' => 'Palestra', 'en' => 'Gym', 'ru' => 'Тренажёрный зал', 'es' => 'Gimnasio', 'de' => 'Fitnessraum',
+],
+'amenity.spa' => [
+    'it' => 'SPA', 'en' => 'Spa', 'ru' => 'СПА', 'es' => 'Spa', 'de' => 'Spa',
+],
+'amenity.4x4' => [
+    'it' => '4×4', 'en' => '4×4', 'ru' => '4×4', 'es' => '4×4', 'de' => '4×4',
+],
+'amenity.cambio_manuale' => [
+    'it' => 'Cambio manuale', 'en' => 'Manual transmission', 'ru' => 'Механика', 'es' => 'Cambio manual', 'de' => 'Schaltgetriebe',
+],
+'amenity.cambio_automatico' => [
+    'it' => 'Cambio automatico', 'en' => 'Automatic transmission', 'ru' => 'Автомат', 'es' => 'Cambio automático', 'de' => 'Automatik',
+],
+'amenity.bluetooth' => [
+    'it' => 'Bluetooth', 'en' => 'Bluetooth', 'ru' => 'Bluetooth', 'es' => 'Bluetooth', 'de' => 'Bluetooth',
+],
+'amenity.gps' => [
+    'it' => 'GPS', 'en' => 'GPS', 'ru' => 'GPS', 'es' => 'GPS', 'de' => 'GPS',
+],
+'amenity.casco' => [
+    'it' => 'Casco', 'en' => 'Helmet', 'ru' => 'Шлем', 'es' => 'Casco', 'de' => 'Helm',
+],
+'amenity.assicurazione' => [
+    'it' => 'Assicurazione', 'en' => 'Insurance', 'ru' => 'Страховка', 'es' => 'Seguro', 'de' => 'Versicherung',
+],
+'amenity.acqua_inclusa' => [
+    'it' => 'Acqua inclusa', 'en' => 'Water included', 'ru' => 'Вода включена', 'es' => 'Agua incluida', 'de' => 'Wasser inklusive',
+],
+'amenity.guida_inclusa' => [
+    'it' => 'Guida inclusa', 'en' => 'Guide included', 'ru' => 'Гид включен', 'es' => 'Guía incluida', 'de' => 'Reiseleiter inklusive',
+],
+'amenity.pranzo_incluso' => [
+    'it' => 'Pranzo incluso', 'en' => 'Lunch included', 'ru' => 'Обед включён', 'es' => 'Almuerzo incluido', 'de' => 'Mittagessen inklusive',
+],
+'amenity.transfer_incluso' => [
+    'it' => 'Transfer incluso', 'en' => 'Transfer included', 'ru' => 'Трансфер включён', 'es' => 'Traslado incluido', 'de' => 'Transfer inklusive',
+],
+'amenity.snorkeling' => [
+    'it' => 'Snorkeling', 'en' => 'Snorkeling', 'ru' => 'Снорклинг', 'es' => 'Snorkel', 'de' => 'Schnorcheln',
+],
+'amenity.diving' => [
+    'it' => 'Diving', 'en' => 'Diving', 'ru' => 'Дайвинг', 'es' => 'Buceo', 'de' => 'Tauchen',
+],
+
 // ========== RENTALS LIST ==========
 'rent.title' => [
     'it' => 'Muoviti come vuoi.', 'en' => 'Move how you want.', 'ru' => 'Передвигайтесь как удобно.', 'es' => 'Muévete a tu manera.', 'de' => 'Beweg dich, wie du willst.',
@@ -980,6 +1133,37 @@ $TRANSLATIONS = [
 ],
 
 ];
+
+/**
+ * Traduce una "amenity" o termine breve italiano usando il dizionario interno.
+ * Match case-insensitive con normalizzazione (rimuove accenti, spazi → underscore).
+ * Se non trovato, ritorna l'originale.
+ *
+ * Esempio: tAmenity('Aria condizionata') → 'Air conditioning' (in lingua corrente).
+ */
+function tAmenity(string $text): string {
+    static $index = null;
+    if ($index === null) {
+        global $TRANSLATIONS;
+        $index = [];
+        foreach ($TRANSLATIONS as $key => $vals) {
+            if (strpos($key, 'amenity.') !== 0) continue;
+            $italian = $vals['it'] ?? '';
+            if ($italian === '') continue;
+            $index[mb_strtolower(trim($italian))] = $key;
+        }
+    }
+    $needle = mb_strtolower(trim($text));
+    if (isset($index[$needle])) return t($index[$needle]);
+    return $text;
+}
+
+/**
+ * Restituisce il nome di un mese (1-12) tradotto.
+ */
+function tMonth(int $m): string {
+    return t('month.' . max(1, min(12, $m)));
+}
 
 function t(string $key, array $vars = []): string {
     global $TRANSLATIONS;

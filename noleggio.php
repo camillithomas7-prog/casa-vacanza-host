@@ -57,7 +57,7 @@ require __DIR__ . '/partials/site-header.php';
             <?php foreach ($features as $f): ?>
               <div class="flex items-center gap-3 p-3 rounded-xl bg-ink-50/60 dark:bg-ink-900/40 border border-ink-100/60 dark:border-ink-800/60">
                 <span class="h-8 w-8 rounded-lg bg-white dark:bg-ink-900 border border-ink-100 dark:border-ink-800/80 flex items-center justify-center text-brand-500"><i data-lucide="check" class="size-[14px]"></i></span>
-                <span class="text-sm font-medium"><?= e($f) ?></span>
+                <span class="text-sm font-medium"><?= e(tAmenity($f)) ?></span>
               </div>
             <?php endforeach; ?>
           </div>

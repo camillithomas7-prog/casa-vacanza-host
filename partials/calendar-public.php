@@ -21,18 +21,18 @@ if (!function_exists('dayCellStatus')) {
 }
 $prev_m = date('Y-m', strtotime('-1 month', $cal_ref));
 $next_m = date('Y-m', strtotime('+1 month', $cal_ref));
-$months_it = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 $today = date('Y-m-d');
 $apt_id = (int)$a['id'];
+$dowKeys = ['mon','tue','wed','thu','fri','sat','sun'];
 ?>
 <div x-data="calPicker(<?= $apt_id ?>)" x-init="init()">
   <div class="flex items-center justify-between mb-4">
-    <a href="?slug=<?= e($a['slug']) ?>&m=<?= $prev_m ?>#calendar" class="h-9 w-9 rounded-xl border border-ink-200 dark:border-ink-700/80 flex items-center justify-center hover:bg-ink-50 dark:hover:bg-ink-800"><i data-lucide="chevron-left" class="size-[16px]"></i></a>
-    <div class="font-display font-bold text-lg"><?= $months_it[$cal_month-1] ?> <?= $cal_year ?></div>
-    <a href="?slug=<?= e($a['slug']) ?>&m=<?= $next_m ?>#calendar" class="h-9 w-9 rounded-xl border border-ink-200 dark:border-ink-700/80 flex items-center justify-center hover:bg-ink-50 dark:hover:bg-ink-800"><i data-lucide="chevron-right" class="size-[16px]"></i></a>
+    <a href="?slug=<?= e($a['slug']) ?>&m=<?= $prev_m ?>&lang=<?= e(currentLang()) ?>#calendar" class="h-9 w-9 rounded-xl border border-ink-200 dark:border-ink-700/80 flex items-center justify-center hover:bg-ink-50 dark:hover:bg-ink-800"><i data-lucide="chevron-left" class="size-[16px]"></i></a>
+    <div class="font-display font-bold text-lg"><?= e(tMonth($cal_month)) ?> <?= $cal_year ?></div>
+    <a href="?slug=<?= e($a['slug']) ?>&m=<?= $next_m ?>&lang=<?= e(currentLang()) ?>#calendar" class="h-9 w-9 rounded-xl border border-ink-200 dark:border-ink-700/80 flex items-center justify-center hover:bg-ink-50 dark:hover:bg-ink-800"><i data-lucide="chevron-right" class="size-[16px]"></i></a>
   </div>
   <div class="grid grid-cols-7 gap-1 text-[11px] font-semibold uppercase tracking-wider text-ink-500 mb-2">
-    <?php foreach (['Lun','Mar','Mer','Gio','Ven','Sab','Dom'] as $d): ?><div class="text-center"><?= $d ?></div><?php endforeach; ?>
+    <?php foreach ($dowKeys as $k): ?><div class="text-center"><?= e(t('common.dow.' . $k)) ?></div><?php endforeach; ?>
   </div>
   <div class="grid grid-cols-7 gap-1 sm:gap-1.5">
     <?php foreach ($days as $ts):
@@ -61,15 +61,15 @@ $apt_id = (int)$a['id'];
     <?php endforeach; ?>
   </div>
   <div class="flex flex-wrap gap-4 text-xs mt-5 text-ink-500">
-    <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-md bg-emerald-200 dark:bg-emerald-500/30"></span> Disponibile</span>
-    <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-md bg-red-200 dark:bg-red-500/30"></span> Occupato</span>
-    <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-md bg-amber-200 dark:bg-amber-500/30"></span> Check-in/out</span>
-    <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-md bg-brand-500"></span> Selezionato</span>
+    <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-md bg-emerald-200 dark:bg-emerald-500/30"></span> <?= e(t('apt.cal.legend.free')) ?></span>
+    <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-md bg-red-200 dark:bg-red-500/30"></span> <?= e(t('apt.cal.legend.busy')) ?></span>
+    <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-md bg-amber-200 dark:bg-amber-500/30"></span> <?= e(t('apt.cal.legend.checkinout')) ?></span>
+    <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-md bg-brand-500"></span> <?= e(t('apt.cal.legend.selected')) ?></span>
   </div>
   <div x-show="from || to" class="mt-4 p-3 rounded-xl bg-brand-50 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/30 text-sm flex items-center justify-between gap-2 animate-fade-in">
     <div class="flex items-center gap-2 text-brand-700 dark:text-brand-300">
       <i data-lucide="calendar-check" class="size-[16px]"></i>
-      <span><span x-show="from && !to">Check-in: <strong x-text="fmtIt(from)"></strong> · Scegli check-out</span><span x-show="from && to"><strong x-text="fmtIt(from)"></strong> → <strong x-text="fmtIt(to)"></strong> · <span x-text="nights"></span> notti</span></span>
+      <span><span x-show="from && !to"><?= e(t('apt.checkin')) ?>: <strong x-text="fmtIt(from)"></strong> · <?= e(t('apt.cal.choose_out')) ?></span><span x-show="from && to"><strong x-text="fmtIt(from)"></strong> → <strong x-text="fmtIt(to)"></strong> · <span x-text="nights"></span> <?= e(t('apt.cal.nights_count')) ?></span></span>
     </div>
     <button type="button" @click="reset()" class="text-xs font-semibold text-brand-700 dark:text-brand-300 hover:underline">Reset</button>
   </div>

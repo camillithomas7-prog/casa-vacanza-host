@@ -129,7 +129,7 @@ require __DIR__ . '/partials/site-header.php';
             ?>
               <div class="flex items-center gap-3 p-3 rounded-xl bg-ink-50/60 dark:bg-ink-900/40 border border-ink-100/60 dark:border-ink-800/60">
                 <span class="h-9 w-9 rounded-lg bg-white dark:bg-ink-900 border border-ink-100 dark:border-ink-800/80 flex items-center justify-center text-brand-500"><i data-lucide="<?= e($icon) ?>" class="size-[16px]"></i></span>
-                <span class="text-sm font-medium"><?= e($s) ?></span>
+                <span class="text-sm font-medium"><?= e(tAmenity($s)) ?></span>
               </div>
             <?php endforeach; ?>
           </div>

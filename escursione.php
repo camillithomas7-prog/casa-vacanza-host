@@ -60,7 +60,7 @@ require __DIR__ . '/partials/site-header.php';
             <div class="card p-5">
               <div class="font-display font-bold mb-3 flex items-center gap-2 text-emerald-600"><i data-lucide="check-circle-2" class="size-[16px]"></i> <?= e(t('exc.detail.included')) ?></div>
               <ul class="space-y-1.5">
-                <?php foreach ($includes as $i): ?><li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="size-[14px] text-emerald-500 mt-0.5 shrink-0"></i> <?= e($i) ?></li><?php endforeach; ?>
+                <?php foreach ($includes as $i): ?><li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="size-[14px] text-emerald-500 mt-0.5 shrink-0"></i> <?= e(tAmenity($i)) ?></li><?php endforeach; ?>
               </ul>
             </div>
           <?php endif; ?>
@@ -68,7 +68,7 @@ require __DIR__ . '/partials/site-header.php';
             <div class="card p-5">
               <div class="font-display font-bold mb-3 flex items-center gap-2 text-ink-500"><i data-lucide="x-circle" class="size-[16px]"></i> <?= e(t('exc.detail.not_included')) ?></div>
               <ul class="space-y-1.5">
-                <?php foreach ($excludes as $i): ?><li class="flex items-start gap-2 text-sm"><i data-lucide="x" class="size-[14px] text-ink-400 mt-0.5 shrink-0"></i> <?= e($i) ?></li><?php endforeach; ?>
+                <?php foreach ($excludes as $i): ?><li class="flex items-start gap-2 text-sm"><i data-lucide="x" class="size-[14px] text-ink-400 mt-0.5 shrink-0"></i> <?= e(tAmenity($i)) ?></li><?php endforeach; ?>
               </ul>
             </div>
           <?php endif; ?>
