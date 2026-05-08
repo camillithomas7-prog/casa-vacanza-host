@@ -163,6 +163,15 @@ try { if (localStorage.getItem('cv-theme') === 'dark') document.documentElement.
   }
   input[type="date"]:hover::-webkit-calendar-picker-indicator { opacity: 1; }
   .dark input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(75%); }
+  /* Rimuove l'outline blu nativo di Chrome sul campo data e l'highlight
+     azzurro del segmento attivo (es. "gg" evidenziato in blu) */
+  input[type="date"]:focus { outline: none; }
+  input[type="date"]::-webkit-datetime-edit-day-field:focus,
+  input[type="date"]::-webkit-datetime-edit-month-field:focus,
+  input[type="date"]::-webkit-datetime-edit-year-field:focus {
+    background-color: rgb(255 213 164 / .35);
+    color: inherit; outline: none; border-radius: 3px;
+  }
 }
 </style>
 <script>
