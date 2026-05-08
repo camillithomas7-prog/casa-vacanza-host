@@ -104,14 +104,18 @@ $title = $apt ? 'Modifica appartamento' : 'Nuovo appartamento';
 require __DIR__ . '/../partials/head.php';
 require __DIR__ . '/../partials/admin-shell-top.php';
 
-// === DEBUG TEMPORANEO === (rimuovere dopo aver risolto)
-if (isset($_GET['debug'])) {
-    echo '<pre style="background:#fff;padding:20px;font-family:monospace;font-size:12px;border:2px solid red;margin:20px;white-space:pre-wrap">';
-    echo "GET id = " . var_export($_GET['id'] ?? null, true) . "\n";
-    echo "Query result \$apt = " . var_export($apt, true) . "\n";
-    echo "\$f after merge = " . var_export($f, true) . "\n";
-    echo '</pre>';
-}
+// === DEBUG TEMPORANEO ALWAYS-ON === (rimuovere dopo aver risolto)
+echo '<pre style="background:#fffbe6;padding:16px;font-family:ui-monospace,monospace;font-size:11px;border:2px solid #f59e0b;margin:16px;white-space:pre-wrap;overflow-x:auto;max-height:400px">';
+echo "GET id = " . var_export($_GET['id'] ?? null, true) . "\n\n";
+echo "\$apt name = " . var_export($apt['name'] ?? '(null)', true) . "\n";
+echo "\$apt guests = " . var_export($apt['guests'] ?? '(null)', true) . "\n";
+echo "\$apt base_price = " . var_export($apt['base_price'] ?? '(null)', true) . "\n";
+echo "\$apt city = " . var_export($apt['city'] ?? '(null)', true) . "\n\n";
+echo "\$f name = " . var_export($f['name'] ?? '(null)', true) . "\n";
+echo "\$f guests = " . var_export($f['guests'] ?? '(null)', true) . "\n";
+echo "\$f base_price = " . var_export($f['base_price'] ?? '(null)', true) . "\n";
+echo "\$f city = " . var_export($f['city'] ?? '(null)', true) . "\n";
+echo '</pre>';
 ?>
 <form method="post" enctype="multipart/form-data" class="space-y-5">
   <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
