@@ -4,7 +4,7 @@ require_once __DIR__ . '/lib/utils.php';
 
 $slug = $_GET['slug'] ?? '';
 $a = row('SELECT * FROM apartments WHERE slug = ? AND active = 1', [$slug]);
-if (!$a) { http_response_code(404); $title='Non trovato'; require __DIR__.'/partials/head.php'; require __DIR__.'/partials/site-header.php'; echo '<div class="container-narrow card p-14 mt-20 text-center"><h1 class="font-serif text-3xl">Appartamento non trovato</h1><a href="/appartamenti.php" class="btn-primary mt-6 inline-flex">Torna alla lista</a></div>'; require __DIR__.'/partials/site-footer.php'; exit; }
+if (!$a) { http_response_code(404); $title=t('apt.detail.not_found_title'); require __DIR__.'/partials/head.php'; require __DIR__.'/partials/site-header.php'; echo '<div class="container-narrow card p-14 mt-20 text-center"><h1 class="font-serif text-3xl">' . e(t('apt.detail.not_found_title')) . '</h1><a href="/appartamenti.php?lang=' . e(currentLang()) . '" class="btn-primary mt-6 inline-flex">' . e(t('apt.detail.not_found_back')) . '</a></div>'; require __DIR__.'/partials/site-footer.php'; exit; }
 
 $photos = rows('SELECT * FROM photos WHERE apartment_id = ? ORDER BY position ASC', [$a['id']]);
 if (!$photos && $a['cover_image']) $photos = [['url' => $a['cover_image'], 'alt' => $a['name']]];
@@ -33,15 +33,15 @@ require __DIR__ . '/partials/site-header.php';
   }
 ?>
 <div class="container-wide pt-8 pb-4" x-data="{ lightbox: null, media: <?= e(json_encode($mediaList)) ?> }">
-  <a href="/appartamenti.php" class="text-sm text-ink-500 hover:text-brand-600 inline-flex items-center gap-1"><i data-lucide="chevron-left" class="size-[14px]"></i> Tutti gli appartamenti</a>
+  <a href="/appartamenti.php?lang=<?= e(currentLang()) ?>" class="text-sm text-ink-500 hover:text-brand-600 inline-flex items-center gap-1"><i data-lucide="chevron-left" class="size-[14px]"></i> <?= e(t('apt.detail.back')) ?></a>
   <div class="mt-4 flex items-end justify-between flex-wrap gap-4">
     <div>
       <div class="badge-soft mb-3"><i data-lucide="map-pin" class="size-[12px]"></i> <?= e($a['city'] ?: $a['country']) ?></div>
       <h1 class="font-serif text-4xl md:text-6xl font-semibold tracking-tight max-w-2xl text-balance"><?= e($a['name']) ?></h1>
       <div class="flex flex-wrap items-center gap-4 text-sm text-ink-500 mt-3">
-        <?php if ($rating): ?><span class="flex items-center gap-1"><i data-lucide="star" class="size-[14px] fill-amber-400 text-amber-400"></i> <strong class="text-ink-900 dark:text-white"><?= number_format($rating, 1) ?></strong> · <?= count($reviews) ?> recensioni</span><?php endif; ?>
+        <?php if ($rating): ?><span class="flex items-center gap-1"><i data-lucide="star" class="size-[14px] fill-amber-400 text-amber-400"></i> <strong class="text-ink-900 dark:text-white"><?= number_format($rating, 1) ?></strong> · <?= e(t('apt.detail.reviews_count', ['n' => count($reviews)])) ?></span><?php endif; ?>
         <?php if ($a['address']): ?><span class="flex items-center gap-1"><i data-lucide="map-pin" class="size-[14px]"></i> <?= e($a['address']) ?></span><?php endif; ?>
-        <span class="flex items-center gap-1"><i data-lucide="users" class="size-[14px]"></i> Fino a <?= (int)$a['guests'] ?> ospiti</span>
+        <span class="flex items-center gap-1"><i data-lucide="users" class="size-[14px]"></i> <?= e(t('apt.detail.up_to_guests', ['n' => (int)$a['guests']])) ?></span>
       </div>
     </div>
   </div>
@@ -78,7 +78,7 @@ require __DIR__ . '/partials/site-header.php';
     <?php endforeach; ?>
   </div>
   <button @click="lightbox=0" class="mt-3 inline-flex items-center gap-2 text-sm text-ink-600 dark:text-ink-300 hover:text-brand-600">
-    <i data-lucide="layout-grid" class="size-[14px]"></i> Mostra tutto (<?= count($photos) ?>)
+    <i data-lucide="layout-grid" class="size-[14px]"></i> <?= e(t('apt.detail.show_all_photos', ['n' => count($photos)])) ?>
   </button>
 
   <!-- LIGHTBOX (foto + video) -->
@@ -101,7 +101,12 @@ require __DIR__ . '/partials/site-header.php';
     <div class="lg:col-span-2 space-y-10">
       <!-- INFO STRIP -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <?php foreach ([['users','Ospiti',$a['guests']],['bed-double','Camere',$a['bedrooms']],['bed','Letti',$a['beds']],['bath','Bagni',$a['bathrooms']]] as $s): ?>
+        <?php foreach ([
+          ['users', t('apt.info.guests'), $a['guests']],
+          ['bed-double', t('apt.info.bedrooms'), $a['bedrooms']],
+          ['bed', t('apt.info.beds'), $a['beds']],
+          ['bath', t('apt.info.bathrooms'), $a['bathrooms']],
+        ] as $s): ?>
           <div class="card p-4">
             <div class="text-ink-500 text-xs flex items-center gap-1.5 uppercase tracking-wider"><i data-lucide="<?= $s[0] ?>" class="size-[14px]"></i> <?= e($s[1]) ?></div>
             <div class="font-display font-bold text-2xl mt-1"><?= (int)$s[2] ?></div>
@@ -110,13 +115,13 @@ require __DIR__ . '/partials/site-header.php';
       </div>
 
       <div>
-        <h2 class="font-serif text-3xl font-semibold tracking-tight mb-4">L'appartamento</h2>
+        <h2 class="font-serif text-3xl font-semibold tracking-tight mb-4"><?= e(t('apt.about')) ?></h2>
         <p class="text-ink-700 dark:text-ink-300 whitespace-pre-line leading-relaxed text-pretty"><?= e($a['description']) ?></p>
       </div>
 
       <?php if ($amenities): ?>
         <div>
-          <h2 class="font-serif text-3xl font-semibold tracking-tight mb-5">Servizi inclusi</h2>
+          <h2 class="font-serif text-3xl font-semibold tracking-tight mb-5"><?= e(t('apt.amenities')) ?></h2>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <?php foreach ($amenities as $s):
               $key = mb_strtolower($s);
@@ -132,8 +137,8 @@ require __DIR__ . '/partials/site-header.php';
       <?php endif; ?>
 
       <div id="calendar" class="scroll-mt-24">
-        <h2 class="font-serif text-3xl font-semibold tracking-tight mb-2">Disponibilità</h2>
-        <p class="text-ink-500 mb-5">Tocca le date verdi per selezionare check-in e check-out.</p>
+        <h2 class="font-serif text-3xl font-semibold tracking-tight mb-2"><?= e(t('apt.availability')) ?></h2>
+        <p class="text-ink-500 mb-5"><?= e(t('apt.detail.cal_help')) ?></p>
         <div class="card p-3 sm:p-6">
           <?php require __DIR__ . '/partials/calendar-public.php'; ?>
         </div>
@@ -141,7 +146,7 @@ require __DIR__ . '/partials/site-header.php';
 
       <?php if ($a['rules']): ?>
         <div>
-          <h2 class="font-serif text-3xl font-semibold tracking-tight mb-4">Regole della casa</h2>
+          <h2 class="font-serif text-3xl font-semibold tracking-tight mb-4"><?= e(t('apt.rules')) ?></h2>
           <div class="card p-6">
             <p class="text-ink-700 dark:text-ink-300 whitespace-pre-line leading-relaxed"><?= e($a['rules']) ?></p>
           </div>
@@ -153,7 +158,7 @@ require __DIR__ . '/partials/site-header.php';
           <div class="flex items-end justify-between flex-wrap gap-2 mb-5">
             <h2 class="font-serif text-3xl font-semibold tracking-tight flex items-center gap-3">
               <i data-lucide="star" class="size-[24px] fill-amber-400 text-amber-400"></i>
-              <?= number_format($rating, 1) ?> · <?= count($reviews) ?> recensioni
+              <?= number_format($rating, 1) ?> · <?= e(t('apt.detail.reviews_count', ['n' => count($reviews)])) ?>
             </h2>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -184,51 +189,51 @@ require __DIR__ . '/partials/site-header.php';
         <div class="flex items-baseline justify-between gap-2 mb-1">
           <div>
             <span class="font-display text-3xl font-bold"><?= fmtMoney((float)$a['base_price']) ?></span>
-            <span class="text-sm text-ink-500">/notte</span>
+            <span class="text-sm text-ink-500"><?= e(t('common.per_night')) ?></span>
           </div>
           <?php if ($rating): ?><div class="text-sm flex items-center gap-1"><i data-lucide="star" class="size-[14px] fill-amber-400 text-amber-400"></i> <strong><?= number_format($rating, 1) ?></strong></div><?php endif; ?>
         </div>
-        <div class="text-xs text-ink-500 mb-5">Pulizie <?= fmtMoney((float)$a['cleaning_fee']) ?> · Tassa soggiorno <?= fmtMoney((float)$a['city_tax']) ?>/p/notte</div>
+        <div class="text-xs text-ink-500 mb-5"><?= e(t('apt.detail.fees_line', ['c' => fmtMoney((float)$a['cleaning_fee']), 't' => fmtMoney((float)$a['city_tax'])])) ?></div>
 
         <template x-if="done">
           <div class="text-center py-6 animate-fade-in">
             <div class="h-16 w-16 mx-auto rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3"><i data-lucide="check" class="size-[32px]"></i></div>
-            <div class="font-display text-xl font-bold">Richiesta inviata!</div>
-            <p class="text-sm text-ink-500 mt-1">Codice prenotazione</p>
+            <div class="font-display text-xl font-bold"><?= e(t('apt.req_sent')) ?></div>
+            <p class="text-sm text-ink-500 mt-1"><?= e(t('apt.booking_code')) ?></p>
             <p class="font-mono text-base mt-1" x-text="done"></p>
-            <p class="text-xs text-ink-500 mt-3">Ti contatteremo a breve per la conferma.</p>
+            <p class="text-xs text-ink-500 mt-3"><?= e(t('apt.contact_soon')) ?></p>
           </div>
         </template>
 
         <form x-show="!done" @submit.prevent="submit" class="space-y-2.5">
           <div class="grid grid-cols-2 gap-0 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm overflow-hidden divide-x divide-ink-100 dark:divide-ink-700/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
             <label class="block px-3.5 py-2.5 cursor-pointer hover:bg-ink-50/60 dark:hover:bg-ink-900/60 transition-colors">
-              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400">Check-in</span>
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('apt.checkin')) ?></span>
               <input type="date" required class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5 booking-date" x-model="from" @change="quote()">
             </label>
             <label class="block px-3.5 py-2.5 cursor-pointer hover:bg-ink-50/60 dark:hover:bg-ink-900/60 transition-colors">
-              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400">Check-out</span>
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('apt.checkout')) ?></span>
               <input type="date" required class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5 booking-date" x-model="to" @change="quote()">
             </label>
           </div>
           <label class="block px-3.5 py-2.5 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm cursor-pointer hover:bg-ink-50/40 dark:hover:bg-ink-900/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
-            <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400">Ospiti (max <?= (int)$a['guests'] ?>)</span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('apt.guests_max', ['n' => (int)$a['guests']])) ?></span>
             <input type="number" min="1" max="<?= (int)$a['guests'] ?>" class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5" x-model.number="guests" @input="quote()">
           </label>
           <label class="block px-3.5 py-2.5 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm cursor-pointer hover:bg-ink-50/40 dark:hover:bg-ink-900/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
-            <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400">Codice sconto (opzionale)</span>
-            <input class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 placeholder:text-ink-300 placeholder:font-normal mt-0.5" placeholder="es. SUMMER10" x-model="coupon" @input.debounce.500="quote()">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('apt.coupon_optional')) ?></span>
+            <input class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 placeholder:text-ink-300 placeholder:font-normal mt-0.5" placeholder="<?= e(t('apt.coupon_ph')) ?>" x-model="coupon" @input.debounce.500="quote()">
           </label>
 
           <template x-if="q && q.nights > 0">
             <div class="rounded-xl bg-ink-50 dark:bg-ink-900/40 p-4 text-sm space-y-2 animate-slide-up">
-              <div class="flex justify-between"><span class="text-ink-500"><span x-text="q.nights"></span> notti × pernottamento</span><span class="font-medium tabular-nums" x-text="fmt(q.nightlyTotal)"></span></div>
+              <div class="flex justify-between"><span class="text-ink-500"><span x-text="q.nights"></span> <?= e(t('apt.summary.nights')) ?></span><span class="font-medium tabular-nums" x-text="fmt(q.nightlyTotal)"></span></div>
               <template x-if="q.discount > 0">
                 <div class="flex justify-between text-emerald-600"><span x-text="q.discountLabel"></span><span class="tabular-nums" x-text="'-' + fmt(q.discount)"></span></div>
               </template>
-              <div class="flex justify-between"><span class="text-ink-500">Pulizie</span><span class="tabular-nums" x-text="fmt(q.cleaningFee)"></span></div>
-              <div class="flex justify-between"><span class="text-ink-500">Tassa soggiorno</span><span class="tabular-nums" x-text="fmt(q.cityTax)"></span></div>
-              <div class="flex justify-between font-display font-bold text-base pt-2 mt-1 border-t border-ink-200 dark:border-ink-700/80"><span>Totale</span><span class="tabular-nums" x-text="fmt(q.total)"></span></div>
+              <div class="flex justify-between"><span class="text-ink-500"><?= e(t('form.cleaning')) ?></span><span class="tabular-nums" x-text="fmt(q.cleaningFee)"></span></div>
+              <div class="flex justify-between"><span class="text-ink-500"><?= e(t('form.city_tax')) ?></span><span class="tabular-nums" x-text="fmt(q.cityTax)"></span></div>
+              <div class="flex justify-between font-display font-bold text-base pt-2 mt-1 border-t border-ink-200 dark:border-ink-700/80"><span><?= e(t('form.total')) ?></span><span class="tabular-nums" x-text="fmt(q.total)"></span></div>
             </div>
           </template>
 
@@ -322,10 +327,10 @@ require __DIR__ . '/partials/site-header.php';
           <div x-show="err" x-text="err" class="text-sm text-red-600 p-2 rounded-lg bg-red-50 dark:bg-red-500/10"></div>
 
           <button :disabled="busy" class="btn-primary w-full h-12 text-base">
-            <span x-show="!busy">Richiedi prenotazione</span>
-            <span x-show="busy" class="flex items-center gap-2"><i data-lucide="loader-2" class="size-[18px] animate-spin"></i> Invio…</span>
+            <span x-show="!busy"><?= e(t('apt.request_book')) ?></span>
+            <span x-show="busy" class="flex items-center gap-2"><i data-lucide="loader-2" class="size-[18px] animate-spin"></i> <?= e(t('form.sending')) ?></span>
           </button>
-          <p class="text-[11px] text-ink-500 text-center">Non ti verrà addebitato nulla ora. Confermeremo via WhatsApp o email.</p>
+          <p class="text-[11px] text-ink-500 text-center"><?= e(t('apt.no_charge')) ?></p>
         </form>
       </div>
 
@@ -333,9 +338,9 @@ require __DIR__ . '/partials/site-header.php';
         <div class="flex items-start gap-3">
           <span class="h-10 w-10 rounded-xl bg-brand-50 dark:bg-brand-500/15 text-brand-600 flex items-center justify-center shrink-0"><i data-lucide="message-circle" class="size-[18px]"></i></span>
           <div>
-            <div class="font-medium">Hai domande?</div>
-            <div class="text-sm text-ink-500">Scrivici, rispondiamo velocemente.</div>
-            <a href="/contatti.php" class="text-sm text-brand-600 font-medium mt-1 inline-block">Contatta lo staff →</a>
+            <div class="font-medium"><?= e(t('apt.help.title')) ?></div>
+            <div class="text-sm text-ink-500"><?= e(t('apt.help.sub')) ?></div>
+            <a href="/contatti.php?lang=<?= e(currentLang()) ?>" class="text-sm text-brand-600 font-medium mt-1 inline-block"><?= e(t('apt.help.cta')) ?></a>
           </div>
         </div>
       </div>
@@ -426,12 +431,12 @@ function bookingForm() {
     <div class="min-w-0">
       <div class="flex items-baseline gap-1">
         <span class="font-display text-xl font-bold"><?= fmtMoney((float)$a['base_price']) ?></span>
-        <span class="text-xs text-ink-500">/notte</span>
+        <span class="text-xs text-ink-500"><?= e(t('common.per_night')) ?></span>
       </div>
       <?php if ($rating): ?>
-        <div class="text-xs text-ink-500 flex items-center gap-1 mt-0.5"><i data-lucide="star" class="size-[12px] fill-amber-400 text-amber-400"></i> <strong class="text-ink-900 dark:text-white"><?= number_format($rating, 1) ?></strong> · <?= count($reviews) ?> rec.</div>
+        <div class="text-xs text-ink-500 flex items-center gap-1 mt-0.5"><i data-lucide="star" class="size-[12px] fill-amber-400 text-amber-400"></i> <strong class="text-ink-900 dark:text-white"><?= number_format($rating, 1) ?></strong> · <?= e(t('apt.detail.reviews_count', ['n' => count($reviews)])) ?></div>
       <?php else: ?>
-        <div class="text-xs text-ink-500 mt-0.5">Conferma rapida</div>
+        <div class="text-xs text-ink-500 mt-0.5"><?= e(t('apt.detail.quick_confirm')) ?></div>
       <?php endif; ?>
     </div>
     <a href="#booking-form" class="btn-primary h-12 px-5 shrink-0"><?= e(t('cta.book_now')) ?> <i data-lucide="arrow-right" class="size-[14px]"></i></a>

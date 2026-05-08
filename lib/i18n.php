@@ -624,6 +624,117 @@ $TRANSLATIONS = [
 ],
 'apt.cal.nights_count' => [ 'it' => 'notti', 'en' => 'nights', 'ru' => 'ночей', 'es' => 'noches', 'de' => 'Nächte' ],
 
+// ========== APARTMENT DETAIL — extra ==========
+'apt.detail.back' => [
+    'it' => 'Tutti gli appartamenti', 'en' => 'All apartments', 'ru' => 'Все апартаменты', 'es' => 'Todos los apartamentos', 'de' => 'Alle Apartments',
+],
+'apt.detail.not_found_title' => [
+    'it' => 'Appartamento non trovato', 'en' => 'Apartment not found', 'ru' => 'Апартаменты не найдены', 'es' => 'Apartamento no encontrado', 'de' => 'Apartment nicht gefunden',
+],
+'apt.detail.not_found_back' => [
+    'it' => 'Torna alla lista', 'en' => 'Back to list', 'ru' => 'Вернуться к списку', 'es' => 'Volver a la lista', 'de' => 'Zur Liste',
+],
+'apt.detail.up_to_guests' => [
+    'it' => 'Fino a {n} ospiti', 'en' => 'Up to {n} guests', 'ru' => 'До {n} гостей', 'es' => 'Hasta {n} huéspedes', 'de' => 'Bis zu {n} Gäste',
+],
+'apt.detail.reviews_count' => [
+    'it' => '{n} recensioni', 'en' => '{n} reviews', 'ru' => '{n} отзывов', 'es' => '{n} opiniones', 'de' => '{n} Bewertungen',
+],
+'apt.detail.show_all_photos' => [
+    'it' => 'Mostra tutto ({n})', 'en' => 'Show all ({n})', 'ru' => 'Показать все ({n})', 'es' => 'Ver todas ({n})', 'de' => 'Alle anzeigen ({n})',
+],
+'apt.detail.cal_help' => [
+    'it' => 'Tocca le date verdi per selezionare check-in e check-out.',
+    'en' => 'Tap the green dates to pick check-in and check-out.',
+    'ru' => 'Коснитесь зелёных дат, чтобы выбрать заезд и выезд.',
+    'es' => 'Toca las fechas verdes para elegir entrada y salida.',
+    'de' => 'Tippe auf die grünen Daten, um An- und Abreise zu wählen.',
+],
+'apt.detail.fees_line' => [
+    'it' => 'Pulizie {c} · Tassa soggiorno {t}/p/notte',
+    'en' => 'Cleaning {c} · City tax {t}/person/night',
+    'ru' => 'Уборка {c} · Туристический сбор {t}/чел/ночь',
+    'es' => 'Limpieza {c} · Tasa turística {t}/persona/noche',
+    'de' => 'Reinigung {c} · Kurtaxe {t}/Person/Nacht',
+],
+'apt.checkin' => [ 'it' => 'Check-in', 'en' => 'Check-in', 'ru' => 'Заезд', 'es' => 'Entrada', 'de' => 'Anreise' ],
+'apt.checkout' => [ 'it' => 'Check-out', 'en' => 'Check-out', 'ru' => 'Выезд', 'es' => 'Salida', 'de' => 'Abreise' ],
+'apt.guests_max' => [
+    'it' => 'Ospiti (max {n})', 'en' => 'Guests (max {n})', 'ru' => 'Гости (макс. {n})', 'es' => 'Huéspedes (máx. {n})', 'de' => 'Gäste (max. {n})',
+],
+'apt.coupon_optional' => [
+    'it' => 'Codice sconto (opzionale)', 'en' => 'Discount code (optional)', 'ru' => 'Промокод (необязательно)', 'es' => 'Código de descuento (opcional)', 'de' => 'Rabattcode (optional)',
+],
+'apt.coupon_ph' => [
+    'it' => 'es. SUMMER10', 'en' => 'e.g. SUMMER10', 'ru' => 'напр. SUMMER10', 'es' => 'ej. SUMMER10', 'de' => 'z. B. SUMMER10',
+],
+'apt.detail.quick_confirm' => [
+    'it' => 'Conferma rapida', 'en' => 'Quick confirm', 'ru' => 'Быстрое подтверждение', 'es' => 'Confirmación rápida', 'de' => 'Schnelle Bestätigung',
+],
+
+// ========== COMMON FORM ==========
+'form.sending' => [ 'it' => 'Invio…', 'en' => 'Sending…', 'ru' => 'Отправка…', 'es' => 'Enviando…', 'de' => 'Senden…' ],
+'form.error' => [ 'it' => 'Errore', 'en' => 'Error', 'ru' => 'Ошибка', 'es' => 'Error', 'de' => 'Fehler' ],
+'form.cleaning' => [ 'it' => 'Pulizie', 'en' => 'Cleaning', 'ru' => 'Уборка', 'es' => 'Limpieza', 'de' => 'Reinigung' ],
+'form.city_tax' => [ 'it' => 'Tassa soggiorno', 'en' => 'City tax', 'ru' => 'Туристический сбор', 'es' => 'Tasa turística', 'de' => 'Kurtaxe' ],
+'form.total' => [ 'it' => 'Totale', 'en' => 'Total', 'ru' => 'Итого', 'es' => 'Total', 'de' => 'Gesamt' ],
+'form.extra' => [ 'it' => 'Extra', 'en' => 'Extra', 'ru' => 'Доп.', 'es' => 'Extra', 'de' => 'Extra' ],
+
+// ========== RENTAL DETAIL — extra ==========
+'rent.detail.not_found' => [
+    'it' => 'Servizio non trovato', 'en' => 'Service not found', 'ru' => 'Услуга не найдена', 'es' => 'Servicio no encontrado', 'de' => 'Dienst nicht gefunden',
+],
+'rent.detail.see_all' => [
+    'it' => 'Vedi noleggi', 'en' => 'See rentals', 'ru' => 'К арендам', 'es' => 'Ver alquileres', 'de' => 'Mietfahrzeuge ansehen',
+],
+'rent.detail.discount_ph' => [
+    'it' => 'opzionale', 'en' => 'optional', 'ru' => 'необязательно', 'es' => 'opcional', 'de' => 'optional',
+],
+'rent.detail.notes_ph' => [
+    'it' => 'Note: numero patente, hotel, ecc.',
+    'en' => 'Notes: license number, hotel, etc.',
+    'ru' => 'Примечания: номер прав, отель и т. д.',
+    'es' => 'Notas: número de licencia, hotel, etc.',
+    'de' => 'Notizen: Führerscheinnummer, Hotel usw.',
+],
+'rent.detail.book_btn' => [
+    'it' => 'Richiedi noleggio', 'en' => 'Request rental', 'ru' => 'Запросить аренду', 'es' => 'Solicitar alquiler', 'de' => 'Miete anfragen',
+],
+'rent.detail.contact_soon' => [
+    'it' => 'Ti contatteremo a breve.', 'en' => 'We\'ll be in touch shortly.', 'ru' => 'Скоро свяжемся с вами.', 'es' => 'Nos pondremos en contacto en breve.', 'de' => 'Wir melden uns in Kürze.',
+],
+'rent.detail.whatsapp_note' => [
+    'it' => 'Conferma e dettagli pickup via WhatsApp.',
+    'en' => 'Confirmation and pickup details via WhatsApp.',
+    'ru' => 'Подтверждение и детали получения по WhatsApp.',
+    'es' => 'Confirmación y detalles de recogida por WhatsApp.',
+    'de' => 'Bestätigung und Abholdetails per WhatsApp.',
+],
+
+// ========== EXCURSION DETAIL — extra ==========
+'exc.detail.not_found' => [
+    'it' => 'Escursione non trovata', 'en' => 'Tour not found', 'ru' => 'Экскурсия не найдена', 'es' => 'Excursión no encontrada', 'de' => 'Ausflug nicht gefunden',
+],
+'exc.detail.see_all' => [
+    'it' => 'Tutte le escursioni', 'en' => 'All tours', 'ru' => 'Все экскурсии', 'es' => 'Todas las excursiones', 'de' => 'Alle Ausflüge',
+],
+'exc.detail.book_btn' => [
+    'it' => 'Prenota escursione', 'en' => 'Book tour', 'ru' => 'Забронировать экскурсию', 'es' => 'Reservar excursión', 'de' => 'Ausflug buchen',
+],
+'exc.detail.per_person_count' => [
+    'it' => '× persona', 'en' => '× person', 'ru' => '× человек', 'es' => '× persona', 'de' => '× Person',
+],
+'common.per_person' => [
+    'it' => '/persona', 'en' => '/person', 'ru' => '/чел', 'es' => '/persona', 'de' => '/Person',
+],
+'common.dow.mon' => [ 'it' => 'Lun', 'en' => 'Mon', 'ru' => 'Пн', 'es' => 'Lun', 'de' => 'Mo' ],
+'common.dow.tue' => [ 'it' => 'Mar', 'en' => 'Tue', 'ru' => 'Вт', 'es' => 'Mar', 'de' => 'Di' ],
+'common.dow.wed' => [ 'it' => 'Mer', 'en' => 'Wed', 'ru' => 'Ср', 'es' => 'Mié', 'de' => 'Mi' ],
+'common.dow.thu' => [ 'it' => 'Gio', 'en' => 'Thu', 'ru' => 'Чт', 'es' => 'Jue', 'de' => 'Do' ],
+'common.dow.fri' => [ 'it' => 'Ven', 'en' => 'Fri', 'ru' => 'Пт', 'es' => 'Vie', 'de' => 'Fr' ],
+'common.dow.sat' => [ 'it' => 'Sab', 'en' => 'Sat', 'ru' => 'Сб', 'es' => 'Sáb', 'de' => 'Sa' ],
+'common.dow.sun' => [ 'it' => 'Dom', 'en' => 'Sun', 'ru' => 'Вс', 'es' => 'Dom', 'de' => 'So' ],
+
 // ========== RENTALS LIST ==========
 'rent.title' => [
     'it' => 'Muoviti come vuoi.', 'en' => 'Move how you want.', 'ru' => 'Передвигайтесь как удобно.', 'es' => 'Muévete a tu manera.', 'de' => 'Beweg dich, wie du willst.',

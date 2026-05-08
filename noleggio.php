@@ -7,10 +7,10 @@ $slug = $_GET['slug'] ?? '';
 $s = row('SELECT * FROM services WHERE slug = ? AND active = 1', [$slug]);
 if (!$s || !isRental($s['type'])) {
     http_response_code(404);
-    $title = 'Non trovato';
+    $title = t('rent.detail.not_found');
     require __DIR__ . '/partials/head.php';
     require __DIR__ . '/partials/site-header.php';
-    echo '<div class="container-narrow card p-14 mt-20 text-center"><h1 class="font-serif text-3xl">Servizio non trovato</h1><a href="/noleggi.php" class="btn-primary mt-6 inline-flex">Vedi noleggi</a></div>';
+    echo '<div class="container-narrow card p-14 mt-20 text-center"><h1 class="font-serif text-3xl">' . e(t('rent.detail.not_found')) . '</h1><a href="/noleggi.php?lang=' . e(currentLang()) . '" class="btn-primary mt-6 inline-flex">' . e(t('rent.detail.see_all')) . '</a></div>';
     require __DIR__ . '/partials/site-footer.php';
     exit;
 }
@@ -24,12 +24,12 @@ require __DIR__ . '/partials/head.php';
 require __DIR__ . '/partials/site-header.php';
 ?>
 <div class="container-wide pt-8 pb-4">
-  <a href="/noleggi.php" class="text-sm text-ink-500 hover:text-brand-600 inline-flex items-center gap-1"><i data-lucide="chevron-left" class="size-[14px]"></i> Tutti i noleggi</a>
+  <a href="/noleggi.php?lang=<?= e(currentLang()) ?>" class="text-sm text-ink-500 hover:text-brand-600 inline-flex items-center gap-1"><i data-lucide="chevron-left" class="size-[14px]"></i> <?= e(t('rent.detail.back')) ?></a>
   <div class="mt-4">
     <div class="badge-brand mb-3"><i data-lucide="<?= e(serviceTypeIcon($s['type'])) ?>" class="size-[12px]"></i> <?= e(serviceTypeLabel($s['type'])) ?></div>
     <h1 class="font-serif text-4xl md:text-6xl font-semibold tracking-tight max-w-3xl text-balance"><?= e($s['name']) ?></h1>
     <?php if ($s['resort_name']): ?>
-      <div class="text-sm text-ink-500 mt-2 flex items-center gap-1.5"><i data-lucide="map-pin" class="size-[14px]"></i> Disponibile presso <strong class="text-ink-900 dark:text-white"><?= e($s['resort_name']) ?></strong> · <?= e($s['resort_address']) ?></div>
+      <div class="text-sm text-ink-500 mt-2 flex items-center gap-1.5"><i data-lucide="map-pin" class="size-[14px]"></i> <?= e(t('rent.detail.available_at')) ?> <strong class="text-ink-900 dark:text-white"><?= e($s['resort_name']) ?></strong> · <?= e($s['resort_address']) ?></div>
     <?php endif; ?>
   </div>
 </div>
@@ -46,13 +46,13 @@ require __DIR__ . '/partials/site-header.php';
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
     <div class="lg:col-span-2 space-y-8">
       <div>
-        <h2 class="font-serif text-3xl font-semibold tracking-tight mb-3">Descrizione</h2>
+        <h2 class="font-serif text-3xl font-semibold tracking-tight mb-3"><?= e(t('rent.detail.description')) ?></h2>
         <p class="text-ink-700 dark:text-ink-300 whitespace-pre-line leading-relaxed text-pretty"><?= e($s['description']) ?></p>
       </div>
 
       <?php if ($features): ?>
         <div>
-          <h2 class="font-serif text-3xl font-semibold tracking-tight mb-4">Caratteristiche</h2>
+          <h2 class="font-serif text-3xl font-semibold tracking-tight mb-4"><?= e(t('rent.detail.features')) ?></h2>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <?php foreach ($features as $f): ?>
               <div class="flex items-center gap-3 p-3 rounded-xl bg-ink-50/60 dark:bg-ink-900/40 border border-ink-100/60 dark:border-ink-800/60">
@@ -65,15 +65,15 @@ require __DIR__ . '/partials/site-header.php';
       <?php endif; ?>
 
       <div class="card p-6">
-        <h2 class="font-serif text-2xl font-semibold tracking-tight mb-4">Tariffe</h2>
+        <h2 class="font-serif text-2xl font-semibold tracking-tight mb-4"><?= e(t('rent.detail.rates')) ?></h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <?php
           $rates = [
-            ['Giornaliera', $s['daily_price']],
-            ['Settimanale', $s['weekly_price']],
-            ['2 settimane', $s['biweekly_price']],
-            ['3 settimane', $s['triweekly_price']],
-            ['Mensile', $s['monthly_price']],
+            [t('rent.detail.daily'), $s['daily_price']],
+            [t('rent.detail.weekly'), $s['weekly_price']],
+            [t('rent.detail.biweekly'), $s['biweekly_price']],
+            [t('rent.detail.triweekly'), $s['triweekly_price']],
+            [t('rent.detail.monthly'), $s['monthly_price']],
           ];
           foreach ($rates as $r): if (!$r[1]) continue; ?>
             <div class="flex items-center justify-between p-3 rounded-xl bg-ink-50/60 dark:bg-ink-900/40">
@@ -83,10 +83,10 @@ require __DIR__ . '/partials/site-header.php';
           <?php endforeach; ?>
         </div>
         <?php if ($s['security_deposit']): ?>
-          <div class="text-xs text-ink-500 mt-4">Cauzione richiesta: <strong><?= fmtMoney((float)$s['security_deposit']) ?></strong> (rimborsata alla riconsegna).</div>
+          <div class="text-xs text-ink-500 mt-4"><?= e(t('rent.detail.deposit', ['p' => fmtMoney((float)$s['security_deposit'])])) ?></div>
         <?php endif; ?>
-        <?php if ($s['license_required']): ?><div class="text-xs text-ink-500 mt-1">Patente di guida obbligatoria.</div><?php endif; ?>
-        <?php if ($s['min_age']): ?><div class="text-xs text-ink-500 mt-1">Età minima: <?= (int)$s['min_age'] ?> anni.</div><?php endif; ?>
+        <?php if ($s['license_required']): ?><div class="text-xs text-ink-500 mt-1"><?= e(t('rent.detail.license')) ?></div><?php endif; ?>
+        <?php if ($s['min_age']): ?><div class="text-xs text-ink-500 mt-1"><?= e(t('rent.detail.minage', ['n' => (int)$s['min_age']])) ?></div><?php endif; ?>
       </div>
     </div>
 
@@ -94,61 +94,61 @@ require __DIR__ . '/partials/site-header.php';
       <div class="card-elev p-6">
         <div class="flex items-baseline gap-1 mb-4">
           <span class="font-display text-3xl font-bold"><?= fmtMoney((float)$s['daily_price']) ?></span>
-          <span class="text-sm text-ink-500">/giorno</span>
+          <span class="text-sm text-ink-500"><?= e(t('common.per_day')) ?></span>
         </div>
         <template x-if="done">
           <div class="text-center py-6 animate-fade-in">
             <div class="h-16 w-16 mx-auto rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3"><i data-lucide="check" class="size-[32px]"></i></div>
-            <div class="font-display text-xl font-bold">Richiesta inviata!</div>
+            <div class="font-display text-xl font-bold"><?= e(t('apt.req_sent')) ?></div>
             <p class="font-mono text-base mt-1" x-text="done"></p>
-            <p class="text-xs text-ink-500 mt-3">Ti contatteremo a breve.</p>
+            <p class="text-xs text-ink-500 mt-3"><?= e(t('rent.detail.contact_soon')) ?></p>
           </div>
         </template>
-        <form x-show="!done" @submit.prevent="submit" class="space-y-3">
-          <div class="grid grid-cols-2 gap-2 rounded-xl border border-ink-200 dark:border-ink-700/80 overflow-hidden">
-            <label class="block p-3 border-r border-ink-200 dark:border-ink-700/80">
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Ritiro</span>
-              <input type="date" required class="w-full bg-transparent outline-none text-sm font-medium mt-1" x-model="from" @change="quote()">
+        <form x-show="!done" @submit.prevent="submit" class="space-y-2.5">
+          <div class="grid grid-cols-2 gap-0 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm overflow-hidden divide-x divide-ink-100 dark:divide-ink-700/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
+            <label class="block px-3.5 py-2.5 cursor-pointer hover:bg-ink-50/60 dark:hover:bg-ink-900/60 transition-colors">
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('rent.detail.pickup')) ?></span>
+              <input type="date" required class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5" x-model="from" @change="quote()">
             </label>
-            <label class="block p-3">
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Riconsegna</span>
-              <input type="date" required class="w-full bg-transparent outline-none text-sm font-medium mt-1" x-model="to" @change="quote()">
+            <label class="block px-3.5 py-2.5 cursor-pointer hover:bg-ink-50/60 dark:hover:bg-ink-900/60 transition-colors">
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('rent.detail.return')) ?></span>
+              <input type="date" required class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5" x-model="to" @change="quote()">
             </label>
           </div>
-          <label class="block p-3 rounded-xl border border-ink-200 dark:border-ink-700/80">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Codice sconto</span>
-            <input class="w-full bg-transparent outline-none text-sm font-medium mt-1" placeholder="opzionale" x-model="coupon" @input.debounce.500="quote()">
+          <label class="block px-3.5 py-2.5 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm cursor-pointer hover:bg-ink-50/40 dark:hover:bg-ink-900/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('apt.coupon')) ?></span>
+            <input class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 placeholder:text-ink-300 placeholder:font-normal mt-0.5" placeholder="<?= e(t('rent.detail.discount_ph')) ?>" x-model="coupon" @input.debounce.500="quote()">
           </label>
 
           <template x-if="q && q.days > 0">
             <div class="rounded-xl bg-ink-50 dark:bg-ink-900/40 p-4 text-sm space-y-2 animate-slide-up">
-              <div class="flex justify-between"><span class="text-ink-500"><span x-text="q.days"></span> giorni</span><span class="font-medium tabular-nums" x-text="fmt(q.nightlyTotal)"></span></div>
+              <div class="flex justify-between"><span class="text-ink-500"><span x-text="q.days"></span> <?= e(t('rent.detail.days')) ?></span><span class="font-medium tabular-nums" x-text="fmt(q.nightlyTotal)"></span></div>
               <template x-if="q.discount > 0">
                 <div class="flex justify-between text-emerald-600"><span x-text="q.discountLabel"></span><span class="tabular-nums" x-text="'-' + fmt(q.discount)"></span></div>
               </template>
               <template x-if="q.extras > 0">
-                <div class="flex justify-between"><span class="text-ink-500">Extra</span><span class="tabular-nums" x-text="fmt(q.extras)"></span></div>
+                <div class="flex justify-between"><span class="text-ink-500"><?= e(t('form.extra')) ?></span><span class="tabular-nums" x-text="fmt(q.extras)"></span></div>
               </template>
-              <div class="flex justify-between font-display font-bold text-base pt-2 mt-1 border-t border-ink-200 dark:border-ink-700/80"><span>Totale</span><span class="tabular-nums" x-text="fmt(q.total)"></span></div>
+              <div class="flex justify-between font-display font-bold text-base pt-2 mt-1 border-t border-ink-200 dark:border-ink-700/80"><span><?= e(t('form.total')) ?></span><span class="tabular-nums" x-text="fmt(q.total)"></span></div>
             </div>
           </template>
 
           <div class="space-y-2 pt-2">
-            <input required placeholder="Nome e cognome" class="input" x-model="name">
+            <input required placeholder="<?= e(t('apt.fullname')) ?>" class="input" x-model="name">
             <div class="grid grid-cols-2 gap-2">
-              <input type="email" required placeholder="Email" class="input" x-model="email">
-              <input required placeholder="Telefono" class="input" x-model="phone">
+              <input type="email" required placeholder="<?= e(t('apt.email')) ?>" class="input" x-model="email">
+              <input required placeholder="<?= e(t('apt.phone')) ?>" class="input" x-model="phone">
             </div>
-            <input placeholder="Note: numero patente, hotel, ecc." class="input" x-model="notes">
+            <input placeholder="<?= e(t('rent.detail.notes_ph')) ?>" class="input" x-model="notes">
           </div>
 
           <div x-show="err" x-text="err" class="text-sm text-red-600 p-2 rounded-lg bg-red-50"></div>
 
           <button :disabled="busy" class="btn-primary w-full h-12 text-base">
-            <span x-show="!busy">Richiedi noleggio</span>
-            <span x-show="busy">Invio…</span>
+            <span x-show="!busy"><?= e(t('rent.detail.book_btn')) ?></span>
+            <span x-show="busy"><?= e(t('form.sending')) ?></span>
           </button>
-          <p class="text-[11px] text-ink-500 text-center">Conferma e dettagli pickup via WhatsApp.</p>
+          <p class="text-[11px] text-ink-500 text-center"><?= e(t('rent.detail.whatsapp_note')) ?></p>
         </form>
       </div>
     </aside>
@@ -188,7 +188,7 @@ function rentalForm() {
     <div class="min-w-0">
       <div class="flex items-baseline gap-1">
         <span class="font-display text-xl font-bold"><?= fmtMoney((float)$s['daily_price']) ?></span>
-        <span class="text-xs text-ink-500">/giorno</span>
+        <span class="text-xs text-ink-500"><?= e(t('common.per_day')) ?></span>
       </div>
       <div class="text-xs text-ink-500 mt-0.5 truncate"><?= e($s['name']) ?></div>
     </div>

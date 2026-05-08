@@ -7,10 +7,10 @@ $slug = $_GET['slug'] ?? '';
 $s = row('SELECT * FROM services WHERE slug = ? AND active = 1', [$slug]);
 if (!$s || !isExperience($s['type'])) {
     http_response_code(404);
-    $title = 'Non trovato';
+    $title = t('exc.detail.not_found');
     require __DIR__ . '/partials/head.php';
     require __DIR__ . '/partials/site-header.php';
-    echo '<div class="container-narrow card p-14 mt-20 text-center"><h1 class="font-serif text-3xl">Escursione non trovata</h1><a href="/escursioni.php" class="btn-primary mt-6 inline-flex">Tutte le escursioni</a></div>';
+    echo '<div class="container-narrow card p-14 mt-20 text-center"><h1 class="font-serif text-3xl">' . e(t('exc.detail.not_found')) . '</h1><a href="/escursioni.php?lang=' . e(currentLang()) . '" class="btn-primary mt-6 inline-flex">' . e(t('exc.detail.see_all')) . '</a></div>';
     require __DIR__ . '/partials/site-footer.php';
     exit;
 }
@@ -26,13 +26,13 @@ require __DIR__ . '/partials/head.php';
 require __DIR__ . '/partials/site-header.php';
 ?>
 <div class="container-wide pt-8 pb-4">
-  <a href="/escursioni.php" class="text-sm text-ink-500 hover:text-brand-600 inline-flex items-center gap-1"><i data-lucide="chevron-left" class="size-[14px]"></i> Tutte le escursioni</a>
+  <a href="/escursioni.php?lang=<?= e(currentLang()) ?>" class="text-sm text-ink-500 hover:text-brand-600 inline-flex items-center gap-1"><i data-lucide="chevron-left" class="size-[14px]"></i> <?= e(t('exc.detail.see_all')) ?></a>
   <div class="mt-4">
     <div class="badge-brand mb-3"><i data-lucide="<?= e(serviceTypeIcon($s['type'])) ?>" class="size-[12px]"></i> <?= e(serviceTypeLabel($s['type'])) ?></div>
     <h1 class="font-serif text-4xl md:text-6xl font-semibold tracking-tight max-w-3xl text-balance"><?= e($s['name']) ?></h1>
     <div class="flex flex-wrap items-center gap-4 text-sm text-ink-500 mt-3">
-      <?php if ($s['duration_hours']): ?><span class="flex items-center gap-1"><i data-lucide="clock" class="size-[14px]"></i> <?= rtrim(rtrim(number_format((float)$s['duration_hours'], 1), '0'), '.') ?> ore</span><?php endif; ?>
-      <?php if ($s['group_size_max']): ?><span class="flex items-center gap-1"><i data-lucide="users" class="size-[14px]"></i> Max <?= (int)$s['group_size_max'] ?> persone</span><?php endif; ?>
+      <?php if ($s['duration_hours']): ?><span class="flex items-center gap-1"><i data-lucide="clock" class="size-[14px]"></i> <?= rtrim(rtrim(number_format((float)$s['duration_hours'], 1), '0'), '.') ?> <?= e(t('exc.detail.hours')) ?></span><?php endif; ?>
+      <?php if ($s['group_size_max']): ?><span class="flex items-center gap-1"><i data-lucide="users" class="size-[14px]"></i> <?= e(t('exc.detail.max_people', ['n' => (int)$s['group_size_max']])) ?></span><?php endif; ?>
       <?php if ($s['meeting_point']): ?><span class="flex items-center gap-1"><i data-lucide="map-pin" class="size-[14px]"></i> <?= e($s['meeting_point']) ?></span><?php endif; ?>
     </div>
   </div>
@@ -50,7 +50,7 @@ require __DIR__ . '/partials/site-header.php';
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
     <div class="lg:col-span-2 space-y-8">
       <div>
-        <h2 class="font-serif text-3xl font-semibold tracking-tight mb-3">L'esperienza</h2>
+        <h2 class="font-serif text-3xl font-semibold tracking-tight mb-3"><?= e(t('exc.detail.experience')) ?></h2>
         <p class="text-ink-700 dark:text-ink-300 whitespace-pre-line leading-relaxed text-pretty"><?= e($s['description']) ?></p>
       </div>
 
@@ -58,7 +58,7 @@ require __DIR__ . '/partials/site-header.php';
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <?php if ($includes): ?>
             <div class="card p-5">
-              <div class="font-display font-bold mb-3 flex items-center gap-2 text-emerald-600"><i data-lucide="check-circle-2" class="size-[16px]"></i> Incluso</div>
+              <div class="font-display font-bold mb-3 flex items-center gap-2 text-emerald-600"><i data-lucide="check-circle-2" class="size-[16px]"></i> <?= e(t('exc.detail.included')) ?></div>
               <ul class="space-y-1.5">
                 <?php foreach ($includes as $i): ?><li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="size-[14px] text-emerald-500 mt-0.5 shrink-0"></i> <?= e($i) ?></li><?php endforeach; ?>
               </ul>
@@ -66,7 +66,7 @@ require __DIR__ . '/partials/site-header.php';
           <?php endif; ?>
           <?php if ($excludes): ?>
             <div class="card p-5">
-              <div class="font-display font-bold mb-3 flex items-center gap-2 text-ink-500"><i data-lucide="x-circle" class="size-[16px]"></i> Non incluso</div>
+              <div class="font-display font-bold mb-3 flex items-center gap-2 text-ink-500"><i data-lucide="x-circle" class="size-[16px]"></i> <?= e(t('exc.detail.not_included')) ?></div>
               <ul class="space-y-1.5">
                 <?php foreach ($excludes as $i): ?><li class="flex items-start gap-2 text-sm"><i data-lucide="x" class="size-[14px] text-ink-400 mt-0.5 shrink-0"></i> <?= e($i) ?></li><?php endforeach; ?>
               </ul>
@@ -77,12 +77,21 @@ require __DIR__ . '/partials/site-header.php';
 
       <?php if ($days): ?>
         <div>
-          <h2 class="font-serif text-2xl font-semibold tracking-tight mb-3">Giorni disponibili</h2>
+          <h2 class="font-serif text-2xl font-semibold tracking-tight mb-3"><?= e(t('exc.detail.days')) ?></h2>
           <div class="flex flex-wrap gap-2">
-            <?php foreach (['Lun','Mar','Mer','Gio','Ven','Sab','Dom'] as $d):
-              $on = in_array($d, $days, true);
+            <?php
+              // Le chiavi del DB restano sempre in italiano (Lun/Mar/...) ma la
+              // label visibile usa la traduzione corrente.
+              $dowMap = [
+                'Lun' => t('common.dow.mon'), 'Mar' => t('common.dow.tue'),
+                'Mer' => t('common.dow.wed'), 'Gio' => t('common.dow.thu'),
+                'Ven' => t('common.dow.fri'), 'Sab' => t('common.dow.sat'),
+                'Dom' => t('common.dow.sun'),
+              ];
+              foreach (array_keys($dowMap) as $d):
+                $on = in_array($d, $days, true);
             ?>
-              <span class="px-3.5 py-2 rounded-xl text-sm font-medium <?= $on ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300' : 'bg-ink-100 text-ink-400 dark:bg-ink-800 line-through' ?>"><?= $d ?></span>
+              <span class="px-3.5 py-2 rounded-xl text-sm font-medium <?= $on ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300' : 'bg-ink-100 text-ink-400 dark:bg-ink-800 line-through' ?>"><?= e($dowMap[$d]) ?></span>
             <?php endforeach; ?>
           </div>
         </div>
@@ -93,48 +102,48 @@ require __DIR__ . '/partials/site-header.php';
       <div class="card-elev p-6">
         <div class="flex items-baseline gap-1 mb-4">
           <span class="font-display text-3xl font-bold"><?= fmtMoney((float)$s['price_per_person']) ?></span>
-          <span class="text-sm text-ink-500">/persona</span>
+          <span class="text-sm text-ink-500"><?= e(t('common.per_person')) ?></span>
         </div>
         <template x-if="done">
           <div class="text-center py-6 animate-fade-in">
             <div class="h-16 w-16 mx-auto rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3"><i data-lucide="check" class="size-[32px]"></i></div>
-            <div class="font-display text-xl font-bold">Richiesta inviata!</div>
+            <div class="font-display text-xl font-bold"><?= e(t('apt.req_sent')) ?></div>
             <p class="font-mono text-base mt-1" x-text="done"></p>
           </div>
         </template>
-        <form x-show="!done" @submit.prevent="submit" class="space-y-3">
-          <label class="block p-3 rounded-xl border border-ink-200 dark:border-ink-700/80">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Data</span>
-            <input type="date" required class="w-full bg-transparent outline-none text-sm font-medium mt-1" x-model="from" @change="quote()">
+        <form x-show="!done" @submit.prevent="submit" class="space-y-2.5">
+          <label class="block px-3.5 py-2.5 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm cursor-pointer hover:bg-ink-50/40 dark:hover:bg-ink-900/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('exc.detail.date')) ?></span>
+            <input type="date" required class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5" x-model="from" @change="quote()">
           </label>
-          <label class="block p-3 rounded-xl border border-ink-200 dark:border-ink-700/80">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Partecipanti</span>
-            <input type="number" min="<?= (int)($s['group_size_min'] ?: 1) ?>" max="<?= (int)($s['group_size_max'] ?: 30) ?>" class="w-full bg-transparent outline-none text-sm font-medium mt-1" x-model.number="participants" @input="quote()">
+          <label class="block px-3.5 py-2.5 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm cursor-pointer hover:bg-ink-50/40 dark:hover:bg-ink-900/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('exc.detail.participants')) ?></span>
+            <input type="number" min="<?= (int)($s['group_size_min'] ?: 1) ?>" max="<?= (int)($s['group_size_max'] ?: 30) ?>" class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5" x-model.number="participants" @input="quote()">
           </label>
-          <label class="block p-3 rounded-xl border border-ink-200 dark:border-ink-700/80">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Hotel / Appartamento</span>
-            <input class="w-full bg-transparent outline-none text-sm font-medium mt-1" placeholder="es. Naama Bay Sea View" x-model="pickup">
+          <label class="block px-3.5 py-2.5 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm cursor-pointer hover:bg-ink-50/40 dark:hover:bg-ink-900/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('exc.detail.pickup')) ?></span>
+            <input class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 placeholder:text-ink-300 placeholder:font-normal mt-0.5" placeholder="<?= e(t('exc.detail.pickup_ph')) ?>" x-model="pickup">
           </label>
           <template x-if="q && q.total > 0">
             <div class="rounded-xl bg-ink-50 dark:bg-ink-900/40 p-4 text-sm space-y-2">
-              <div class="flex justify-between"><span class="text-ink-500"><span x-text="q.participants"></span> × persona</span><span class="font-medium tabular-nums" x-text="fmt(q.base)"></span></div>
+              <div class="flex justify-between"><span class="text-ink-500"><span x-text="q.participants"></span> <?= e(t('exc.detail.per_person_count')) ?></span><span class="font-medium tabular-nums" x-text="fmt(q.base)"></span></div>
               <template x-if="q.discount > 0">
                 <div class="flex justify-between text-emerald-600"><span x-text="q.discountLabel"></span><span class="tabular-nums" x-text="'-' + fmt(q.discount)"></span></div>
               </template>
-              <div class="flex justify-between font-display font-bold text-base pt-2 mt-1 border-t border-ink-200 dark:border-ink-700/80"><span>Totale</span><span class="tabular-nums" x-text="fmt(q.total)"></span></div>
+              <div class="flex justify-between font-display font-bold text-base pt-2 mt-1 border-t border-ink-200 dark:border-ink-700/80"><span><?= e(t('form.total')) ?></span><span class="tabular-nums" x-text="fmt(q.total)"></span></div>
             </div>
           </template>
           <div class="space-y-2 pt-2">
-            <input required placeholder="Nome e cognome" class="input" x-model="name">
+            <input required placeholder="<?= e(t('apt.fullname')) ?>" class="input" x-model="name">
             <div class="grid grid-cols-2 gap-2">
-              <input type="email" required placeholder="Email" class="input" x-model="email">
-              <input required placeholder="Telefono" class="input" x-model="phone">
+              <input type="email" required placeholder="<?= e(t('apt.email')) ?>" class="input" x-model="email">
+              <input required placeholder="<?= e(t('apt.phone')) ?>" class="input" x-model="phone">
             </div>
           </div>
           <div x-show="err" x-text="err" class="text-sm text-red-600 p-2 rounded-lg bg-red-50"></div>
           <button :disabled="busy" class="btn-primary w-full h-12 text-base">
-            <span x-show="!busy">Prenota escursione</span>
-            <span x-show="busy">Invio…</span>
+            <span x-show="!busy"><?= e(t('exc.detail.book_btn')) ?></span>
+            <span x-show="busy"><?= e(t('form.sending')) ?></span>
           </button>
         </form>
       </div>
@@ -175,7 +184,7 @@ function experienceForm() {
     <div class="min-w-0">
       <div class="flex items-baseline gap-1">
         <span class="font-display text-xl font-bold"><?= fmtMoney((float)$s['price_per_person']) ?></span>
-        <span class="text-xs text-ink-500">/persona</span>
+        <span class="text-xs text-ink-500"><?= e(t('common.per_person')) ?></span>
       </div>
       <div class="text-xs text-ink-500 mt-0.5 truncate"><?= e($s['name']) ?></div>
     </div>
