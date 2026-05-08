@@ -8,6 +8,19 @@ $id = $_GET['id'] ?? null;
 $svc = $id ? row('SELECT * FROM services WHERE id = ?', [$id]) : null;
 if ($id && !$svc) { flash('Servizio non trovato', 'error'); redirect('/admin/servizi.php'); }
 
+// Helper upload immagini in /uploads/services
+$uploadServiceImage = function (array $file): ?string {
+    if ($file['error'] !== UPLOAD_ERR_OK) return null;
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, ['jpg','jpeg','png','webp'])) return null;
+    $dir = __DIR__ . '/../uploads/services';
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    $fname = 's_' . substr(uniqid(), -8) . '.' . preg_replace('/[^a-z0-9]/', '', $ext);
+    $dest = $dir . '/' . $fname;
+    if (move_uploaded_file($file['tmp_name'], $dest)) return '/uploads/services/' . $fname;
+    return null;
+};
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrfCheck($_POST['csrf'] ?? null);
     $action = $_POST['action'] ?? 'save';
@@ -18,14 +31,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('/admin/servizi.php');
     }
 
+    if ($action === 'gallery_remove' && $svc) {
+        $url = $_POST['url'] ?? '';
+        $existing = parseFeatures($svc['gallery'] ?? '');
+        $filtered = array_values(array_filter($existing, fn($u) => $u !== $url));
+        q('UPDATE services SET gallery = ? WHERE id = ?', [json_encode($filtered), $svc['id']]);
+        flash('Foto rimossa');
+        redirect('/admin/servizio-edit.php?id=' . $svc['id']);
+    }
+
+    if ($action === 'gallery_add' && $svc) {
+        $existing = parseFeatures($svc['gallery'] ?? '');
+        $added = 0;
+        if (!empty($_FILES['gallery_files']['tmp_name'][0])) {
+            foreach ($_FILES['gallery_files']['tmp_name'] as $i => $tmp) {
+                if (!is_uploaded_file($tmp)) continue;
+                $path = $uploadServiceImage([
+                    'tmp_name' => $tmp,
+                    'name' => $_FILES['gallery_files']['name'][$i],
+                    'error' => $_FILES['gallery_files']['error'][$i],
+                ]);
+                if ($path) { $existing[] = $path; $added++; }
+            }
+        }
+        q('UPDATE services SET gallery = ? WHERE id = ?', [json_encode(array_values($existing)), $svc['id']]);
+        flash($added . ' foto caricat' . ($added === 1 ? 'a' : 'e'));
+        redirect('/admin/servizio-edit.php?id=' . $svc['id']);
+    }
+
+    // Cover image upload (su salvataggio principale)
+    $coverPath = $_POST['existing_cover'] ?? null;
+    if (isset($_POST['remove_cover']) && $_POST['remove_cover'] === '1') {
+        $coverPath = null;
+    }
+    if (!empty($_FILES['cover_image_file']['name']) && $_FILES['cover_image_file']['error'] === UPLOAD_ERR_OK) {
+        $newCover = $uploadServiceImage($_FILES['cover_image_file']);
+        if ($newCover) $coverPath = $newCover;
+    }
+
     $type = $_POST['type'] ?? 'car';
+    $existingGallery = $svc ? parseFeatures($svc['gallery'] ?? '') : [];
     $data = [
         'type' => $type,
         'name' => trim($_POST['name'] ?? ''),
         'slug' => trim($_POST['slug'] ?? '') ?: slugify($_POST['name'] ?? ''),
         'description' => $_POST['description'] ?? '',
-        'cover_image' => $_POST['cover_image'] ?? null,
-        'gallery' => json_encode(array_values(array_filter(array_map('trim', explode("\n", $_POST['gallery'] ?? ''))))),
+        'cover_image' => $coverPath,
+        'gallery' => json_encode($existingGallery),
         'features' => json_encode(array_values(array_filter(array_map('trim', explode(',', $_POST['features'] ?? ''))))),
         'active' => isset($_POST['active']) ? 1 : 0,
     ];
@@ -102,7 +154,7 @@ $f = $svc ?? [
   'from_location' => 'Aeroporto SSH', 'to_location' => '', 'vehicle_capacity' => 4,
   'active' => 1,
 ];
-$gallery = is_array(parseFeatures($f['gallery'])) ? implode("\n", parseFeatures($f['gallery'])) : '';
+$galleryList = parseFeatures($f['gallery'] ?? '');
 $features = implode(', ', parseFeatures($f['features']));
 $includes = implode("\n", parseFeatures($f['includes'] ?? ''));
 $excludes = implode("\n", parseFeatures($f['excludes'] ?? ''));
@@ -111,8 +163,10 @@ $title = $svc ? 'Modifica servizio' : 'Nuovo servizio';
 require __DIR__ . '/../partials/head.php';
 require __DIR__ . '/../partials/admin-shell-top.php';
 ?>
-<form method="post" class="space-y-5" x-data="{ type: '<?= e($f['type']) ?>' }">
+<form method="post" enctype="multipart/form-data" class="space-y-5" x-data="{ type: '<?= e($f['type']) ?>' }">
   <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
+  <input type="hidden" name="existing_cover" value="<?= e($f['cover_image']) ?>">
+  <input type="hidden" id="remove-cover-flag" name="remove_cover" value="">
   <div class="flex items-center justify-between flex-wrap gap-3">
     <h1 class="font-serif text-2xl font-semibold tracking-tight"><?= $svc ? 'Modifica servizio' : 'Nuovo servizio' ?></h1>
     <div class="flex gap-2">
@@ -140,8 +194,35 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       <label class="block"><span class="label">Nome</span><input class="input" name="name" required value="<?= e($f['name']) ?>"></label>
       <label class="block"><span class="label">Slug</span><input class="input" name="slug" value="<?= e($f['slug']) ?>" placeholder="auto dal nome"></label>
       <label class="block"><span class="label">Descrizione</span><textarea class="input min-h-[120px]" name="description"><?= e($f['description']) ?></textarea></label>
-      <label class="block"><span class="label">URL foto cover</span><input class="input" name="cover_image" value="<?= e($f['cover_image']) ?>"></label>
-      <label class="block"><span class="label">Galleria (un URL per riga)</span><textarea class="input min-h-[80px] font-mono text-xs" name="gallery"><?= e($gallery) ?></textarea></label>
+
+      <div class="space-y-2">
+        <span class="label">Foto di copertina</span>
+        <div class="rounded-xl bg-ink-100 dark:bg-ink-800 overflow-hidden relative aspect-[16/9]">
+          <?php if ($f['cover_image']): ?>
+            <img id="svc-cover-preview" src="<?= e($f['cover_image']) ?>" alt="" class="absolute inset-0 h-full w-full object-cover">
+          <?php else: ?>
+            <div id="svc-cover-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-ink-400 gap-2">
+              <i data-lucide="image" class="size-[28px]"></i>
+              <span class="text-xs">Nessuna foto cover</span>
+            </div>
+            <img id="svc-cover-preview" src="" alt="" class="absolute inset-0 h-full w-full object-cover hidden">
+          <?php endif; ?>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <label class="btn-outline cursor-pointer text-sm">
+            <i data-lucide="upload" class="size-[14px]"></i> Carica foto
+            <input type="file" name="cover_image_file" accept="image/jpeg,image/png,image/webp" class="hidden"
+                   onchange="const f=this.files[0]; if(f){const r=new FileReader();r.onload=e=>{const i=document.getElementById('svc-cover-preview');i.src=e.target.result;i.classList.remove('hidden');const p=document.getElementById('svc-cover-placeholder');if(p)p.classList.add('hidden');document.getElementById('remove-cover-flag').value=''};r.readAsDataURL(f)}">
+          </label>
+          <?php if ($f['cover_image']): ?>
+            <button type="button" class="btn-ghost text-red-600 text-sm" onclick="document.getElementById('svc-cover-preview').classList.add('hidden');document.getElementById('remove-cover-flag').value='1';this.style.display='none'">
+              <i data-lucide="trash-2" class="size-[14px]"></i> Rimuovi
+            </button>
+          <?php endif; ?>
+        </div>
+        <span class="text-xs text-ink-500">JPG, PNG o WebP. Consigliato 16:9.</span>
+      </div>
+
       <label class="block"><span class="label">Caratteristiche (separate da virgola)</span><input class="input" name="features" value="<?= e($features) ?>" placeholder="Aria condizionata, Bluetooth, GPS"></label>
       <label class="flex items-center gap-2"><input type="checkbox" name="active" <?= $f['active'] ? 'checked' : '' ?>> Attivo (visibile sul sito)</label>
     </div>
@@ -208,4 +289,34 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
   </div>
 </form>
+
+<?php if ($svc): ?>
+<div class="card p-4 sm:p-5 mt-5">
+  <h3 class="font-display font-bold mb-3">Galleria foto</h3>
+  <form method="post" enctype="multipart/form-data" class="flex flex-wrap items-center gap-3 mb-4">
+    <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
+    <input type="hidden" name="action" value="gallery_add">
+    <label class="btn-primary cursor-pointer">
+      <i data-lucide="image-plus" class="size-[18px]"></i> Carica una o più foto
+      <input type="file" name="gallery_files[]" multiple accept="image/jpeg,image/png,image/webp" class="hidden" onchange="this.form.submit()">
+    </label>
+    <span class="text-xs text-ink-500">JPG, PNG o WebP. Selezione multipla.</span>
+  </form>
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+    <?php foreach ($galleryList as $url): ?>
+      <div class="relative group rounded-xl overflow-hidden aspect-[4/3] bg-ink-100 dark:bg-ink-900">
+        <img src="<?= e($url) ?>" class="h-full w-full object-cover">
+        <form method="post" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100">
+          <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
+          <input type="hidden" name="action" value="gallery_remove">
+          <input type="hidden" name="url" value="<?= e($url) ?>">
+          <button onclick="return confirm('Rimuovere?')" class="h-8 w-8 rounded-full bg-red-500 text-white flex items-center justify-center"><i data-lucide="trash-2" class="size-[14px]"></i></button>
+        </form>
+      </div>
+    <?php endforeach; ?>
+    <?php if (!$galleryList): ?><div class="col-span-full text-sm text-ink-500 text-center py-6">Nessuna foto nella galleria.</div><?php endif; ?>
+  </div>
+</div>
+<?php endif; ?>
+
 <?php require __DIR__ . '/../partials/admin-shell-bottom.php';
