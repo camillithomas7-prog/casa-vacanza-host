@@ -237,17 +237,17 @@ require __DIR__ . '/partials/site-header.php';
             <input type="email" required placeholder="<?= e(t('apt.email')) ?>" class="input" x-model="email">
 
             <!-- Phone with country prefix -->
-            <div class="relative flex" @click.outside="dialOpen=false">
+            <div class="relative flex w-full" @click.outside="dialOpen=false">
               <button type="button" @click="dialOpen=!dialOpen; if(dialOpen){$nextTick(()=>$refs.dialSearch.focus())}"
-                class="input rounded-r-none border-r-0 px-3 flex items-center gap-1.5 cursor-pointer shrink-0 min-w-[88px]">
+                class="input rounded-r-none border-r-0 px-2.5 flex items-center gap-1 cursor-pointer shrink-0 w-[96px]">
                 <span class="text-base leading-none" x-text="flagOf(dial)"></span>
                 <span class="text-sm font-medium tabular-nums" x-text="'+' + dialCodeOf(dial)"></span>
-                <i data-lucide="chevron-down" class="size-[12px] text-ink-400 transition" :class="dialOpen && 'rotate-180'"></i>
+                <i data-lucide="chevron-down" class="size-[12px] text-ink-400 shrink-0 transition" :class="dialOpen && 'rotate-180'"></i>
               </button>
-              <input required placeholder="<?= e(t('apt.phone')) ?>" type="tel" class="input rounded-l-none flex-1 min-w-0" x-model="phone" inputmode="tel">
+              <input required placeholder="<?= e(t('apt.phone')) ?>" type="tel" class="input rounded-l-none flex-1 min-w-0 w-0" x-model="phone" inputmode="tel">
 
               <div x-show="dialOpen" x-cloak x-transition.opacity.duration.150ms
-                   class="absolute z-50 top-full mt-1 left-0 w-[280px] bg-white dark:bg-ink-900 border border-ink-200 dark:border-ink-700 rounded-2xl shadow-pop overflow-hidden"
+                   class="absolute z-50 top-full mt-1 left-0 right-0 sm:w-[280px] sm:right-auto bg-white dark:bg-ink-900 border border-ink-200 dark:border-ink-700 rounded-2xl shadow-pop overflow-hidden"
                    style="display:none">
                 <div class="p-2 border-b border-ink-100 dark:border-ink-800/80">
                   <div class="relative">
