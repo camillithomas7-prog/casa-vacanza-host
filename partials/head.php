@@ -140,6 +140,15 @@ try { if (localStorage.getItem('cv-theme') === 'dark') document.documentElement.
   .scrollbar-thin::-webkit-scrollbar-thumb { @apply bg-ink-200 dark:bg-ink-700 rounded-full; }
   .mask-fade-r { mask-image: linear-gradient(to right, black 70%, transparent); }
   .mask-fade-b { mask-image: linear-gradient(to bottom, black 70%, transparent); }
+
+  /* Date input — ammorbidisce il "gg/mm/aaaa" quando il campo è vuoto */
+  input[type="date"]:not(:focus):invalid::-webkit-datetime-edit { color: rgb(148 163 184); font-weight: 400; }
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: .55; cursor: pointer; transition: opacity .2s;
+    filter: invert(45%) sepia(8%) saturate(380%) hue-rotate(176deg) brightness(95%) contrast(85%);
+  }
+  input[type="date"]:hover::-webkit-calendar-picker-indicator { opacity: 1; }
+  .dark input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(75%); }
 }
 </style>
 <script>

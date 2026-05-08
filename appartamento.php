@@ -200,24 +200,24 @@ require __DIR__ . '/partials/site-header.php';
           </div>
         </template>
 
-        <form x-show="!done" @submit.prevent="submit" class="space-y-3">
-          <div class="grid grid-cols-2 gap-2 rounded-xl border border-ink-200 dark:border-ink-700/80 overflow-hidden">
-            <label class="block p-3 border-r border-ink-200 dark:border-ink-700/80">
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Check-in</span>
-              <input type="date" required class="w-full bg-transparent outline-none text-sm font-medium mt-1" x-model="from" @change="quote()">
+        <form x-show="!done" @submit.prevent="submit" class="space-y-2.5">
+          <div class="grid grid-cols-2 gap-0 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm overflow-hidden divide-x divide-ink-100 dark:divide-ink-700/60 focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-500/15 transition-all">
+            <label class="block px-3.5 py-2.5 cursor-pointer hover:bg-ink-50/60 dark:hover:bg-ink-900/60 transition-colors">
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400">Check-in</span>
+              <input type="date" required class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5 booking-date" x-model="from" @change="quote()">
             </label>
-            <label class="block p-3">
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Check-out</span>
-              <input type="date" required class="w-full bg-transparent outline-none text-sm font-medium mt-1" x-model="to" @change="quote()">
+            <label class="block px-3.5 py-2.5 cursor-pointer hover:bg-ink-50/60 dark:hover:bg-ink-900/60 transition-colors">
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400">Check-out</span>
+              <input type="date" required class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5 booking-date" x-model="to" @change="quote()">
             </label>
           </div>
-          <label class="block p-3 rounded-xl border border-ink-200 dark:border-ink-700/80">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Ospiti (max <?= (int)$a['guests'] ?>)</span>
-            <input type="number" min="1" max="<?= (int)$a['guests'] ?>" class="w-full bg-transparent outline-none text-sm font-medium mt-1" x-model.number="guests" @input="quote()">
+          <label class="block px-3.5 py-2.5 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm cursor-pointer hover:bg-ink-50/40 dark:hover:bg-ink-900/60 focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-500/15 transition-all">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400">Ospiti (max <?= (int)$a['guests'] ?>)</span>
+            <input type="number" min="1" max="<?= (int)$a['guests'] ?>" class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5" x-model.number="guests" @input="quote()">
           </label>
-          <label class="block p-3 rounded-xl border border-ink-200 dark:border-ink-700/80">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Codice sconto (opzionale)</span>
-            <input class="w-full bg-transparent outline-none text-sm font-medium mt-1" placeholder="es. SUMMER10" x-model="coupon" @input.debounce.500="quote()">
+          <label class="block px-3.5 py-2.5 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm cursor-pointer hover:bg-ink-50/40 dark:hover:bg-ink-900/60 focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-500/15 transition-all">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400">Codice sconto (opzionale)</span>
+            <input class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 placeholder:text-ink-300 placeholder:font-normal mt-0.5" placeholder="es. SUMMER10" x-model="coupon" @input.debounce.500="quote()">
           </label>
 
           <template x-if="q && q.nights > 0">
