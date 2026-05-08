@@ -43,6 +43,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('/admin/appartamento-edit.php?id=' . $apt['id']);
     }
 
+    // Upload cover image se presente
+    $coverPath = $_POST['existing_cover'] ?? null;
+    if (isset($_POST['remove_cover']) && $_POST['remove_cover'] === '1') {
+        $coverPath = null;
+    }
+    if (!empty($_FILES['cover_image_file']['name']) && $_FILES['cover_image_file']['error'] === UPLOAD_ERR_OK) {
+        $ext = strtolower(pathinfo($_FILES['cover_image_file']['name'], PATHINFO_EXTENSION));
+        if (in_array($ext, ['jpg','jpeg','png','webp'])) {
+            $dir = __DIR__ . '/../uploads/photos';
+            if (!is_dir($dir)) mkdir($dir, 0755, true);
+            $fname = 'cover_' . substr(uniqid(), -8) . '.' . preg_replace('/[^a-z0-9]/', '', $ext);
+            $dest = $dir . '/' . $fname;
+            if (move_uploaded_file($_FILES['cover_image_file']['tmp_name'], $dest)) {
+                $coverPath = '/uploads/photos/' . $fname;
+            }
+        }
+    }
+
     // save
     $data = [
         'name' => trim($_POST['name'] ?? ''),
@@ -75,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'long_stay_discount_30' => (float)$_POST['long_stay_discount_30'],
         'active' => isset($_POST['active']) ? 1 : 0,
         'under_maintenance' => isset($_POST['under_maintenance']) ? 1 : 0,
-        'cover_image' => $_POST['cover_image'] ?? null,
+        'cover_image' => $coverPath,
     ];
     if ($apt) {
         $set = implode(', ', array_map(fn($k) => "$k = ?", array_keys($data)));
@@ -164,7 +182,36 @@ require __DIR__ . '/../partials/admin-shell-top.php';
           <?php endif; ?>
         </label>
         <label class="block"><span class="label">Paese</span><input class="input" name="country" value="<?= e($f['country']) ?>"></label>
-        <label class="block"><span class="label">URL foto cover</span><input class="input" name="cover_image" value="<?= e($f['cover_image']) ?>"></label>
+        <div></div>
+      </div>
+      <div class="space-y-2">
+        <span class="label">Foto di copertina</span>
+        <input type="hidden" name="existing_cover" value="<?= e($f['cover_image']) ?>">
+        <div class="rounded-xl bg-ink-100 dark:bg-ink-800 overflow-hidden relative aspect-[16/9]">
+          <?php if ($f['cover_image']): ?>
+            <img id="cover-preview" src="<?= e($f['cover_image']) ?>" alt="" class="absolute inset-0 h-full w-full object-cover">
+          <?php else: ?>
+            <div id="cover-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-ink-400 gap-2">
+              <i data-lucide="image" class="size-[28px]"></i>
+              <span class="text-xs">Nessuna foto cover</span>
+            </div>
+            <img id="cover-preview" src="" alt="" class="absolute inset-0 h-full w-full object-cover hidden">
+          <?php endif; ?>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <label class="btn-outline cursor-pointer text-sm">
+            <i data-lucide="upload" class="size-[14px]"></i> Carica foto
+            <input type="file" name="cover_image_file" accept="image/jpeg,image/png,image/webp" class="hidden"
+                   onchange="const f=this.files[0]; if(f){const r=new FileReader();r.onload=e=>{const i=document.getElementById('cover-preview');i.src=e.target.result;i.classList.remove('hidden');const p=document.getElementById('cover-placeholder');if(p)p.classList.add('hidden');document.getElementById('remove-cover-flag').value=''};r.readAsDataURL(f)}">
+          </label>
+          <?php if ($f['cover_image']): ?>
+            <button type="button" class="btn-ghost text-red-600 text-sm" onclick="document.getElementById('cover-preview').classList.add('hidden');document.getElementById('remove-cover-flag').value='1';this.style.display='none'">
+              <i data-lucide="trash-2" class="size-[14px]"></i> Rimuovi
+            </button>
+          <?php endif; ?>
+          <input type="hidden" id="remove-cover-flag" name="remove_cover" value="">
+        </div>
+        <span class="text-xs text-ink-500">JPG, PNG o WebP. Consigliato 16:9, almeno 1200×675px.</span>
       </div>
     </div>
 
@@ -220,14 +267,11 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 <?php if ($apt): ?>
 <div class="card p-4 sm:p-5 mt-5">
   <h3 class="font-display font-bold mb-3">Galleria foto</h3>
-  <form method="post" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-3 mb-4">
+  <form method="post" enctype="multipart/form-data" class="flex flex-wrap items-center gap-3 mb-4">
     <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
     <input type="hidden" name="action" value="photo_add">
-    <label class="btn-outline cursor-pointer"><i data-lucide="image-plus" class="size-[18px]"></i> Carica file<input type="file" name="photos[]" multiple accept="image/*" class="hidden" onchange="this.form.submit()"></label>
-    <div class="flex gap-2 flex-1">
-      <input class="input flex-1" name="photo_url" placeholder="https://... (URL immagine)">
-      <button class="btn-secondary"><i data-lucide="plus" class="size-[16px]"></i> Aggiungi</button>
-    </div>
+    <label class="btn-primary cursor-pointer"><i data-lucide="image-plus" class="size-[18px]"></i> Carica una o più foto<input type="file" name="photos[]" multiple accept="image/jpeg,image/png,image/webp" class="hidden" onchange="this.form.submit()"></label>
+    <span class="text-xs text-ink-500">JPG, PNG o WebP. Puoi selezionare più file insieme.</span>
   </form>
   <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
     <?php foreach ($photos as $p): ?>
