@@ -72,38 +72,68 @@ function vapidKeys(): array {
  * Push a JSON payload to every saved subscription.
  * Drops subscriptions that return 404/410 (gone).
  */
+function pushLog(string $line): void {
+    try {
+        $dir = __DIR__ . '/../uploads/logs';
+        if (!is_dir($dir)) @mkdir($dir, 0755, true);
+        @file_put_contents($dir . '/push.log', date('Y-m-d H:i:s') . ' ' . $line . "\n", FILE_APPEND | LOCK_EX);
+    } catch (Throwable $e) {}
+}
+
 function sendPushToAll(array $payload): array {
-    ensurePushSchema();
-    $keys = vapidKeys();
+    pushLog("=== sendPushToAll called: type={$payload['type']} title={$payload['title']}");
+    try {
+        ensurePushSchema();
+    } catch (Throwable $e) {
+        pushLog('ensurePushSchema failed: ' . $e->getMessage());
+        return ['sent' => 0, 'errors' => 1];
+    }
+
+    try {
+        $keys = vapidKeys();
+    } catch (Throwable $e) {
+        pushLog('vapidKeys failed: ' . $e->getMessage());
+        return ['sent' => 0, 'errors' => 1];
+    }
+
     $subject = setting('push_subject') ?: ('mailto:' . (cfg('site.email') ?: 'admin@casavacanza.it'));
     try {
         $wp = new WebPush($keys['public'], $keys['private'], $subject);
     } catch (Throwable $e) {
-        error_log('WebPush init failed: ' . $e->getMessage());
+        pushLog('WebPush init failed: ' . $e->getMessage());
         return ['sent' => 0, 'errors' => 1];
     }
 
-    $subs = rows('SELECT * FROM push_subscriptions');
+    try {
+        $subs = rows('SELECT * FROM push_subscriptions');
+    } catch (Throwable $e) {
+        pushLog('rows() push_subscriptions failed: ' . $e->getMessage());
+        return ['sent' => 0, 'errors' => 1];
+    }
+
+    pushLog("subs count: " . count($subs));
     $payloadJson = json_encode($payload, JSON_UNESCAPED_UNICODE);
 
     $sent = 0; $errors = 0;
     foreach ($subs as $sub) {
         try {
+            $endpointShort = substr($sub['endpoint'], 0, 60);
             $res = $wp->send($sub, $payloadJson);
+            pushLog("send to {$endpointShort}... status={$res['status']} body=" . substr($res['body'], 0, 120));
             if ($res['ok']) {
                 $sent++;
             } else {
                 $errors++;
                 if ($res['status'] === 404 || $res['status'] === 410) {
                     q('DELETE FROM push_subscriptions WHERE id = ?', [$sub['id']]);
-                } else {
-                    error_log("WebPush send failed (status={$res['status']}): {$res['body']}");
+                    pushLog("subscription gone, deleted: id={$sub['id']}");
                 }
             }
         } catch (Throwable $e) {
             $errors++;
-            error_log('WebPush send exception: ' . $e->getMessage());
+            pushLog('send exception: ' . $e->getMessage());
         }
     }
+    pushLog("=== done: sent=$sent errors=$errors");
     return ['sent' => $sent, 'errors' => $errors];
 }
