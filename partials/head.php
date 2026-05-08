@@ -10,6 +10,9 @@ $lang = currentLang();
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="cache-control" content="no-cache, must-revalidate">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
 <title><?= e($pageTitle) ?> · <?= e($siteName) ?></title>
 <meta name="description" content="<?= e($metaDesc ?? t('meta.default_desc')) ?>">
 <meta name="theme-color" content="#f04e00">
