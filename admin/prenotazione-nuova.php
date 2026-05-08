@@ -20,8 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $quote = computeQuote($apt, $rules, $_POST['from'], $_POST['to'], $guests, $couponPct);
 
     $cid = newId();
-    q('INSERT INTO customers (id, name, email, phone) VALUES (?, ?, ?, ?)',
-        [$cid, $_POST['name'], $_POST['email'] ?: null, $_POST['phone'] ?: null]);
+    $country = !empty($_POST['country']) ? strtoupper(substr($_POST['country'], 0, 2)) : null;
+    q('INSERT INTO customers (id, name, email, phone, country) VALUES (?, ?, ?, ?, ?)',
+        [$cid, $_POST['name'], $_POST['email'] ?: null, $_POST['phone'] ?: null, $country]);
 
     $seq = ((int)val('SELECT COUNT(*) FROM bookings')) + 1;
     $bid = newId();
@@ -62,6 +63,14 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <label class="block"><span class="label">Email</span><input class="input" type="email" name="email"></label>
         <label class="block"><span class="label">Telefono</span><input class="input" name="phone"></label>
       </div>
+      <label class="block"><span class="label">Paese</span>
+        <select class="input" name="country">
+          <option value="">— Seleziona —</option>
+          <?php foreach (countryList('it') as $c): ?>
+            <option value="<?= e($c['code']) ?>"><?= e($c['name']) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </label>
       <label class="block"><span class="label">Note interne</span><textarea class="input min-h-[100px]" name="notes"></textarea></label>
     </div>
 

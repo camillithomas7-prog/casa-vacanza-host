@@ -233,11 +233,17 @@ require __DIR__ . '/partials/site-header.php';
           </template>
 
           <div class="space-y-2 pt-2">
-            <input required placeholder="Nome e cognome" class="input" x-model="name">
+            <input required placeholder="<?= e(t('apt.fullname')) ?>" class="input" x-model="name">
             <div class="grid grid-cols-2 gap-2">
-              <input type="email" required placeholder="Email" class="input" x-model="email">
-              <input required placeholder="Telefono" class="input" x-model="phone">
+              <input type="email" required placeholder="<?= e(t('apt.email')) ?>" class="input" x-model="email">
+              <input required placeholder="<?= e(t('apt.phone')) ?>" class="input" x-model="phone">
             </div>
+            <select required class="input" x-model="country">
+              <option value=""><?= e(t('apt.country_select')) ?></option>
+              <?php foreach (countryList(currentLang()) as $c): ?>
+                <option value="<?= e($c['code']) ?>"><?= e($c['name']) ?></option>
+              <?php endforeach; ?>
+            </select>
           </div>
 
           <div x-show="err" x-text="err" class="text-sm text-red-600 p-2 rounded-lg bg-red-50 dark:bg-red-500/10"></div>
@@ -268,7 +274,7 @@ require __DIR__ . '/partials/site-header.php';
 function bookingForm() {
   return {
     aptId: <?= json_encode($a['id']) ?>,
-    from: '', to: '', guests: 2, coupon: '', name: '', email: '', phone: '',
+    from: '', to: '', guests: 2, coupon: '', name: '', email: '', phone: '', country: '',
     q: null, busy: false, done: null, err: '',
     fmt(n) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(n || 0); },
     init() {
@@ -301,7 +307,7 @@ function bookingForm() {
       this.busy = true; this.err = '';
       try {
         const r = await fetch('/api/booking.php', { method: 'POST', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ apartment_id: this.aptId, from: this.from, to: this.to, guests: this.guests, coupon: this.coupon, name: this.name, email: this.email, phone: this.phone }) });
+          body: JSON.stringify({ apartment_id: this.aptId, from: this.from, to: this.to, guests: this.guests, coupon: this.coupon, name: this.name, email: this.email, phone: this.phone, country: this.country }) });
         const d = await r.json();
         if (!r.ok) throw new Error(d.error || 'Errore');
         this.done = d.code;

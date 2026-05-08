@@ -61,9 +61,19 @@ $templates = rows('SELECT * FROM message_templates WHERE active = 1 ORDER BY nam
 $tplTranslations = templateTranslations();
 $due = (float)$b['total'] - (float)$b['paid'];
 
-// Auto-detect lingua dell'ospite dal country (best-effort)
+// Auto-detect lingua dell'ospite dal country (supporta sia ISO code IT/DE/RU/... sia stringhe libere)
 $countryLang = function (?string $country): string {
     if (!$country) return 'it';
+    $code = strtoupper(trim($country));
+    // ISO alpha-2
+    $byCode = [
+        'IT'=>'it', 'CH'=>'it', 'SM'=>'it', 'VA'=>'it',
+        'DE'=>'de', 'AT'=>'de', 'LI'=>'de',
+        'RU'=>'ru', 'BY'=>'ru', 'UA'=>'ru', 'KZ'=>'ru', 'KG'=>'ru',
+        'ES'=>'es', 'MX'=>'es', 'AR'=>'es', 'CL'=>'es', 'CO'=>'es', 'PE'=>'es', 'VE'=>'es', 'UY'=>'es', 'BO'=>'es', 'PY'=>'es', 'EC'=>'es', 'CU'=>'es', 'DO'=>'es', 'GT'=>'es', 'CR'=>'es', 'PA'=>'es', 'SV'=>'es', 'HN'=>'es', 'NI'=>'es',
+    ];
+    if (strlen($code) === 2 && isset($byCode[$code])) return $byCode[$code];
+    // Fallback su stringhe libere (legacy)
     $c = mb_strtolower($country);
     if (preg_match('/italia|italy|italian/u', $c)) return 'it';
     if (preg_match('/germ|deutsch|austria|switzer|svizzera/u', $c)) return 'de';
@@ -142,7 +152,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div><div class="text-xs text-ink-500">Email</div><div><?= e($b['customer_email'] ?: '—') ?></div></div>
           <div><div class="text-xs text-ink-500">Telefono</div><div><?= e($b['customer_phone'] ?: '—') ?></div></div>
-          <div><div class="text-xs text-ink-500">Paese</div><div><?= e($b['customer_country'] ?: '—') ?></div></div>
+          <div><div class="text-xs text-ink-500">Paese</div><div><?= e($b['customer_country'] ? countryName($b['customer_country'], 'it') : '—') ?></div></div>
           <div><div class="text-xs text-ink-500">Documento</div><div><?= e($b['customer_document'] ?: '—') ?></div></div>
         </div>
       </div>

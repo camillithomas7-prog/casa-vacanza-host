@@ -552,6 +552,13 @@ $TRANSLATIONS = [
 'apt.phone' => [
     'it' => 'Telefono', 'en' => 'Phone', 'ru' => 'Телефон', 'es' => 'Teléfono', 'de' => 'Telefon',
 ],
+'apt.country_select' => [
+    'it' => 'Seleziona il tuo paese',
+    'en' => 'Select your country',
+    'ru' => 'Выберите вашу страну',
+    'es' => 'Selecciona tu país',
+    'de' => 'Land auswählen',
+],
 'apt.request_book' => [
     'it' => 'Richiedi prenotazione', 'en' => 'Request booking', 'ru' => 'Запросить бронирование', 'es' => 'Solicitar reserva', 'de' => 'Buchung anfragen',
 ],

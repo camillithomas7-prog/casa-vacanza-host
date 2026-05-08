@@ -29,8 +29,9 @@ $guests = max(1, (int)($body['guests'] ?? 1));
 $quote = computeQuote($apt, $rules, $from, $to, $guests, $couponPct);
 
 $customerId = newId();
-q('INSERT INTO customers (id, name, email, phone) VALUES (?, ?, ?, ?)',
-    [$customerId, $body['name'], $body['email'] ?? null, $body['phone']]);
+$country = !empty($body['country']) ? strtoupper(substr($body['country'], 0, 2)) : null;
+q('INSERT INTO customers (id, name, email, phone, country) VALUES (?, ?, ?, ?, ?)',
+    [$customerId, $body['name'], $body['email'] ?? null, $body['phone'], $country]);
 
 $seq = ((int)val('SELECT COUNT(*) FROM bookings')) + 1;
 $bookingId = newId();

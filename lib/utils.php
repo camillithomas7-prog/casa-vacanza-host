@@ -77,6 +77,45 @@ function isVideoUrl(?string $url): bool {
     return in_array($ext, ['mp4', 'webm', 'mov', 'm4v']);
 }
 
+/**
+ * Lista di paesi in ordine alfabetico nella lingua specificata.
+ * Restituisce array di [code => 'IT', name => 'Italia'].
+ * I primi sono i paesi più frequenti per il mercato Sharm (italiani, tedeschi, russi…).
+ */
+function countryList(string $lang = 'it'): array {
+    $codes = [
+        'IT','DE','RU','UA','GB','FR','ES','PL','CZ','SK','RO','BG','HU','AT','CH','BE','NL','SE','NO','DK','FI','IE','PT','GR','EG',
+        'US','CA','MX','AR','BR','CL','CO','PE','VE','UY','PY','EC','BO','CR','PA','DO','CU',
+        'AU','NZ','JP','CN','KR','IN','TH','VN','ID','MY','PH','SG','HK','TW','TR','IL','SA','AE','QA','KW','BH','OM','JO','LB','MA','TN','DZ','LY','SD','ET','KE','TZ','ZA','NG','GH','SN',
+        'AL','AM','AZ','BA','BY','EE','GE','HR','IS','LT','LU','LV','MD','ME','MK','MT','RS','SI','XK',
+        'IS','LI','SM','VA','AD','MC',
+        'AF','BD','LK','PK','NP','MM','LA','KH','MN','UZ','KZ','KG','TM','TJ','IR','IQ','SY','YE',
+        'AO','BI','BJ','BF','BW','CF','CD','CG','CI','CM','CV','DJ','ER','GA','GM','GN','GQ','GW','LR','LS','MG','ML','MR','MU','MW','MZ','NA','NE','RW','SC','SL','SO','SS','SZ','TD','TG','UG','ZM','ZW',
+        'BS','BB','BZ','GD','GT','GY','HN','HT','JM','LC','NI','SR','SV','TT','VC',
+        'FJ','PG','SB','TO','VU','WS',
+    ];
+    // Dedup preservando ordine (alcuni codici tipo IS sono comparsi due volte)
+    $codes = array_values(array_unique($codes));
+    $list = [];
+    foreach ($codes as $code) {
+        $name = class_exists('Locale') ? \Locale::getDisplayRegion('-' . $code, $lang) : $code;
+        if (!$name || $name === $code) continue;
+        $list[] = ['code' => $code, 'name' => $name];
+    }
+    // Ordina alfabeticamente
+    usort($list, fn($a, $b) => strcoll($a['name'], $b['name']));
+    return $list;
+}
+
+/**
+ * Converte un codice ISO paese nel suo nome localizzato.
+ */
+function countryName(?string $code, string $lang = 'it'): string {
+    if (!$code) return '';
+    if (strlen($code) !== 2 || !class_exists('Locale')) return $code;
+    return \Locale::getDisplayRegion('-' . strtoupper($code), $lang) ?: $code;
+}
+
 function parseAmenities($raw): array {
     if (!$raw) return [];
     $v = json_decode($raw, true);
