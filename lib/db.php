@@ -24,6 +24,13 @@ function db(): PDO {
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => false,
         ]);
+        // Allinea il timezone MySQL all'Italia così CURRENT_TIMESTAMP nelle
+        // CREATE TABLE (notifications, bookings, ecc.) salva l'ora locale italiana
+        try {
+            $tz = cfg('site.timezone') ?: 'Europe/Rome';
+            $offset = (new DateTime('now', new DateTimeZone($tz)))->format('P'); // es. +02:00
+            $pdo->exec("SET time_zone = '$offset'");
+        } catch (Throwable $e) {}
     } catch (Throwable $e) {
         http_response_code(500);
         die('Errore connessione DB: ' . htmlspecialchars($e->getMessage()));
