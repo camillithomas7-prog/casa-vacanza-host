@@ -559,6 +559,20 @@ $TRANSLATIONS = [
     'es' => 'Selecciona tu país',
     'de' => 'Land auswählen',
 ],
+'apt.country_search' => [
+    'it' => 'Cerca paese…',
+    'en' => 'Search country…',
+    'ru' => 'Поиск страны…',
+    'es' => 'Buscar país…',
+    'de' => 'Land suchen…',
+],
+'apt.country_empty' => [
+    'it' => 'Nessun paese trovato',
+    'en' => 'No country found',
+    'ru' => 'Страна не найдена',
+    'es' => 'Ningún país encontrado',
+    'de' => 'Kein Land gefunden',
+],
 'apt.request_book' => [
     'it' => 'Richiedi prenotazione', 'en' => 'Request booking', 'ru' => 'Запросить бронирование', 'es' => 'Solicitar reserva', 'de' => 'Buchung anfragen',
 ],

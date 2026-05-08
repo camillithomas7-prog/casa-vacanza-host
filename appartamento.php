@@ -238,12 +238,48 @@ require __DIR__ . '/partials/site-header.php';
               <input type="email" required placeholder="<?= e(t('apt.email')) ?>" class="input" x-model="email">
               <input required placeholder="<?= e(t('apt.phone')) ?>" class="input" x-model="phone">
             </div>
-            <select required class="input" x-model="country">
-              <option value=""><?= e(t('apt.country_select')) ?></option>
-              <?php foreach (countryList(currentLang()) as $c): ?>
-                <option value="<?= e($c['code']) ?>"><?= e($c['name']) ?></option>
-              <?php endforeach; ?>
-            </select>
+
+            <!-- Country picker custom -->
+            <div class="relative" @click.outside="countryOpen=false">
+              <button type="button" @click="countryOpen=!countryOpen; if(countryOpen){$nextTick(()=>$refs.countrySearch.focus())}"
+                class="input w-full text-left flex items-center gap-2 cursor-pointer"
+                :class="!country && 'text-ink-400'">
+                <template x-if="country">
+                  <span class="text-lg leading-none" x-text="flagOf(country)"></span>
+                </template>
+                <template x-if="!country">
+                  <i data-lucide="globe" class="size-[16px] text-ink-400 shrink-0"></i>
+                </template>
+                <span class="flex-1 truncate" x-text="country ? countryNameOf(country) : '<?= e(t('apt.country_select')) ?>'"></span>
+                <i data-lucide="chevron-down" class="size-[14px] text-ink-400 shrink-0 transition" :class="countryOpen && 'rotate-180'"></i>
+              </button>
+
+              <div x-show="countryOpen" x-cloak x-transition.opacity.duration.150ms
+                   class="absolute z-50 mt-1 w-full bg-white dark:bg-ink-900 border border-ink-200 dark:border-ink-700 rounded-2xl shadow-pop overflow-hidden"
+                   style="display:none">
+                <div class="p-2 border-b border-ink-100 dark:border-ink-800/80">
+                  <div class="relative">
+                    <i data-lucide="search" class="size-[14px] absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-400"></i>
+                    <input x-ref="countrySearch" x-model="countrySearch" type="text" placeholder="<?= e(t('apt.country_search')) ?>"
+                           class="w-full pl-8 pr-3 py-2 text-sm bg-ink-50 dark:bg-ink-800 rounded-xl outline-none focus:ring-2 focus:ring-brand-500/30">
+                  </div>
+                </div>
+                <ul class="max-h-[280px] overflow-y-auto py-1">
+                  <template x-for="c in filteredCountries()" :key="c.code">
+                    <li>
+                      <button type="button" @click="country=c.code; countryOpen=false; countrySearch=''"
+                              class="w-full px-3 py-2 flex items-center gap-2.5 text-sm text-left hover:bg-brand-50 dark:hover:bg-brand-500/10 transition"
+                              :class="country===c.code && 'bg-brand-50 dark:bg-brand-500/15 text-brand-700 dark:text-brand-300 font-medium'">
+                        <span class="text-base leading-none" x-text="flagOf(c.code)"></span>
+                        <span class="flex-1 truncate" x-text="c.name"></span>
+                        <template x-if="country===c.code"><i data-lucide="check" class="size-[14px] text-brand-600"></i></template>
+                      </button>
+                    </li>
+                  </template>
+                  <li x-show="filteredCountries().length === 0" class="px-3 py-4 text-sm text-ink-500 text-center"><?= e(t('apt.country_empty')) ?></li>
+                </ul>
+              </div>
+            </div>
           </div>
 
           <div x-show="err" x-text="err" class="text-sm text-red-600 p-2 rounded-lg bg-red-50 dark:bg-red-500/10"></div>
@@ -275,8 +311,23 @@ function bookingForm() {
   return {
     aptId: <?= json_encode($a['id']) ?>,
     from: '', to: '', guests: 2, coupon: '', name: '', email: '', phone: '', country: '',
+    countries: <?= json_encode(countryList(currentLang())) ?>,
+    countryOpen: false, countrySearch: '',
     q: null, busy: false, done: null, err: '',
     fmt(n) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(n || 0); },
+    flagOf(code) {
+      if (!code || code.length !== 2) return '';
+      return code.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0)));
+    },
+    countryNameOf(code) {
+      const f = this.countries.find(c => c.code === code);
+      return f ? f.name : code;
+    },
+    filteredCountries() {
+      const q = (this.countrySearch || '').trim().toLowerCase();
+      if (!q) return this.countries;
+      return this.countries.filter(c => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q));
+    },
     init() {
       try {
         const saved = JSON.parse(sessionStorage.getItem('cv_book_' + this.aptId) || '{}');
@@ -304,6 +355,7 @@ function bookingForm() {
       } catch (e) {}
     },
     async submit() {
+      if (!this.country) { this.err = '<?= e(t('apt.country_select')) ?>'; return; }
       this.busy = true; this.err = '';
       try {
         const r = await fetch('/api/booking.php', { method: 'POST', headers: { 'content-type': 'application/json' },
