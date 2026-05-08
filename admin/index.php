@@ -2,9 +2,10 @@
 require_once __DIR__ . '/../lib/auth.php';
 require_once __DIR__ . '/../lib/utils.php';
 requireAdmin();
+ensureColumns();
 
 $apt_count = (int)val('SELECT COUNT(*) FROM apartments WHERE active = 1');
-$bookings = rows('SELECT b.*, a.name as apartment_name, c.name as customer_name FROM bookings b JOIN apartments a ON b.apartment_id = a.id JOIN customers c ON b.customer_id = c.id WHERE b.status != "cancelled"');
+$bookings = rows('SELECT b.*, a.name as apartment_name, a.manager_commission_pct, c.name as customer_name FROM bookings b JOIN apartments a ON b.apartment_id = a.id JOIN customers c ON b.customer_id = c.id WHERE b.status != "cancelled"');
 $expenses = rows('SELECT * FROM expenses');
 
 $revenue = array_sum(array_column($bookings, 'total'));
@@ -12,6 +13,16 @@ $paid = array_sum(array_column($bookings, 'paid'));
 $due = $revenue - $paid;
 $exp_total = array_sum(array_column($expenses, 'amount'));
 $profit = $revenue - $exp_total;
+
+// Quota di gestione di Patrizia: % sul ricavo NETTO della prenotazione
+// (escluso pulizie e tassa di soggiorno, che sono pass-through).
+$manager_commission = 0;
+foreach ($bookings as $b) {
+    $netto = (float)$b['total'] - (float)$b['cleaning_fee'] - (float)$b['city_tax'];
+    $pct = (float)($b['manager_commission_pct'] ?? 0);
+    $manager_commission += $netto * $pct / 100;
+}
+$owner_payout = max(0, $revenue - $exp_total - $manager_commission);
 
 $months = [];
 for ($i = 11; $i >= 0; $i--) {
@@ -31,8 +42,10 @@ foreach ($months as $m => $v) $series[] = ['month' => substr($m, 2), 'rev' => $v
 
 $by_apt = [];
 foreach ($bookings as $b) {
-    $by_apt[$b['apartment_id']] = $by_apt[$b['apartment_id']] ?? ['name' => $b['apartment_name'], 'total' => 0];
+    $by_apt[$b['apartment_id']] = $by_apt[$b['apartment_id']] ?? ['name' => $b['apartment_name'], 'total' => 0, 'commission' => 0, 'pct' => (float)($b['manager_commission_pct'] ?? 0)];
     $by_apt[$b['apartment_id']]['total'] += (float)$b['total'];
+    $netto_b = (float)$b['total'] - (float)$b['cleaning_fee'] - (float)$b['city_tax'];
+    $by_apt[$b['apartment_id']]['commission'] += $netto_b * (float)($b['manager_commission_pct'] ?? 0) / 100;
 }
 usort($by_apt, fn($a, $b) => $b['total'] <=> $a['total']);
 $top = array_slice($by_apt, 0, 5);
@@ -66,9 +79,9 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     <?php
       $kpis = [
         ['Fatturato', fmtMoney($revenue), count($bookings) . ' prenotazioni', 'trending-up', 'from-emerald-400 to-emerald-600', $revTrend],
+        ['Tua quota di gestione', fmtMoney($manager_commission), 'commissioni Patrizia', 'percent', 'from-brand-400 to-brand-600', null],
         ['Saldo da incassare', fmtMoney($due), $due > 0 ? 'da sollecitare' : 'tutto incassato', 'clock', 'from-amber-400 to-amber-600', null],
         ['Spese totali', fmtMoney($exp_total), count($expenses) . ' voci', 'wallet', 'from-rose-400 to-rose-600', null],
-        ['Utile netto', fmtMoney($profit), 'ricavi − spese', 'sparkles', 'from-brand-400 to-brand-600', null],
       ];
       foreach ($kpis as $i => $k):
     ?>
@@ -123,14 +136,20 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
     <div class="card p-4 sm:p-6 overflow-hidden">
       <h2 class="font-serif text-lg sm:text-xl font-semibold tracking-tight">Top appartamenti</h2>
-      <p class="text-xs text-ink-500 mt-0.5 mb-4">per fatturato</p>
+      <p class="text-xs text-ink-500 mt-0.5 mb-4">fatturato e tua quota</p>
       <?php if (!$top): ?><div class="text-sm text-ink-500">Nessun dato.</div><?php else: ?>
         <div class="relative h-[180px] sm:h-[220px] mb-4 w-full max-w-full overflow-hidden"><canvas id="pieChart"></canvas></div>
-        <ul class="space-y-1.5 text-sm">
+        <ul class="space-y-2 text-sm">
           <?php foreach ($top as $i => $t): ?>
-            <li class="flex items-center justify-between">
-              <span class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full" style="background:<?= ['#ff6a0a','#f04e00','#9c300d','#ff8a32','#ffb56c'][$i] ?>"></span><span class="truncate"><?= e($t['name']) ?></span></span>
-              <span class="font-semibold tabular-nums"><?= fmtMoney((float)$t['total']) ?></span>
+            <li>
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-2 min-w-0"><span class="h-2.5 w-2.5 rounded-full shrink-0" style="background:<?= ['#ff6a0a','#f04e00','#9c300d','#ff8a32','#ffb56c'][$i] ?>"></span><span class="truncate"><?= e($t['name']) ?></span></span>
+                <span class="font-semibold tabular-nums shrink-0 ml-2"><?= fmtMoney((float)$t['total']) ?></span>
+              </div>
+              <div class="flex items-center justify-between text-[11px] text-ink-500 ml-5 mt-0.5">
+                <span>tua quota <?= number_format((float)$t['pct'], 0) ?>%</span>
+                <span class="font-medium tabular-nums text-brand-600"><?= fmtMoney((float)$t['commission']) ?></span>
+              </div>
             </li>
           <?php endforeach; ?>
         </ul>

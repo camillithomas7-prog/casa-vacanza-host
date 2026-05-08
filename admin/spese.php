@@ -2,8 +2,9 @@
 require_once __DIR__ . '/../lib/auth.php';
 require_once __DIR__ . '/../lib/utils.php';
 requireAdmin();
+ensureColumns();
 
-$apartments = rows('SELECT id, name FROM apartments ORDER BY name ASC');
+$apartments = rows('SELECT id, name, manager_commission_pct, owner_name FROM apartments ORDER BY name ASC');
 $year = (int)($_GET['year'] ?? date('Y'));
 $aptFilter = $_GET['apt'] ?? 'all';
 
@@ -25,13 +26,30 @@ $where = ['date >= ? AND date < ?']; $params = ["$year-01-01", ($year + 1) . "-0
 if ($aptFilter !== 'all') { $where[] = 'apartment_id = ?'; $params[] = $aptFilter; }
 $expenses = rows("SELECT e.*, a.name AS apartment_name FROM expenses e LEFT JOIN apartments a ON e.apartment_id = a.id WHERE " . implode(' AND ', $where) . " ORDER BY date DESC", $params);
 
-$bWhere = ['status != "cancelled"', 'check_in >= ?', 'check_in < ?']; $bParams = ["$year-01-01", ($year + 1) . "-01-01"];
-if ($aptFilter !== 'all') { $bWhere[] = 'apartment_id = ?'; $bParams[] = $aptFilter; }
-$bookings = rows("SELECT * FROM bookings WHERE " . implode(' AND ', $bWhere), $bParams);
+$bWhere = ['b.status != "cancelled"', 'b.check_in >= ?', 'b.check_in < ?']; $bParams = ["$year-01-01", ($year + 1) . "-01-01"];
+if ($aptFilter !== 'all') { $bWhere[] = 'b.apartment_id = ?'; $bParams[] = $aptFilter; }
+$bookings = rows("SELECT b.*, a.manager_commission_pct, a.name AS apt_name FROM bookings b JOIN apartments a ON a.id = b.apartment_id WHERE " . implode(' AND ', $bWhere), $bParams);
 
 $totalExp = array_sum(array_column($expenses, 'amount'));
 $totalRev = array_sum(array_column($bookings, 'total'));
 $totalPaid = array_sum(array_column($bookings, 'paid'));
+
+// Quota di gestione di Patrizia (commissioni) e quota proprietario.
+$totalCommission = 0;
+$byAptCommission = [];
+foreach ($bookings as $b) {
+    $netto = (float)$b['total'] - (float)$b['cleaning_fee'] - (float)$b['city_tax'];
+    $pct = (float)($b['manager_commission_pct'] ?? 0);
+    $c = $netto * $pct / 100;
+    $totalCommission += $c;
+    $key = $b['apartment_id'];
+    $byAptCommission[$key] = $byAptCommission[$key] ?? ['name' => $b['apt_name'], 'pct' => $pct, 'rev' => 0, 'netto' => 0, 'commission' => 0];
+    $byAptCommission[$key]['rev'] += (float)$b['total'];
+    $byAptCommission[$key]['netto'] += $netto;
+    $byAptCommission[$key]['commission'] += $c;
+}
+uasort($byAptCommission, fn($a, $b) => $b['commission'] <=> $a['commission']);
+$ownerPayout = max(0, $totalRev - $totalExp - $totalCommission);
 
 $monthly = [];
 for ($m = 1; $m <= 12; $m++) $monthly[str_pad($m,2,'0',STR_PAD_LEFT)] = ['rev' => 0, 'exp' => 0];
@@ -69,20 +87,58 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </form>
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
     <?php foreach ([
       ['Fatturato', fmtMoney($totalRev), 'bg-emerald-500'],
       ['Incassato', fmtMoney($totalPaid), 'bg-sky-500'],
       ['Spese', fmtMoney($totalExp), 'bg-rose-500'],
-      ['Utile', fmtMoney($totalRev - $totalExp), 'bg-brand-500'],
+      ['Tua quota', fmtMoney($totalCommission), 'bg-brand-500'],
+      ['Quota proprietari', fmtMoney($ownerPayout), 'bg-violet-500'],
     ] as $s): ?>
       <div class="card p-4 sm:p-5">
         <div class="text-xs font-medium uppercase tracking-wide text-ink-500"><?= e($s[0]) ?></div>
-        <div class="text-2xl font-display font-bold mt-1"><?= e($s[1]) ?></div>
+        <div class="text-xl sm:text-2xl font-display font-bold mt-1 tabular-nums"><?= e($s[1]) ?></div>
         <div class="h-1 rounded-full mt-2 <?= $s[2] ?>"></div>
       </div>
     <?php endforeach; ?>
   </div>
+
+  <?php if ($byAptCommission): ?>
+  <div class="card p-4 sm:p-5">
+    <div class="flex items-start gap-3 mb-4">
+      <span class="h-9 w-9 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center shrink-0"><i data-lucide="percent" class="size-[18px]"></i></span>
+      <div>
+        <h3 class="font-display font-bold">Commissioni di gestione · <?= $year ?></h3>
+        <p class="text-xs text-ink-500 mt-0.5">La tua quota su ogni appartamento. Calcolata sul ricavo netto (totale − pulizie − tassa di soggiorno).</p>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table-base">
+        <thead><tr><th>Appartamento</th><th class="text-right">Fatturato</th><th class="text-right">Netto</th><th class="text-center">%</th><th class="text-right">Tua quota</th></tr></thead>
+        <tbody>
+          <?php foreach ($byAptCommission as $row): ?>
+            <tr>
+              <td class="font-medium"><?= e($row['name']) ?></td>
+              <td class="text-right tabular-nums"><?= fmtMoney((float)$row['rev']) ?></td>
+              <td class="text-right tabular-nums text-ink-500"><?= fmtMoney((float)$row['netto']) ?></td>
+              <td class="text-center"><span class="badge-soft tabular-nums"><?= number_format((float)$row['pct'], 0) ?>%</span></td>
+              <td class="text-right tabular-nums font-semibold text-brand-600"><?= fmtMoney((float)$row['commission']) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+        <tfoot>
+          <tr class="font-semibold">
+            <td class="pt-3">Totale</td>
+            <td class="text-right tabular-nums pt-3"><?= fmtMoney($totalRev) ?></td>
+            <td class="text-right tabular-nums pt-3 text-ink-500"><?= fmtMoney(array_sum(array_column($byAptCommission, 'netto'))) ?></td>
+            <td></td>
+            <td class="text-right tabular-nums pt-3 text-brand-600"><?= fmtMoney($totalCommission) ?></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <?php endif; ?>
 
   <div class="card p-4 sm:p-5">
     <h3 class="font-display font-bold mb-3">Andamento <?= $year ?></h3>

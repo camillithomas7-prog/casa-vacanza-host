@@ -55,3 +55,31 @@ function newId(): string {
 function tableExists(string $name): bool {
     try { q("SELECT 1 FROM `$name` LIMIT 1"); return true; } catch (Throwable $e) { return false; }
 }
+
+/**
+ * Migration idempotente: aggiunge colonne mancanti su tabelle esistenti.
+ * Cached per request — la prima chiamata fa SHOW COLUMNS, le successive
+ * sono no-op.
+ */
+function ensureColumns(): void {
+    static $done = false;
+    if ($done) return;
+    $done = true;
+
+    $migrations = [
+        // [tabella, colonna, definizione]
+        ['apartments', 'manager_commission_pct', 'DECIMAL(5,2) NOT NULL DEFAULT 20'],
+        ['apartments', 'owner_name', "VARCHAR(190) DEFAULT ''"],
+    ];
+    try {
+        foreach ($migrations as [$tbl, $col, $def]) {
+            $exists = (int)db()->query("SELECT COUNT(*) FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '$tbl' AND COLUMN_NAME = '$col'")->fetchColumn();
+            if (!$exists) {
+                db()->exec("ALTER TABLE `$tbl` ADD COLUMN $col $def");
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('ensureColumns failed: ' . $e->getMessage());
+    }
+}

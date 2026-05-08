@@ -48,6 +48,8 @@ CREATE TABLE IF NOT EXISTS apartments (
   long_stay_discount_7 DECIMAL(5,2) NOT NULL DEFAULT 5,
   long_stay_discount_14 DECIMAL(5,2) NOT NULL DEFAULT 10,
   long_stay_discount_30 DECIMAL(5,2) NOT NULL DEFAULT 20,
+  manager_commission_pct DECIMAL(5,2) NOT NULL DEFAULT 20,
+  owner_name VARCHAR(190) DEFAULT '',
   active TINYINT(1) NOT NULL DEFAULT 1,
   under_maintenance TINYINT(1) NOT NULL DEFAULT 0,
   cover_image VARCHAR(500),
@@ -339,6 +341,24 @@ foreach (preg_split('/;\s*\n/', $schema) as $stmt) {
     if ($stmt) $pdo->exec($stmt);
 }
 echo "✓ Schema creato/verificato\n";
+
+// === Migrazioni idempotenti per DB esistenti ===========================
+// Aggiunge nuove colonne se mancano. MySQL non supporta IF NOT EXISTS su
+// ADD COLUMN in tutte le versioni, quindi controlliamo prima con SHOW COLUMNS.
+function ensureColumn(PDO $pdo, string $table, string $column, string $definition): bool {
+    $exists = (int)$pdo->query("SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '$table' AND COLUMN_NAME = '$column'")->fetchColumn();
+    if ($exists) return false;
+    $pdo->exec("ALTER TABLE `$table` ADD COLUMN $column $definition");
+    return true;
+}
+$migrations = [
+    ['apartments', 'manager_commission_pct', 'DECIMAL(5,2) NOT NULL DEFAULT 20'],
+    ['apartments', 'owner_name', "VARCHAR(190) DEFAULT ''"],
+];
+foreach ($migrations as [$tbl, $col, $def]) {
+    if (ensureColumn($pdo, $tbl, $col, $def)) echo "✓ Aggiunta colonna $tbl.$col\n";
+}
 
 if ($reset) {
     echo "⚠ RESET RICHIESTO — pulizia dati...\n";

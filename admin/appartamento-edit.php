@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../lib/auth.php';
 require_once __DIR__ . '/../lib/utils.php';
 requireAdmin();
+ensureColumns();
 
 $id = $_GET['id'] ?? null;
 $apt = $id ? row('SELECT * FROM apartments WHERE id = ?', [$id]) : null;
@@ -93,6 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'long_stay_discount_7' => (float)$_POST['long_stay_discount_7'],
         'long_stay_discount_14' => (float)$_POST['long_stay_discount_14'],
         'long_stay_discount_30' => (float)$_POST['long_stay_discount_30'],
+        'manager_commission_pct' => (float)($_POST['manager_commission_pct'] ?? 20),
+        'owner_name' => trim($_POST['owner_name'] ?? ''),
         'active' => isset($_POST['active']) ? 1 : 0,
         'under_maintenance' => isset($_POST['under_maintenance']) ? 1 : 0,
         'cover_image' => $coverPath,
@@ -122,7 +125,7 @@ $zonesList = [];
 try {
     $zonesList = rows('SELECT name, kind FROM zones WHERE active = 1 ORDER BY kind ASC, position ASC, name ASC');
 } catch (Throwable $e) {}
-$defaults = ['name'=>'','slug'=>'','description'=>'','address'=>'','city'=>'','country'=>'Egitto','guests'=>2,'bedrooms'=>1,'bathrooms'=>1,'beds'=>1,'size_sqm'=>'','rules'=>'','check_in_time'=>'15:00','check_out_time'=>'11:00','base_price'=>80,'weekly_price'=>'','biweekly_price'=>'','triweekly_price'=>'','monthly_price'=>'','weekend_price'=>'','cleaning_fee'=>35,'security_deposit'=>0,'city_tax'=>2,'city_tax_max_nights'=>5,'long_stay_discount_7'=>5,'long_stay_discount_14'=>10,'long_stay_discount_30'=>20,'active'=>1,'under_maintenance'=>0,'cover_image'=>''];
+$defaults = ['name'=>'','slug'=>'','description'=>'','address'=>'','city'=>'','country'=>'Egitto','guests'=>2,'bedrooms'=>1,'bathrooms'=>1,'beds'=>1,'size_sqm'=>'','rules'=>'','check_in_time'=>'15:00','check_out_time'=>'11:00','base_price'=>80,'weekly_price'=>'','biweekly_price'=>'','triweekly_price'=>'','monthly_price'=>'','weekend_price'=>'','cleaning_fee'=>35,'security_deposit'=>0,'city_tax'=>2,'city_tax_max_nights'=>5,'long_stay_discount_7'=>5,'long_stay_discount_14'=>10,'long_stay_discount_30'=>20,'manager_commission_pct'=>20,'owner_name'=>'','active'=>1,'under_maintenance'=>0,'cover_image'=>''];
 // Merge: i valori salvati sovrascrivono i default
 $f = $apt ? array_merge($defaults, $apt) : $defaults;
 
@@ -261,6 +264,31 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       <div class="flex flex-wrap gap-4 pt-2">
         <label class="flex items-center gap-2"><input type="checkbox" name="active" <?= $f['active'] ? 'checked' : '' ?>> Attivo (visibile sul sito)</label>
         <label class="flex items-center gap-2"><input type="checkbox" name="under_maintenance" <?= $f['under_maintenance'] ? 'checked' : '' ?>> In manutenzione</label>
+      </div>
+    </div>
+
+    <div class="card p-4 sm:p-5 space-y-3 border-2 border-brand-200 dark:border-brand-500/30 bg-brand-50/40 dark:bg-brand-500/5">
+      <div class="flex items-start gap-3">
+        <span class="h-9 w-9 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center shrink-0"><i data-lucide="percent" class="size-[18px]"></i></span>
+        <div>
+          <h3 class="font-display font-bold">Property management</h3>
+          <p class="text-xs text-ink-500 mt-0.5">Imposta la tua commissione su ogni prenotazione di questo appartamento. Userai questi dati nella Dashboard e in Spese & bilancio.</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label class="block">
+          <span class="label">Commissione di gestione (%)</span>
+          <div class="relative">
+            <input class="input pr-10" type="number" step="0.01" min="0" max="100" name="manager_commission_pct" value="<?= e((string)$f['manager_commission_pct']) ?>">
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 text-sm">%</span>
+          </div>
+          <span class="text-[11px] text-ink-500 mt-1 block">Es. 20 = trattieni il 20% sui ricavi netti, il resto va al proprietario.</span>
+        </label>
+        <label class="block">
+          <span class="label">Proprietario (opzionale)</span>
+          <input class="input" type="text" name="owner_name" value="<?= e((string)$f['owner_name']) ?>" placeholder="Nome dell'imprenditore">
+          <span class="text-[11px] text-ink-500 mt-1 block">Solo per memoria interna, non viene mostrato sul sito.</span>
+        </label>
       </div>
     </div>
   </div>
