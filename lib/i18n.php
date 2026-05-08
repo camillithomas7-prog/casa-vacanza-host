@@ -276,14 +276,18 @@ $TRANSLATIONS = [
     'it' => 'Tutte le escursioni', 'en' => 'All tours', 'ru' => 'Все экскурсии', 'es' => 'Todas las excursiones', 'de' => 'Alle Ausflüge',
 ],
 'home.transfer.title' => [
-    'it' => 'Dal volo al letto.', 'en' => 'From flight to pillow.', 'ru' => 'От самолёта до подушки.', 'es' => 'Del vuelo a la cama.', 'de' => 'Vom Flug ins Bett.',
+    'it' => 'Ti aspettiamo all\'aeroporto.',
+    'en' => 'We pick you up at the airport.',
+    'ru' => 'Встретим вас в аэропорту.',
+    'es' => 'Te recogemos en el aeropuerto.',
+    'de' => 'Wir holen Sie am Flughafen ab.',
 ],
 'home.transfer.sub' => [
-    'it' => 'Transfer privato dall\'aeroporto SSH a tutti i villaggi.',
-    'en' => 'Private transfer from SSH airport to every resort area.',
-    'ru' => 'Частный трансфер из аэропорта SSH во все районы курорта.',
-    'es' => 'Traslado privado desde el aeropuerto SSH a todos los complejos.',
-    'de' => 'Privater Transfer vom Flughafen SSH zu allen Resort-Gebieten.',
+    'it' => 'Transfer privato e diretto dall\'aeroporto SSH al tuo appartamento.',
+    'en' => 'Private door-to-door transfer from SSH airport to your apartment.',
+    'ru' => 'Частный трансфер «от двери до двери» из аэропорта SSH к вашим апартаментам.',
+    'es' => 'Traslado privado puerta a puerta desde el aeropuerto SSH a tu apartamento.',
+    'de' => 'Privater Tür-zu-Tür-Transfer vom Flughafen SSH zu Ihrem Apartment.',
 ],
 'home.transfer.see_all' => [
     'it' => 'Tutte le tratte', 'en' => 'All routes', 'ru' => 'Все маршруты', 'es' => 'Todas las rutas', 'de' => 'Alle Strecken',
@@ -707,7 +711,11 @@ $TRANSLATIONS = [
 
 // ========== TRANSFER ==========
 'tr.title' => [
-    'it' => 'Dal volo al letto.', 'en' => 'From flight to pillow.', 'ru' => 'От самолёта до подушки.', 'es' => 'Del vuelo a la cama.', 'de' => 'Vom Flug ins Bett.',
+    'it' => 'Ti aspettiamo all\'aeroporto.',
+    'en' => 'We pick you up at the airport.',
+    'ru' => 'Встретим вас в аэропорту.',
+    'es' => 'Te recogemos en el aeropuerto.',
+    'de' => 'Wir holen Sie am Flughafen ab.',
 ],
 'tr.sub' => [
     'it' => 'Transfer privato dall\'aeroporto di Sharm El Sheikh a qualsiasi villaggio o appartamento. Auto fino a 4 persone o minibus 7 posti.',
