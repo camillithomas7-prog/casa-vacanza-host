@@ -79,6 +79,20 @@ try { if (localStorage.getItem('cv-theme') === 'dark') document.documentElement.
   /* Hard cap viewport overflow — exclude fixed elements which need to span viewport */
   body > *:not(.fixed):not([style*="position:fixed"]):not([style*="position: fixed"]) { max-width: 100%; }
   table { max-width: 100%; }
+
+  /* Rimuove i bordi/angoli vivi che Safari (e iOS in particolare) disegna
+     di default attorno a input, textarea e select. Senza questo si vedono
+     dei rettangoli neri annidati anche quando il nostro CSS non ha bordi. */
+  input, textarea, select, button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-clip: padding-box;
+  }
+  input[type="checkbox"], input[type="radio"] {
+    -webkit-appearance: auto;
+    appearance: auto;
+  }
 }
 @layer components {
   .container-wide { @apply max-w-[1240px] mx-auto px-5 sm:px-6 lg:px-8; }
