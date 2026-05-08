@@ -234,9 +234,42 @@ require __DIR__ . '/partials/site-header.php';
 
           <div class="space-y-2 pt-2">
             <input required placeholder="<?= e(t('apt.fullname')) ?>" class="input" x-model="name">
-            <div class="grid grid-cols-2 gap-2">
-              <input type="email" required placeholder="<?= e(t('apt.email')) ?>" class="input" x-model="email">
-              <input required placeholder="<?= e(t('apt.phone')) ?>" class="input" x-model="phone">
+            <input type="email" required placeholder="<?= e(t('apt.email')) ?>" class="input" x-model="email">
+
+            <!-- Phone with country prefix -->
+            <div class="relative flex" @click.outside="dialOpen=false">
+              <button type="button" @click="dialOpen=!dialOpen; if(dialOpen){$nextTick(()=>$refs.dialSearch.focus())}"
+                class="input rounded-r-none border-r-0 px-3 flex items-center gap-1.5 cursor-pointer shrink-0 min-w-[88px]">
+                <span class="text-base leading-none" x-text="flagOf(dial)"></span>
+                <span class="text-sm font-medium tabular-nums" x-text="'+' + dialCodeOf(dial)"></span>
+                <i data-lucide="chevron-down" class="size-[12px] text-ink-400 transition" :class="dialOpen && 'rotate-180'"></i>
+              </button>
+              <input required placeholder="<?= e(t('apt.phone')) ?>" type="tel" class="input rounded-l-none flex-1 min-w-0" x-model="phone" inputmode="tel">
+
+              <div x-show="dialOpen" x-cloak x-transition.opacity.duration.150ms
+                   class="absolute z-50 top-full mt-1 left-0 w-[280px] bg-white dark:bg-ink-900 border border-ink-200 dark:border-ink-700 rounded-2xl shadow-pop overflow-hidden"
+                   style="display:none">
+                <div class="p-2 border-b border-ink-100 dark:border-ink-800/80">
+                  <div class="relative">
+                    <i data-lucide="search" class="size-[14px] absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-400"></i>
+                    <input x-ref="dialSearch" x-model="dialSearch" type="text" placeholder="<?= e(t('apt.country_search')) ?>"
+                           class="w-full pl-8 pr-3 py-2 text-sm bg-ink-50 dark:bg-ink-800 rounded-xl outline-none focus:ring-2 focus:ring-brand-500/30">
+                  </div>
+                </div>
+                <ul class="max-h-[260px] overflow-y-auto py-1">
+                  <template x-for="c in filteredDials()" :key="c.code">
+                    <li>
+                      <button type="button" @click="dial=c.code; dialOpen=false; dialSearch=''"
+                              class="w-full px-3 py-2 flex items-center gap-2.5 text-sm text-left hover:bg-brand-50 dark:hover:bg-brand-500/10 transition"
+                              :class="dial===c.code && 'bg-brand-50 dark:bg-brand-500/15'">
+                        <span class="text-base leading-none" x-text="flagOf(c.code)"></span>
+                        <span class="flex-1 truncate" x-text="c.name"></span>
+                        <span class="text-ink-500 tabular-nums text-xs" x-text="'+' + c.dial"></span>
+                      </button>
+                    </li>
+                  </template>
+                </ul>
+              </div>
             </div>
 
             <!-- Country picker custom -->
@@ -310,9 +343,11 @@ require __DIR__ . '/partials/site-header.php';
 function bookingForm() {
   return {
     aptId: <?= json_encode($a['id']) ?>,
-    from: '', to: '', guests: 2, coupon: '', name: '', email: '', phone: '', country: '',
+    from: '', to: '', guests: 2, coupon: '', name: '', email: '', phone: '', country: '', dial: 'IT',
     countries: <?= json_encode(countryList(currentLang())) ?>,
+    phoneCountries: <?= json_encode(phoneCountryList(currentLang())) ?>,
     countryOpen: false, countrySearch: '',
+    dialOpen: false, dialSearch: '',
     q: null, busy: false, done: null, err: '',
     fmt(n) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(n || 0); },
     flagOf(code) {
@@ -323,10 +358,19 @@ function bookingForm() {
       const f = this.countries.find(c => c.code === code);
       return f ? f.name : code;
     },
+    dialCodeOf(code) {
+      const f = this.phoneCountries.find(c => c.code === code);
+      return f ? f.dial : '';
+    },
     filteredCountries() {
       const q = (this.countrySearch || '').trim().toLowerCase();
       if (!q) return this.countries;
       return this.countries.filter(c => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q));
+    },
+    filteredDials() {
+      const q = (this.dialSearch || '').trim().toLowerCase();
+      if (!q) return this.phoneCountries;
+      return this.phoneCountries.filter(c => c.name.toLowerCase().includes(q) || c.dial.includes(q) || c.code.toLowerCase().includes(q));
     },
     init() {
       try {
@@ -357,9 +401,11 @@ function bookingForm() {
     async submit() {
       if (!this.country) { this.err = '<?= e(t('apt.country_select')) ?>'; return; }
       this.busy = true; this.err = '';
+      const dialCode = this.dialCodeOf(this.dial) || '39';
+      const phoneFull = '+' + dialCode + ' ' + (this.phone || '').replace(/^\+?\d{1,4}\s*/, '');
       try {
         const r = await fetch('/api/booking.php', { method: 'POST', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ apartment_id: this.aptId, from: this.from, to: this.to, guests: this.guests, coupon: this.coupon, name: this.name, email: this.email, phone: this.phone, country: this.country }) });
+          body: JSON.stringify({ apartment_id: this.aptId, from: this.from, to: this.to, guests: this.guests, coupon: this.coupon, name: this.name, email: this.email, phone: phoneFull, country: this.country }) });
         const d = await r.json();
         if (!r.ok) throw new Error(d.error || 'Errore');
         this.done = d.code;
