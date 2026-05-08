@@ -3,6 +3,8 @@ require_once __DIR__ . '/lib/db.php';
 require_once __DIR__ . '/lib/utils.php';
 require_once __DIR__ . '/lib/services.php';
 
+if (!featureEnabled('rentals')) { redirect('/' . (currentLang() !== 'it' ? '?lang=' . currentLang() : '')); }
+
 $slug = $_GET['slug'] ?? '';
 $s = row('SELECT * FROM services WHERE slug = ? AND active = 1', [$slug]);
 if (!$s || !isRental($s['type'])) {

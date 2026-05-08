@@ -1,4 +1,15 @@
-<?php $curLang = currentLang(); ?>
+<?php
+$curLang = currentLang();
+// Voci di nav, filtrate dai feature flag (Patrizia attiva i servizi via admin).
+$_navItems = array_values(array_filter([
+    ['/', 'nav.home', null],
+    ['/appartamenti.php', 'nav.apartments', 'apartments'],
+    ['/noleggi.php', 'nav.rentals', 'rentals'],
+    ['/escursioni.php', 'nav.excursions', 'excursions'],
+    ['/transfer.php', 'nav.transfer', 'transfer'],
+    ['/contatti.php', 'nav.contact', null],
+], fn($n) => $n[2] === null || featureEnabled($n[2])));
+?>
 <header x-data="{ scrolled: false }" @scroll.window="scrolled = window.scrollY > 8"
   class="sticky top-0 z-40 transition-all duration-300"
   :class="scrolled ? 'backdrop-blur-xl bg-white/80 dark:bg-ink-950/85 border-b border-ink-100 dark:border-ink-800/60 shadow-soft' : 'bg-transparent'">
@@ -7,14 +18,7 @@
       <img src="/assets/logo-256.png?v=2" alt="<?= e(cfg('site.name')) ?>" class="h-12 w-auto group-hover:scale-[1.04] transition-transform" />
     </a>
     <nav class="hidden md:flex items-center gap-1 text-sm font-medium">
-      <?php foreach ([
-        ['/', 'nav.home'],
-        ['/appartamenti.php', 'nav.apartments'],
-        ['/noleggi.php', 'nav.rentals'],
-        ['/escursioni.php', 'nav.excursions'],
-        ['/transfer.php', 'nav.transfer'],
-        ['/contatti.php', 'nav.contact'],
-      ] as $n):
+      <?php foreach ($_navItems as $n):
         $href = $n[0] . ($curLang !== 'it' ? '?lang=' . urlencode($curLang) : '');
       ?>
         <a href="<?= e($href) ?>" class="px-3 py-2 rounded-xl text-ink-700 dark:text-ink-300 hover:text-ink-900 dark:hover:text-white hover:bg-ink-100/70 dark:hover:bg-ink-800/60 transition"><?= e(t($n[1])) ?></a>
@@ -56,16 +60,10 @@
     <button @click="open=false" class="btn-ghost"><i data-lucide="x" class="size-[20px]"></i></button>
   </div>
   <div class="flex flex-col gap-1 mt-8 text-lg">
-    <?php foreach ([
-      ['/', 'nav.home'],
-      ['/appartamenti.php', 'nav.apartments'],
-      ['/noleggi.php', 'nav.rentals'],
-      ['/escursioni.php', 'nav.excursions'],
-      ['/transfer.php', 'nav.transfer'],
-      ['/contatti.php', 'nav.contact'],
-      ['/admin/login.php', 'nav.admin'],
-    ] as $n):
-      $href = $n[0] . ($curLang !== 'it' ? '?lang=' . urlencode($curLang) : '');
+    <?php
+      $_mobileNav = array_merge($_navItems, [['/admin/login.php', 'nav.admin', null]]);
+      foreach ($_mobileNav as $n):
+        $href = $n[0] . ($curLang !== 'it' ? '?lang=' . urlencode($curLang) : '');
     ?>
       <a href="<?= e($href) ?>" class="px-3 py-3 rounded-xl hover:bg-ink-100 dark:hover:bg-ink-800"><?= e(t($n[1])) ?></a>
     <?php endforeach; ?>

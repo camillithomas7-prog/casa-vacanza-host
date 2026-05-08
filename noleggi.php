@@ -3,6 +3,8 @@ require_once __DIR__ . '/lib/db.php';
 require_once __DIR__ . '/lib/utils.php';
 require_once __DIR__ . '/lib/services.php';
 
+if (!featureEnabled('rentals')) { redirect('/' . (currentLang() !== 'it' ? '?lang=' . currentLang() : '')); }
+
 $type = $_GET['type'] ?? '';
 $rentalTypes = SERVICE_GROUPS['rental'];
 $where = ['active = 1', "type IN ('" . implode("','", $rentalTypes) . "')"];

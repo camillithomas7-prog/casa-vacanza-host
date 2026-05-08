@@ -3,6 +3,8 @@ require_once __DIR__ . '/lib/db.php';
 require_once __DIR__ . '/lib/utils.php';
 require_once __DIR__ . '/lib/services.php';
 
+if (!featureEnabled('excursions')) { redirect('/' . (currentLang() !== 'it' ? '?lang=' . currentLang() : '')); }
+
 $cat = $_GET['cat'] ?? '';
 $expTypes = SERVICE_GROUPS['experience'];
 $where = ['active = 1', "type IN ('" . implode("','", $expTypes) . "')"];

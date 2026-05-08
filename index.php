@@ -212,14 +212,18 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
 </section>
 
 <!-- BANNER SERVIZI EXTRA -->
+<?php
+  $_extraBanners = array_values(array_filter([
+    featureEnabled('rentals')    ? ['key-round',     t('home.banner.rentals.title'),    t('home.banner.rentals.sub'),    '/noleggi.php',                'Da €15/g'] : null,
+    featureEnabled('excursions') ? ['compass',       t('home.banner.excursions.title'), t('home.banner.excursions.sub'), '/escursioni.php',             'Da €30/p'] : null,
+    featureEnabled('transfer')   ? ['plane-takeoff', t('home.banner.transfer.title'),   t('home.banner.transfer.sub'),   '/transfer.php',               'Da €25']   : null,
+    featureEnabled('excursions') ? ['waves',         t('home.banner.diving.title'),     t('home.banner.diving.sub'),     '/escursioni.php?cat=diving',  'Da €45/p'] : null,
+  ]));
+  if ($_extraBanners):
+?>
 <section class="container-wide py-12">
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    <?php foreach ([
-      ['key-round', t('home.banner.rentals.title'), t('home.banner.rentals.sub'), '/noleggi.php', 'Da €15/g'],
-      ['compass', t('home.banner.excursions.title'), t('home.banner.excursions.sub'), '/escursioni.php', 'Da €30/p'],
-      ['plane-takeoff', t('home.banner.transfer.title'), t('home.banner.transfer.sub'), '/transfer.php', 'Da €25'],
-      ['waves', t('home.banner.diving.title'), t('home.banner.diving.sub'), '/escursioni.php?cat=diving', 'Da €45/p'],
-    ] as $i => $s):
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-<?= min(4, count($_extraBanners)) ?> gap-4">
+    <?php foreach ($_extraBanners as $i => $s):
       $href = $s[3] . ($_lp ? (strpos($s[3], '?') !== false ? '&lang=' . urlencode(currentLang()) : $_lp) : '');
     ?>
       <a href="<?= e($href) ?>" class="card p-5 card-hover group animate-slide-up" style="animation-delay:<?= $i * 50 ?>ms">
@@ -234,9 +238,10 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
     <?php endforeach; ?>
   </div>
 </section>
+<?php endif; ?>
 
 <!-- NOLEGGI -->
-<?php if ($rentals): ?>
+<?php if (featureEnabled('rentals') && $rentals): ?>
 <section class="container-wide py-16">
   <div class="flex items-end justify-between mb-8 flex-wrap gap-3">
     <div>
@@ -274,7 +279,7 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
 <?php endif; ?>
 
 <!-- ESCURSIONI -->
-<?php if ($experiences): ?>
+<?php if (featureEnabled('excursions') && $experiences): ?>
 <section class="container-wide py-16">
   <div class="flex items-end justify-between mb-8 flex-wrap gap-3">
     <div>
@@ -311,7 +316,7 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
 <?php endif; ?>
 
 <!-- TRANSFER -->
-<?php if ($transfers): ?>
+<?php if (featureEnabled('transfer') && $transfers): ?>
 <section class="container-wide py-16">
   <div class="flex items-end justify-between mb-8 flex-wrap gap-3">
     <div>

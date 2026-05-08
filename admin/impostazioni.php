@@ -15,6 +15,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $msg = 'Impostazioni salvate';
     }
+    if ($action === 'save_features') {
+        foreach (['rentals','excursions','transfer'] as $k) {
+            $v = isset($_POST['feature_' . $k]) ? '1' : '0';
+            q('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)', ['feature_' . $k, $v]);
+        }
+        $msg = 'Servizi sul sito aggiornati';
+    }
     if ($action === 'change_password') {
         $u = row('SELECT * FROM users WHERE id = ?', [$user['id']]);
         if (!password_verify($_POST['old'] ?? '', $u['password'])) { $msg = 'Password attuale errata'; }
@@ -95,6 +102,45 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       <label class="block"><span class="label">Password attuale</span><input type="password" class="input" name="old"></label>
       <label class="block"><span class="label">Nuova password</span><input type="password" class="input" name="next"></label>
       <button class="btn-secondary">Aggiorna password</button>
+    </form>
+
+    <form method="post" class="card p-4 sm:p-5 space-y-3 lg:col-span-2 border-2 border-brand-200 dark:border-brand-500/30 bg-brand-50/40 dark:bg-brand-500/5">
+      <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
+      <input type="hidden" name="action" value="save_features">
+      <div class="flex items-start gap-3">
+        <span class="h-9 w-9 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center shrink-0"><i data-lucide="layers" class="size-[18px]"></i></span>
+        <div>
+          <h3 class="font-display font-bold">Servizi attivi sul sito</h3>
+          <p class="text-xs text-ink-500 mt-0.5">Gli appartamenti sono sempre attivi. Attiva qui sotto le altre categorie quando inizi a offrirle: appariranno nel menù e nella homepage.</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <?php foreach ([
+          ['rentals',    'Noleggi',     'Auto, scooter, golf cart',                'key-round'],
+          ['excursions', 'Escursioni',  'Snorkeling, deserto, diving, cultura',    'compass'],
+          ['transfer',   'Transfer',    'Trasporti aeroporto ↔ alloggio',          'plane-takeoff'],
+        ] as $f):
+          $on = featureEnabled($f[0]);
+        ?>
+          <label class="relative flex items-start gap-3 p-3 rounded-xl border <?= $on ? 'border-brand-400 bg-white dark:bg-ink-900 shadow-sm' : 'border-ink-200 dark:border-ink-700/60 bg-white/60 dark:bg-ink-900/40' ?> cursor-pointer hover:border-brand-400 transition">
+            <input type="checkbox" name="feature_<?= $f[0] ?>" class="peer sr-only" <?= $on ? 'checked' : '' ?>>
+            <span class="h-9 w-9 rounded-lg flex items-center justify-center shrink-0 <?= $on ? 'bg-brand-100 text-brand-600' : 'bg-ink-100 dark:bg-ink-800 text-ink-400' ?>"><i data-lucide="<?= $f[3] ?>" class="size-[18px]"></i></span>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-sm flex items-center gap-2"><?= e($f[1]) ?>
+                <?php if ($on): ?><span class="badge-success text-[10px]">Attivo</span><?php else: ?><span class="badge-soft text-[10px]">Off</span><?php endif; ?>
+              </div>
+              <div class="text-[11px] text-ink-500 mt-0.5"><?= e($f[2]) ?></div>
+            </div>
+            <span class="relative inline-block h-5 w-9 rounded-full transition <?= $on ? 'bg-brand-500' : 'bg-ink-300 dark:bg-ink-700' ?> shrink-0">
+              <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition <?= $on ? 'left-[18px]' : 'left-0.5' ?>"></span>
+            </span>
+          </label>
+        <?php endforeach; ?>
+      </div>
+      <div class="flex items-center justify-between pt-2">
+        <span class="text-xs text-ink-500">L'admin per gestire i servizi resta sempre disponibile.</span>
+        <button class="btn-primary"><i data-lucide="save" class="size-[16px]"></i> Salva</button>
+      </div>
     </form>
 
     <div class="card p-4 sm:p-5">

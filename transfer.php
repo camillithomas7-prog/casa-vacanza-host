@@ -3,6 +3,8 @@ require_once __DIR__ . '/lib/db.php';
 require_once __DIR__ . '/lib/utils.php';
 require_once __DIR__ . '/lib/services.php';
 
+if (!featureEnabled('transfer')) { redirect('/' . (currentLang() !== 'it' ? '?lang=' . currentLang() : '')); }
+
 $transfers = rows("SELECT * FROM services WHERE type = 'transfer' AND active = 1 ORDER BY position ASC");
 $selectedSlug = $_GET['slug'] ?? ($transfers[0]['slug'] ?? '');
 $selected = null;

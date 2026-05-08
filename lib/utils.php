@@ -3,6 +3,20 @@ require_once __DIR__ . '/i18n.php';
 
 function e(?string $s): string { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
 
+/**
+ * Feature flag per le sezioni del sito gestite da Patrizia.
+ * - apartments: sempre ON (è il core business)
+ * - rentals / excursions / transfer: di default OFF (Patrizia li attiva
+ *   manualmente quando inizia a offrire quel servizio).
+ */
+function featureEnabled(string $key): bool {
+    if ($key === 'apartments') return true;
+    $defaults = ['rentals' => false, 'excursions' => false, 'transfer' => false];
+    $raw = setting('feature_' . $key);
+    if ($raw === null) return $defaults[$key] ?? false;
+    return $raw === '1';
+}
+
 function setting(string $key, ?string $default = null): ?string {
     static $cache = null;
     if ($cache === null) {
