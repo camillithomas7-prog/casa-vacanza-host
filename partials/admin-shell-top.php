@@ -104,10 +104,10 @@ $pageMeta = $titles[$path] ?? ['Admin', ''];
     </div>
   </header>
   <main class="p-4 sm:p-5 lg:p-8 animate-fade-in">
-  <?php $f = flash(); if ($f): ?>
-    <div class="mb-5 p-3.5 rounded-xl border flex items-center gap-2.5 animate-slide-down <?= $f['type'] === 'error' ? 'bg-red-50 border-red-200 text-red-700 dark:bg-red-500/10 dark:border-red-500/30 dark:text-red-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-300' ?>">
-      <i data-lucide="<?= $f['type'] === 'error' ? 'alert-circle' : 'check-circle-2' ?>" class="size-[18px]"></i>
-      <span class="text-sm font-medium"><?= e($f['msg']) ?></span>
+  <?php $_flash = flash(); if ($_flash): ?>
+    <div class="mb-5 p-3.5 rounded-xl border flex items-center gap-2.5 animate-slide-down <?= $_flash['type'] === 'error' ? 'bg-red-50 border-red-200 text-red-700 dark:bg-red-500/10 dark:border-red-500/30 dark:text-red-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-300' ?>">
+      <i data-lucide="<?= $_flash['type'] === 'error' ? 'alert-circle' : 'check-circle-2' ?>" class="size-[18px]"></i>
+      <span class="text-sm font-medium"><?= e($_flash['msg']) ?></span>
     </div>
   <?php endif; ?>
 <script>
