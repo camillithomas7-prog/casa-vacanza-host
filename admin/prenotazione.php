@@ -58,7 +58,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $payments = rows('SELECT * FROM payments WHERE booking_id = ? ORDER BY date DESC', [$b['id']]);
 $documents = rows('SELECT * FROM documents WHERE booking_id = ?', [$b['id']]);
 $templates = rows('SELECT * FROM message_templates WHERE active = 1 ORDER BY name ASC');
+$tplTranslations = templateTranslations();
 $due = (float)$b['total'] - (float)$b['paid'];
+
+// Auto-detect lingua dell'ospite dal country (best-effort)
+$countryLang = function (?string $country): string {
+    if (!$country) return 'it';
+    $c = mb_strtolower($country);
+    if (preg_match('/italia|italy|italian/u', $c)) return 'it';
+    if (preg_match('/germ|deutsch|austria|switzer|svizzera/u', $c)) return 'de';
+    if (preg_match('/russi|україн|ukrain|belarus/u', $c)) return 'ru';
+    if (preg_match('/españ|spain|spagna|méxic|mexic|argent|chile|colomb|peru/u', $c)) return 'es';
+    return 'en';
+};
+$guestLang = $countryLang($b['customer_country'] ?? '');
 
 $vars = [
   'nome' => $b['customer_name'], 'appartamento' => $b['apartment_name'],
@@ -201,12 +214,27 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <div class="flex justify-between py-1.5 text-sm"><span class="text-ink-500">Saldo</span><span class="<?= $due > 0 ? 'text-amber-600 font-semibold' : 'text-emerald-600' ?>"><?= fmtMoney(max(0, $due)) ?></span></div>
       </div>
 
-      <div class="card p-4 sm:p-5" x-data="messageSender(<?= e(json_encode($vars)) ?>, <?= e(json_encode($templates)) ?>)">
-        <h3 class="font-display font-bold mb-3">Messaggi rapidi</h3>
+      <div class="card p-4 sm:p-5" x-data="messageSender(<?= e(json_encode($vars)) ?>, <?= e(json_encode($templates)) ?>, <?= e(json_encode($tplTranslations)) ?>, '<?= e($guestLang) ?>')">
+        <div class="flex items-center justify-between mb-3 gap-2 flex-wrap">
+          <h3 class="font-display font-bold">Messaggi rapidi</h3>
+          <div class="flex items-center gap-1 text-xs">
+            <?php foreach (['it'=>'🇮🇹','en'=>'🇬🇧','ru'=>'🇷🇺','es'=>'🇪🇸','de'=>'🇩🇪'] as $code => $flag): ?>
+              <button type="button" @click="setLang('<?= $code ?>')"
+                :class="lang === '<?= $code ?>' ? 'bg-brand-500 text-white shadow-[0_2px_6px_-2px_rgba(255,106,10,.6)]' : 'bg-ink-100 dark:bg-ink-800 text-ink-600 dark:text-ink-300 hover:bg-ink-200 dark:hover:bg-ink-700'"
+                class="px-2 py-1 rounded-lg font-medium transition flex items-center gap-1 text-[11px]" title="<?= e(strtoupper($code)) ?>">
+                <span class="text-[14px]"><?= $flag ?></span> <?= strtoupper($code) ?>
+              </button>
+            <?php endforeach; ?>
+          </div>
+        </div>
         <select class="input mb-3" x-model="key" @change="render()">
           <?php foreach ($templates as $t): ?><option value="<?= e($t['template_key']) ?>"><?= e($t['name']) ?></option><?php endforeach; ?>
         </select>
         <textarea readonly class="input text-sm min-h-[160px] font-mono" x-text="body"></textarea>
+        <p class="text-xs text-ink-500 mt-2" x-show="!hasTranslation" x-cloak>
+          <i data-lucide="info" class="size-[12px] inline"></i>
+          Traduzione non disponibile per questo template — viene mostrato il testo italiano.
+        </p>
         <div class="grid grid-cols-2 gap-2 mt-3">
           <a :href="waLink" target="_blank" class="btn-primary text-sm justify-center"><i data-lucide="message-circle" class="size-[16px]"></i> WhatsApp</a>
           <a :href="mailLink" class="btn-secondary text-sm justify-center"><i data-lucide="mail" class="size-[16px]"></i> Email</a>
@@ -225,18 +253,36 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 <script>
-function messageSender(vars, templates) {
+function messageSender(vars, templates, translations, guestLang) {
   return {
     key: templates[0]?.template_key || '',
-    templates,
+    lang: guestLang || 'it',
+    templates, translations,
     body: '', subject: '', waLink: '#', mailLink: '#', copied: false,
+    hasTranslation: true,
     init() { this.render(); },
+    setLang(l) { this.lang = l; this.render(); },
     render() {
-      const tpl = this.templates.find(t => t.template_key === this.key);
-      if (!tpl) return;
       const sub = (s) => (s || '').replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k) => vars[k] ?? '');
-      this.body = sub(tpl.body);
-      this.subject = sub(tpl.subject);
+      const tplKey = this.key;
+      const trMap = this.translations[tplKey];
+      let subject = '', body = '';
+      this.hasTranslation = true;
+      if (trMap && trMap[this.lang]) {
+        subject = trMap[this.lang].subject;
+        body = trMap[this.lang].body;
+      } else if (trMap && trMap.it) {
+        subject = trMap.it.subject;
+        body = trMap.it.body;
+        this.hasTranslation = (this.lang === 'it');
+      } else {
+        // template custom non in dizionario: usa quello dal DB (italiano)
+        const tpl = this.templates.find(t => t.template_key === tplKey);
+        if (tpl) { subject = tpl.subject || ''; body = tpl.body || ''; }
+        this.hasTranslation = (this.lang === 'it');
+      }
+      this.body = sub(body);
+      this.subject = sub(subject);
       const phone = (vars.telefono || '').replace(/\D/g, '');
       this.waLink = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(this.body);
       this.mailLink = 'mailto:?subject=' + encodeURIComponent(this.subject) + '&body=' + encodeURIComponent(this.body);
