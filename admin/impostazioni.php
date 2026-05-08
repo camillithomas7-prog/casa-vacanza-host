@@ -122,17 +122,23 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         ] as $f):
           $on = featureEnabled($f[0]);
         ?>
-          <label class="relative flex items-start gap-3 p-3 rounded-xl border <?= $on ? 'border-brand-400 bg-white dark:bg-ink-900 shadow-sm' : 'border-ink-200 dark:border-ink-700/60 bg-white/60 dark:bg-ink-900/40' ?> cursor-pointer hover:border-brand-400 transition">
-            <input type="checkbox" name="feature_<?= $f[0] ?>" class="peer sr-only" <?= $on ? 'checked' : '' ?>>
-            <span class="h-9 w-9 rounded-lg flex items-center justify-center shrink-0 <?= $on ? 'bg-brand-100 text-brand-600' : 'bg-ink-100 dark:bg-ink-800 text-ink-400' ?>"><i data-lucide="<?= $f[3] ?>" class="size-[18px]"></i></span>
+          <label x-data="{ on: <?= $on ? 'true' : 'false' ?> }"
+                 :class="on ? 'border-brand-400 bg-white dark:bg-ink-900 shadow-sm' : 'border-ink-200 dark:border-ink-700/60 bg-white/60 dark:bg-ink-900/40'"
+                 class="relative flex items-start gap-3 p-3 rounded-xl border cursor-pointer hover:border-brand-400 transition">
+            <input type="checkbox" name="feature_<?= $f[0] ?>" class="sr-only" x-model="on">
+            <span :class="on ? 'bg-brand-100 text-brand-600' : 'bg-ink-100 dark:bg-ink-800 text-ink-400'"
+                  class="h-9 w-9 rounded-lg flex items-center justify-center shrink-0 transition"><i data-lucide="<?= $f[3] ?>" class="size-[18px]"></i></span>
             <div class="flex-1 min-w-0">
               <div class="font-medium text-sm flex items-center gap-2"><?= e($f[1]) ?>
-                <?php if ($on): ?><span class="badge-success text-[10px]">Attivo</span><?php else: ?><span class="badge-soft text-[10px]">Off</span><?php endif; ?>
+                <span x-show="on" class="badge-success text-[10px]">Attivo</span>
+                <span x-show="!on" class="badge-soft text-[10px]">Off</span>
               </div>
               <div class="text-[11px] text-ink-500 mt-0.5"><?= e($f[2]) ?></div>
             </div>
-            <span class="relative inline-block h-5 w-9 rounded-full transition <?= $on ? 'bg-brand-500' : 'bg-ink-300 dark:bg-ink-700' ?> shrink-0">
-              <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition <?= $on ? 'left-[18px]' : 'left-0.5' ?>"></span>
+            <span :class="on ? 'bg-brand-500' : 'bg-ink-300 dark:bg-ink-700'"
+                  class="relative inline-block h-5 w-9 rounded-full transition shrink-0">
+              <span :class="on ? 'left-[18px]' : 'left-0.5'"
+                    class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all"></span>
             </span>
           </label>
         <?php endforeach; ?>
