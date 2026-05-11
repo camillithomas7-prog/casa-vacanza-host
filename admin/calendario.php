@@ -75,16 +75,16 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   </div>
 
   <!-- ========== VISTA GLOBALE: tutti gli appartamenti × giorni ========== -->
-  <div class="card p-3 sm:p-5">
-    <div class="flex items-center justify-between gap-3 mb-3 flex-wrap">
-      <div>
-        <h2 class="font-display font-bold text-lg sm:text-xl">Disponibilità — tutti gli appartamenti</h2>
-        <p class="text-xs text-ink-500 mt-0.5">Vista d'insieme del mese · clicca una cella per aprire la prenotazione</p>
+  <div class="card p-3 sm:p-5" x-data="{ range: window.innerWidth < 640 ? 14 : 0 }">
+    <div class="flex items-start sm:items-center justify-between gap-2 mb-3 flex-wrap">
+      <div class="min-w-0">
+        <h2 class="font-display font-bold text-base sm:text-xl leading-tight">Disponibilità · tutti gli appartamenti</h2>
+        <p class="text-[11px] sm:text-xs text-ink-500 mt-0.5 hidden sm:block">Clicca una cella per aprire la prenotazione</p>
       </div>
-      <div class="flex items-center gap-2">
-        <a href="?apt=<?= e($aptId) ?>&m=<?= $prev_m ?>" class="btn-ghost"><i data-lucide="chevron-left" class="size-[18px]"></i></a>
-        <div class="font-display text-base sm:text-lg font-bold tabular-nums"><?= $months_it[$cm-1] ?> <?= $cy ?></div>
-        <a href="?apt=<?= e($aptId) ?>&m=<?= $next_m ?>" class="btn-ghost"><i data-lucide="chevron-right" class="size-[18px]"></i></a>
+      <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+        <a href="?apt=<?= e($aptId) ?>&m=<?= $prev_m ?>" class="h-9 w-9 rounded-xl border border-ink-200 dark:border-ink-700/80 flex items-center justify-center hover:bg-ink-50 dark:hover:bg-ink-800 transition" aria-label="mese precedente"><i data-lucide="chevron-left" class="size-[16px]"></i></a>
+        <div class="font-display text-sm sm:text-lg font-bold tabular-nums px-2 whitespace-nowrap"><?= $months_it[$cm-1] ?> <?= $cy ?></div>
+        <a href="?apt=<?= e($aptId) ?>&m=<?= $next_m ?>" class="h-9 w-9 rounded-xl border border-ink-200 dark:border-ink-700/80 flex items-center justify-center hover:bg-ink-50 dark:hover:bg-ink-800 transition" aria-label="mese successivo"><i data-lucide="chevron-right" class="size-[16px]"></i></a>
       </div>
     </div>
 
@@ -94,70 +94,101 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       $today = date('Y-m-d');
       $monthDays = [];
       for ($i = 1; $i <= $daysInMonth; $i++) $monthDays[] = mktime(0,0,0,$cm,$i,$cy);
+      // Su mobile mostro inizialmente i prossimi 14 giorni (a partire da oggi se nel mese corrente, altrimenti da inizio mese)
+      $todayDay = ($cy == (int)date('Y') && $cm == (int)date('n')) ? (int)date('j') : 1;
+      $mobileStart = max(0, $todayDay - 1);
     ?>
-    <div class="overflow-x-auto -mx-3 sm:-mx-5">
-      <table class="min-w-full border-separate" style="border-spacing:0;">
-        <thead>
-          <tr>
-            <th class="sticky left-0 z-10 bg-white dark:bg-ink-900 text-left px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-ink-500 border-b border-ink-100 dark:border-ink-800 min-w-[140px]">Appartamento</th>
-            <?php foreach ($monthDays as $ts):
-              $d = date('Y-m-d', $ts);
-              $dow = (int)date('N', $ts);
-              $isWeekend = $dow >= 6;
-              $isToday = $d === $today;
-            ?>
-              <th class="px-0 py-2 text-center text-[10px] font-semibold border-b border-ink-100 dark:border-ink-800 <?= $isToday ? 'bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-200' : ($isWeekend ? 'text-ink-400' : 'text-ink-500') ?> min-w-[26px]">
-                <div class="tabular-nums leading-none"><?= (int)date('j', $ts) ?></div>
-                <div class="text-[9px] uppercase opacity-60 mt-0.5"><?= ['','L','M','M','G','V','S','D'][$dow] ?></div>
-              </th>
-            <?php endforeach; ?>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($apartments as $apt):
-            $b_apt = $bookingsByApt[$apt['id']] ?? [];
-            $bl_apt = $blocksByApt[$apt['id']] ?? [];
-          ?>
-            <tr class="group">
-              <td class="sticky left-0 z-10 bg-white dark:bg-ink-900 px-3 py-1 border-b border-ink-100 dark:border-ink-800 text-sm font-medium truncate group-hover:bg-ink-50 dark:group-hover:bg-ink-800/50">
-                <a href="?apt=<?= e($apt['id']) ?>&m=<?= date('Y-m', $first) ?>" class="hover:text-brand-600 transition truncate block max-w-[200px]"><?= e($apt['name']) ?></a>
-              </td>
-              <?php foreach ($monthDays as $ts):
-                $info = dayInfo($ts, $b_apt, $bl_apt);
-                $st = $info['s'];
-                $cellCls = $st === 'booked'    ? 'bg-red-400 dark:bg-red-500/80 hover:bg-red-500' :
-                          ($st === 'check_in'  ? 'bg-gradient-to-r from-emerald-300 to-amber-300 dark:from-emerald-500/50 dark:to-amber-500/50' :
-                          ($st === 'check_out' ? 'bg-gradient-to-r from-amber-300 to-emerald-300 dark:from-amber-500/50 dark:to-emerald-500/50' :
-                          ($st === 'blocked'   ? 'bg-ink-300 dark:bg-ink-700 hover:bg-ink-400' :
-                                                 'bg-emerald-100 dark:bg-emerald-500/20 hover:bg-emerald-200')));
-                $title = '';
-                if ($info['b']) $title = $info['b']['customer_name'] . ' · ' . fmtDateShort($info['b']['check_in']) . ' → ' . fmtDateShort($info['b']['check_out']);
-                elseif ($st === 'blocked') $title = 'Bloccato';
-                else $title = 'Disponibile';
-                $clickHref = $info['b'] ? '/admin/prenotazione.php?id=' . $info['b']['id'] : null;
-              ?>
-                <td class="p-0 border-b border-ink-100 dark:border-ink-800">
-                  <?php if ($clickHref): ?>
-                    <a href="<?= e($clickHref) ?>" title="<?= e($title) ?>" class="block h-7 sm:h-8 <?= $cellCls ?> transition"></a>
-                  <?php else: ?>
-                    <div title="<?= e($title) ?>" class="h-7 sm:h-8 <?= $cellCls ?>"></div>
-                  <?php endif; ?>
-                </td>
-              <?php endforeach; ?>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
+    <!-- hint scroll -->
+    <div class="sm:hidden flex items-center justify-end gap-1 text-[10px] text-ink-400 mb-1.5">
+      <i data-lucide="move-horizontal" class="size-[12px]"></i> <span>scorri orizzontalmente</span>
     </div>
 
-    <div class="flex flex-wrap gap-3 text-xs mt-4 text-ink-500">
+    <div class="relative -mx-3 sm:-mx-5">
+      <!-- gradient fade ai bordi su mobile -->
+      <div class="sm:hidden pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-white dark:from-ink-900 to-transparent z-20"></div>
+      <div class="overflow-x-auto" data-cal-scroll>
+        <table class="min-w-full border-separate" style="border-spacing:0;">
+          <thead class="sticky top-0 z-10">
+            <tr>
+              <th class="sticky left-0 z-20 bg-white dark:bg-ink-900 text-left px-2 sm:px-3 py-2 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-ink-500 border-b border-r border-ink-100 dark:border-ink-800 min-w-[100px] sm:min-w-[160px]">Appartamento</th>
+              <?php foreach ($monthDays as $ts):
+                $d = date('Y-m-d', $ts);
+                $dow = (int)date('N', $ts);
+                $isWeekend = $dow >= 6;
+                $isToday = $d === $today;
+                $colBg = $isToday ? 'bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-200 font-bold' : ($isWeekend ? 'bg-ink-50 dark:bg-ink-900/60 text-ink-500' : 'bg-white dark:bg-ink-900 text-ink-500');
+              ?>
+                <th class="px-0 py-1.5 text-center text-[10px] sm:text-[11px] font-semibold border-b border-ink-100 dark:border-ink-800 <?= $colBg ?> min-w-[28px] sm:min-w-[30px]">
+                  <div class="tabular-nums leading-none text-[12px] sm:text-[13px]"><?= (int)date('j', $ts) ?></div>
+                  <div class="text-[9px] uppercase opacity-60 mt-0.5"><?= ['','L','M','M','G','V','S','D'][$dow] ?></div>
+                </th>
+              <?php endforeach; ?>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($apartments as $apt):
+              $b_apt = $bookingsByApt[$apt['id']] ?? [];
+              $bl_apt = $blocksByApt[$apt['id']] ?? [];
+            ?>
+              <tr class="group">
+                <td class="sticky left-0 z-10 bg-white dark:bg-ink-900 px-2 sm:px-3 py-1 border-b border-r border-ink-100 dark:border-ink-800 text-[13px] sm:text-sm font-medium group-hover:bg-ink-50 dark:group-hover:bg-ink-800/50 min-w-[100px] sm:min-w-[160px] max-w-[140px] sm:max-w-[200px]">
+                  <a href="?apt=<?= e($apt['id']) ?>&m=<?= date('Y-m', $first) ?>" class="hover:text-brand-600 transition truncate block leading-tight"><?= e($apt['name']) ?></a>
+                </td>
+                <?php foreach ($monthDays as $ts):
+                  $d = date('Y-m-d', $ts);
+                  $dow = (int)date('N', $ts);
+                  $isWeekend = $dow >= 6;
+                  $isToday = $d === $today;
+                  $info = dayInfo($ts, $b_apt, $bl_apt);
+                  $st = $info['s'];
+                  $cellCls = $st === 'booked'    ? 'bg-red-400 dark:bg-red-500/80 hover:bg-red-500' :
+                            ($st === 'check_in'  ? 'bg-gradient-to-r from-emerald-300 to-amber-300 dark:from-emerald-500/50 dark:to-amber-500/50' :
+                            ($st === 'check_out' ? 'bg-gradient-to-r from-amber-300 to-emerald-300 dark:from-amber-500/50 dark:to-emerald-500/50' :
+                            ($st === 'blocked'   ? 'bg-ink-300 dark:bg-ink-700 hover:bg-ink-400' :
+                                                   'bg-emerald-100 dark:bg-emerald-500/20 hover:bg-emerald-200')));
+                  $colBg = $isWeekend ? 'bg-ink-50 dark:bg-ink-900/40' : '';
+                  $title = '';
+                  if ($info['b']) $title = $info['b']['customer_name'] . ' · ' . fmtDateShort($info['b']['check_in']) . ' → ' . fmtDateShort($info['b']['check_out']);
+                  elseif ($st === 'blocked') $title = 'Bloccato';
+                  else $title = 'Disponibile';
+                  $clickHref = $info['b'] ? '/admin/prenotazione.php?id=' . $info['b']['id'] : null;
+                ?>
+                  <td class="p-0 border-b border-ink-100 dark:border-ink-800 <?= $colBg ?> <?= $isToday ? 'relative' : '' ?>">
+                    <?php if ($clickHref): ?>
+                      <a href="<?= e($clickHref) ?>" title="<?= e($title) ?>" class="block h-9 sm:h-9 mx-0.5 my-0.5 rounded <?= $cellCls ?> transition active:scale-95"></a>
+                    <?php else: ?>
+                      <div title="<?= e($title) ?>" class="h-9 sm:h-9 mx-0.5 my-0.5 rounded <?= $cellCls ?>"></div>
+                    <?php endif; ?>
+                    <?php if ($isToday): ?><div class="absolute inset-x-0 top-0 bottom-0 pointer-events-none border-l-2 border-r-2 border-brand-500/60"></div><?php endif; ?>
+                  </td>
+                <?php endforeach; ?>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-3 gap-y-2 text-[11px] sm:text-xs mt-4 text-ink-500">
       <span class="flex items-center gap-1.5"><span class="h-3 w-4 rounded bg-emerald-200 dark:bg-emerald-500/30"></span> Disponibile</span>
       <span class="flex items-center gap-1.5"><span class="h-3 w-4 rounded bg-red-400"></span> Occupato</span>
       <span class="flex items-center gap-1.5"><span class="h-3 w-4 rounded bg-gradient-to-r from-emerald-300 to-amber-300"></span> Check-in</span>
       <span class="flex items-center gap-1.5"><span class="h-3 w-4 rounded bg-gradient-to-r from-amber-300 to-emerald-300"></span> Check-out</span>
-      <span class="flex items-center gap-1.5"><span class="h-3 w-4 rounded bg-ink-400"></span> Bloccato</span>
+      <span class="flex items-center gap-1.5 col-span-2"><span class="h-3 w-4 rounded bg-ink-400"></span> Bloccato</span>
     </div>
   </div>
+  <script>
+  // Su mobile, fa scroll automatico fino al giorno di oggi se nel mese corrente
+  (function(){
+    if (window.innerWidth >= 640) return;
+    var box = document.querySelector('[data-cal-scroll]');
+    if (!box) return;
+    var today = box.querySelector('th[class*="bg-brand-50"]');
+    if (!today) return;
+    var stickyLeftWidth = 100; // larghezza minima colonna sticky su mobile
+    box.scrollLeft = Math.max(0, today.offsetLeft - stickyLeftWidth - 8);
+  })();
+  </script>
 
   <!-- ========== DETTAGLIO APPARTAMENTO SINGOLO ========== -->
   <div class="card p-3 sm:p-5">
