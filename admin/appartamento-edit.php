@@ -297,8 +297,8 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         </div>
       </div>
 
-      <div class="relative rounded-2xl overflow-hidden border-2 border-sky-200 dark:border-sky-500/30 bg-amber-50 dark:bg-ink-900 select-none" style="aspect-ratio: 2 / 1;">
-        <img src="/assets/resort-map.svg?v=3" alt="Mappa resort" id="resort_map_img" class="absolute inset-0 w-full h-full object-contain" draggable="false">
+      <div class="relative rounded-2xl overflow-hidden border-2 border-sky-200 dark:border-sky-500/30 bg-amber-50 dark:bg-ink-900 select-none" style="aspect-ratio: 2.05 / 1;">
+        <img src="/assets/resort-map.jpg?v=4" alt="Mappa resort Domina Coral Bay" id="resort_map_img" class="absolute inset-0 w-full h-full object-contain" draggable="false">
         <div id="resort_marker" class="absolute z-10 -translate-x-1/2 -translate-y-full cursor-grab active:cursor-grabbing transition-opacity duration-200" style="left: <?= $f['map_x'] !== null ? round((float)$f['map_x']*100,2) : 50 ?>%; top: <?= $f['map_y'] !== null ? round((float)$f['map_y']*100,2) : 50 ?>%; <?= $f['map_x'] === null ? 'opacity:0;pointer-events:none;' : '' ?>">
           <div class="relative">
             <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-2 bg-black/30 rounded-full blur-sm"></div>
