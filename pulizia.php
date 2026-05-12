@@ -102,7 +102,7 @@ require __DIR__ . '/partials/head.php';
           </div>
         </div>
         <div class="relative bg-amber-50 dark:bg-ink-900" style="aspect-ratio: 2.05 / 1;">
-          <img src="/assets/resort-map.jpg?v=4" alt="Mappa resort Domina Coral Bay" class="absolute inset-0 w-full h-full object-contain" draggable="false">
+          <img src="/assets/resort-map.jpg?v=5" alt="Mappa resort Domina Coral Bay" class="absolute inset-0 w-full h-full object-contain" draggable="false">
           <!-- Pulse ring -->
           <div class="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none" style="left: <?= round((float)$s['map_x']*100,2) ?>%; top: <?= round((float)$s['map_y']*100,2) ?>%;">
             <span class="block h-16 w-16 rounded-full bg-red-500/30 animate-ping"></span>
