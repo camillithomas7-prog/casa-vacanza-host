@@ -396,6 +396,10 @@ $migrations = [
     ['apartments', 'owner_name', "VARCHAR(190) DEFAULT ''"],
     ['push_subscriptions', 'role', "VARCHAR(20) NOT NULL DEFAULT 'admin'"],
     ['cleaning_sessions', 'reminder_sent_at', "DATETIME NULL DEFAULT NULL"],
+    ['apartments', 'block_number', "VARCHAR(20) DEFAULT ''"],
+    ['apartments', 'map_x', "DECIMAL(6,3) NULL DEFAULT NULL"],
+    ['apartments', 'map_y', "DECIMAL(6,3) NULL DEFAULT NULL"],
+    ['apartments', 'cleaner_directions', "TEXT"],
 ];
 foreach ($migrations as [$tbl, $col, $def]) {
     if (ensureColumn($pdo, $tbl, $col, $def)) echo "✓ Aggiunta colonna $tbl.$col\n";

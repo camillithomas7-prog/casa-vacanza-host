@@ -9,6 +9,7 @@ if (!$valid) { http_response_code(401); echo 'Link non valido'; exit; }
 
 $sid = $_GET['id'] ?? '';
 $s = row("SELECT s.*, a.name AS apartment_name, a.address AS apartment_address, a.check_out_time, a.rules,
+          a.block_number, a.map_x, a.map_y, a.cleaner_directions,
           b.code AS booking_code, b.check_in, b.check_out, b.guests, c.name AS customer_name
           FROM cleaning_sessions s
           JOIN apartments a ON a.id = s.apartment_id
@@ -87,6 +88,72 @@ require __DIR__ . '/partials/head.php';
         <?php if ($s['customer_name']): ?>
           <div class="flex items-center gap-2 text-ink-700 dark:text-ink-200"><i data-lucide="user" class="size-[16px] text-brand-600 shrink-0"></i> Ospite uscente: <?= e($s['customer_name']) ?></div>
         <?php endif; ?>
+      </div>
+    <?php endif; ?>
+
+    <?php if ($s['map_x'] !== null && $s['map_y'] !== null): ?>
+      <!-- POSIZIONE NEL RESORT -->
+      <div class="card overflow-hidden">
+        <div class="p-4 sm:p-5 border-b border-ink-100 dark:border-ink-800 bg-sky-50/50 dark:bg-sky-500/5 flex items-center gap-3">
+          <span class="h-10 w-10 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 text-white flex items-center justify-center shrink-0 shadow-md"><i data-lucide="map-pinned" class="size-[20px]"></i></span>
+          <div class="min-w-0 flex-1">
+            <div class="font-display font-bold">Posizione nel resort</div>
+            <div class="text-xs text-ink-500 mt-0.5">Domina Coral Bay <?= $s['block_number'] ? '· Blocco <strong class="text-sky-700">' . e($s['block_number']) . '</strong>' : '' ?></div>
+          </div>
+        </div>
+        <div class="relative bg-ink-100 dark:bg-ink-900" style="aspect-ratio: 4 / 3;">
+          <img src="/assets/resort-map.jpg" alt="Mappa resort Domina Coral Bay" class="absolute inset-0 w-full h-full object-cover" draggable="false">
+          <!-- Pulse ring -->
+          <div class="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none" style="left: <?= round((float)$s['map_x']*100,2) ?>%; top: <?= round((float)$s['map_y']*100,2) ?>%;">
+            <span class="block h-16 w-16 rounded-full bg-red-500/30 animate-ping"></span>
+            <span class="block absolute inset-0 m-auto h-6 w-6 rounded-full bg-red-500/60"></span>
+          </div>
+          <!-- Marker pin -->
+          <div class="absolute -translate-x-1/2 -translate-y-full pointer-events-none" style="left: <?= round((float)$s['map_x']*100,2) ?>%; top: <?= round((float)$s['map_y']*100,2) ?>%;">
+            <div class="relative" style="filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));">
+              <svg width="52" height="66" viewBox="0 0 44 56">
+                <defs>
+                  <linearGradient id="pinGradView" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0" stop-color="#f43f5e"/>
+                    <stop offset="1" stop-color="#9f1239"/>
+                  </linearGradient>
+                </defs>
+                <path d="M22 0 C 9 0, 0 10, 0 22 C 0 36, 22 56, 22 56 C 22 56, 44 36, 44 22 C 44 10, 35 0, 22 0 Z" fill="url(#pinGradView)" stroke="#fff" stroke-width="2.5"/>
+                <circle cx="22" cy="20" r="8" fill="#fff"/>
+                <text x="22" y="24" text-anchor="middle" font-family="Inter,system-ui" font-size="11" font-weight="800" fill="#9f1239"><?= e((string)$s['block_number']) ?: '!' ?></text>
+              </svg>
+            </div>
+          </div>
+          <!-- Banner blocco -->
+          <?php if ($s['block_number']): ?>
+            <div class="absolute top-3 left-3 bg-white/95 dark:bg-ink-900/95 backdrop-blur px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+              <span class="text-xs font-display font-bold text-ink-800 dark:text-ink-100">Blocco <?= e($s['block_number']) ?></span>
+            </div>
+          <?php endif; ?>
+        </div>
+        <?php if (trim($s['cleaner_directions'] ?? '')): ?>
+          <div class="p-4 sm:p-5 bg-amber-50/60 dark:bg-amber-500/5 border-t border-amber-100 dark:border-amber-500/20">
+            <div class="flex items-start gap-3">
+              <span class="h-8 w-8 rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300 flex items-center justify-center shrink-0"><i data-lucide="navigation" class="size-[16px]"></i></span>
+              <div class="min-w-0 flex-1">
+                <div class="font-display font-bold text-sm text-amber-900 dark:text-amber-200">Come arrivarci</div>
+                <p class="text-sm text-amber-950/90 dark:text-amber-100/90 mt-1 whitespace-pre-line leading-relaxed"><?= e($s['cleaner_directions']) ?></p>
+              </div>
+            </div>
+          </div>
+        <?php endif; ?>
+      </div>
+    <?php elseif (trim($s['cleaner_directions'] ?? '')): ?>
+      <!-- Solo indicazioni testuali, senza mappa -->
+      <div class="card p-4 sm:p-5 bg-amber-50/60 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/30">
+        <div class="flex items-start gap-3">
+          <span class="h-9 w-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0"><i data-lucide="navigation" class="size-[18px]"></i></span>
+          <div class="min-w-0 flex-1">
+            <div class="font-display font-bold text-amber-900 dark:text-amber-200">Come arrivarci <?= $s['block_number'] ? '· Blocco ' . e($s['block_number']) : '' ?></div>
+            <p class="text-sm text-amber-950/90 dark:text-amber-100/90 mt-1 whitespace-pre-line leading-relaxed"><?= e($s['cleaner_directions']) ?></p>
+          </div>
+        </div>
       </div>
     <?php endif; ?>
 

@@ -96,6 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'long_stay_discount_30' => (float)$_POST['long_stay_discount_30'],
         'manager_commission_pct' => (float)($_POST['manager_commission_pct'] ?? 20),
         'owner_name' => trim($_POST['owner_name'] ?? ''),
+        'block_number' => trim($_POST['block_number'] ?? ''),
+        'cleaner_directions' => $_POST['cleaner_directions'] ?? '',
+        'map_x' => isset($_POST['map_x']) && $_POST['map_x'] !== '' ? (float)$_POST['map_x'] : null,
+        'map_y' => isset($_POST['map_y']) && $_POST['map_y'] !== '' ? (float)$_POST['map_y'] : null,
         'active' => isset($_POST['active']) ? 1 : 0,
         'under_maintenance' => isset($_POST['under_maintenance']) ? 1 : 0,
         'cover_image' => $coverPath,
@@ -125,7 +129,7 @@ $zonesList = [];
 try {
     $zonesList = rows('SELECT name, kind FROM zones WHERE active = 1 ORDER BY kind ASC, position ASC, name ASC');
 } catch (Throwable $e) {}
-$defaults = ['name'=>'','slug'=>'','description'=>'','address'=>'','city'=>'','country'=>'Egitto','guests'=>2,'bedrooms'=>1,'bathrooms'=>1,'beds'=>1,'size_sqm'=>'','rules'=>'','check_in_time'=>'15:00','check_out_time'=>'11:00','base_price'=>80,'weekly_price'=>'','biweekly_price'=>'','triweekly_price'=>'','monthly_price'=>'','weekend_price'=>'','cleaning_fee'=>35,'security_deposit'=>0,'city_tax'=>2,'city_tax_max_nights'=>5,'long_stay_discount_7'=>5,'long_stay_discount_14'=>10,'long_stay_discount_30'=>20,'manager_commission_pct'=>20,'owner_name'=>'','active'=>1,'under_maintenance'=>0,'cover_image'=>''];
+$defaults = ['name'=>'','slug'=>'','description'=>'','address'=>'','city'=>'','country'=>'Egitto','guests'=>2,'bedrooms'=>1,'bathrooms'=>1,'beds'=>1,'size_sqm'=>'','rules'=>'','check_in_time'=>'15:00','check_out_time'=>'11:00','base_price'=>80,'weekly_price'=>'','biweekly_price'=>'','triweekly_price'=>'','monthly_price'=>'','weekend_price'=>'','cleaning_fee'=>35,'security_deposit'=>0,'city_tax'=>2,'city_tax_max_nights'=>5,'long_stay_discount_7'=>5,'long_stay_discount_14'=>10,'long_stay_discount_30'=>20,'manager_commission_pct'=>20,'owner_name'=>'','active'=>1,'under_maintenance'=>0,'cover_image'=>'','block_number'=>'','cleaner_directions'=>'','map_x'=>null,'map_y'=>null];
 // Merge: i valori salvati sovrascrivono i default
 $f = $apt ? array_merge($defaults, $apt) : $defaults;
 
@@ -266,6 +270,129 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <label class="flex items-center gap-2"><input type="checkbox" name="under_maintenance" <?= $f['under_maintenance'] ? 'checked' : '' ?>> In manutenzione</label>
       </div>
     </div>
+
+    <div class="card p-4 sm:p-5 space-y-3 border-2 border-sky-200 dark:border-sky-500/30 bg-sky-50/40 dark:bg-sky-500/5 lg:col-span-2">
+      <div class="flex items-start gap-3">
+        <span class="h-9 w-9 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0"><i data-lucide="map-pinned" class="size-[18px]"></i></span>
+        <div>
+          <h3 class="font-display font-bold">Posizione nel resort (Domina Coral Bay)</h3>
+          <p class="text-xs text-ink-500 mt-0.5">Imposta il blocco e indica sulla mappa dove si trova l'appartamento. La signora delle pulizie vedrà queste informazioni con un puntatore animato.</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label class="block">
+          <span class="label">Numero blocco</span>
+          <input class="input" type="text" name="block_number" id="block_number_input" value="<?= e((string)$f['block_number']) ?>" placeholder="es. 19, 47, K3">
+          <span class="text-[11px] text-ink-500 mt-1 block">Verrà mostrato nella lista pulizie e accanto al puntatore sulla mappa.</span>
+        </label>
+        <div class="block">
+          <span class="label">Coordinate marker</span>
+          <div class="flex items-center gap-2">
+            <input class="input flex-1 tabular-nums text-xs" type="text" id="map_xy_display" value="<?= $f['map_x'] !== null && $f['map_y'] !== null ? round((float)$f['map_x']*100,1) . '% , ' . round((float)$f['map_y']*100,1) . '%' : 'Non posizionato' ?>" readonly>
+            <button type="button" id="map_clear_btn" class="btn-outline text-xs">Reset</button>
+          </div>
+          <input type="hidden" name="map_x" id="map_x_input" value="<?= $f['map_x'] !== null ? e((string)$f['map_x']) : '' ?>">
+          <input type="hidden" name="map_y" id="map_y_input" value="<?= $f['map_y'] !== null ? e((string)$f['map_y']) : '' ?>">
+          <span class="text-[11px] text-ink-500 mt-1 block">Tocca/clicca sulla mappa o trascina il puntatore per posizionarlo.</span>
+        </div>
+      </div>
+
+      <div class="relative rounded-2xl overflow-hidden border-2 border-sky-200 dark:border-sky-500/30 bg-ink-100 dark:bg-ink-900 select-none" style="aspect-ratio: 4 / 3;">
+        <img src="/assets/resort-map.jpg?v=1" alt="Mappa resort" id="resort_map_img" class="absolute inset-0 w-full h-full object-cover" draggable="false">
+        <div id="resort_marker" class="absolute z-10 -translate-x-1/2 -translate-y-full cursor-grab active:cursor-grabbing transition-opacity duration-200" style="left: <?= $f['map_x'] !== null ? round((float)$f['map_x']*100,2) : 50 ?>%; top: <?= $f['map_y'] !== null ? round((float)$f['map_y']*100,2) : 50 ?>%; <?= $f['map_x'] === null ? 'opacity:0;pointer-events:none;' : '' ?>">
+          <div class="relative">
+            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-2 bg-black/30 rounded-full blur-sm"></div>
+            <svg width="44" height="56" viewBox="0 0 44 56" class="drop-shadow-xl">
+              <defs>
+                <linearGradient id="pinGrad" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stop-color="#f43f5e"/>
+                  <stop offset="1" stop-color="#be123c"/>
+                </linearGradient>
+              </defs>
+              <path d="M22 0 C 9 0, 0 10, 0 22 C 0 36, 22 56, 22 56 C 22 56, 44 36, 44 22 C 44 10, 35 0, 22 0 Z" fill="url(#pinGrad)" stroke="#fff" stroke-width="2"/>
+              <circle cx="22" cy="20" r="7" fill="#fff"/>
+              <text x="22" y="24" text-anchor="middle" font-family="Inter,system-ui" font-size="11" font-weight="800" fill="#be123c" id="resort_marker_text"><?= e((string)$f['block_number']) ?: '?' ?></text>
+            </svg>
+          </div>
+        </div>
+        <div id="map_hint" class="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur text-white text-xs font-medium <?= $f['map_x'] !== null ? 'hidden' : '' ?>">
+          Tocca sulla mappa per posizionare
+        </div>
+      </div>
+
+      <label class="block">
+        <span class="label">Indicazioni per la signora delle pulizie</span>
+        <textarea class="input min-h-[100px]" name="cleaner_directions" placeholder="Es: Entrata principale, gira a destra dopo la reception, oltre la piscina principale. L'appartamento è al primo piano. Le chiavi sono dal portiere del blocco."><?= e((string)$f['cleaner_directions']) ?></textarea>
+        <span class="text-[11px] text-ink-500 mt-1 block">Testo libero. Comparirà nella pagina di dettaglio della pulizia.</span>
+      </label>
+    </div>
+
+    <script>
+    (function(){
+      const img = document.getElementById('resort_map_img');
+      const marker = document.getElementById('resort_marker');
+      const xInput = document.getElementById('map_x_input');
+      const yInput = document.getElementById('map_y_input');
+      const display = document.getElementById('map_xy_display');
+      const clearBtn = document.getElementById('map_clear_btn');
+      const hint = document.getElementById('map_hint');
+      const blockInput = document.getElementById('block_number_input');
+      const markerText = document.getElementById('resort_marker_text');
+      let dragging = false;
+
+      function setPos(x, y) {
+        x = Math.max(0, Math.min(1, x));
+        y = Math.max(0, Math.min(1, y));
+        marker.style.left = (x * 100).toFixed(2) + '%';
+        marker.style.top = (y * 100).toFixed(2) + '%';
+        marker.style.opacity = '1';
+        marker.style.pointerEvents = '';
+        xInput.value = x.toFixed(3);
+        yInput.value = y.toFixed(3);
+        display.value = (x * 100).toFixed(1) + '% , ' + (y * 100).toFixed(1) + '%';
+        if (hint) hint.classList.add('hidden');
+      }
+
+      function eventToFrac(e) {
+        const r = img.getBoundingClientRect();
+        const pt = e.touches ? e.touches[0] : e;
+        return { x: (pt.clientX - r.left) / r.width, y: (pt.clientY - r.top) / r.height };
+      }
+
+      img.addEventListener('click', (e) => {
+        if (dragging) return;
+        const p = eventToFrac(e);
+        setPos(p.x, p.y);
+      });
+
+      function startDrag(e) {
+        dragging = true;
+        e.preventDefault();
+      }
+      marker.addEventListener('mousedown', startDrag);
+      marker.addEventListener('touchstart', startDrag, {passive:false});
+
+      document.addEventListener('mousemove', (e) => { if (!dragging) return; const p = eventToFrac(e); setPos(p.x, p.y); });
+      document.addEventListener('touchmove', (e) => { if (!dragging) return; e.preventDefault(); const p = eventToFrac(e); setPos(p.x, p.y); }, {passive:false});
+      document.addEventListener('mouseup', () => { setTimeout(() => dragging = false, 50); });
+      document.addEventListener('touchend', () => { setTimeout(() => dragging = false, 50); });
+
+      clearBtn.addEventListener('click', () => {
+        xInput.value = '';
+        yInput.value = '';
+        display.value = 'Non posizionato';
+        marker.style.opacity = '0';
+        marker.style.pointerEvents = 'none';
+        if (hint) hint.classList.remove('hidden');
+      });
+
+      if (blockInput && markerText) {
+        blockInput.addEventListener('input', () => {
+          markerText.textContent = blockInput.value.trim().substring(0, 3) || '?';
+        });
+      }
+    })();
+    </script>
 
     <div class="card p-4 sm:p-5 space-y-3 border-2 border-brand-200 dark:border-brand-500/30 bg-brand-50/40 dark:bg-brand-500/5">
       <div class="flex items-start gap-3">
