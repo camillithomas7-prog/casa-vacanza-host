@@ -48,7 +48,6 @@ $doneRecent = rows("SELECT s.*, a.name AS apartment_name
                     ORDER BY s.completed_at DESC LIMIT 5", [date('Y-m-d', strtotime('-7 days'))]);
 
 $vapidPub = setting('vapid_public') ?: '';
-$pushDevices = (int)val("SELECT COUNT(*) FROM push_subscriptions WHERE role = 'cleaner'");
 
 $title = 'Pulizie';
 $metaDesc = 'Lista pulizie del giorno';
