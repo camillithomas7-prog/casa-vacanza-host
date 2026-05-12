@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../lib/auth.php';
 require_once __DIR__ . '/../lib/utils.php';
 require_once __DIR__ . '/../lib/pricing.php';
+require_once __DIR__ . '/../lib/cleaning.php';
 requireAdmin();
 
 $apartments = rows('SELECT id, name, base_price FROM apartments ORDER BY name ASC');
@@ -38,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             [newId(), $bid, (float)$_POST['deposit'], 'deposit', 'cash']);
     }
     logActivity('create', 'booking', $bid, bookingCode($seq));
+    try { ensureCleaningSession($bid); } catch (Throwable $e) {}
     flash('Prenotazione creata');
     redirect('/admin/prenotazione.php?id=' . $bid);
 }

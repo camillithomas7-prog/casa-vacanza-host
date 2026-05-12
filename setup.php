@@ -334,6 +334,45 @@ CREATE TABLE IF NOT EXISTS service_bookings (
   INDEX idx_svc (service_id),
   INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS cleaning_tasks (
+  id VARCHAR(32) PRIMARY KEY,
+  label VARCHAR(255) NOT NULL,
+  description VARCHAR(500),
+  position INT NOT NULL DEFAULT 0,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS cleaning_sessions (
+  id VARCHAR(32) PRIMARY KEY,
+  booking_id VARCHAR(32),
+  apartment_id VARCHAR(32) NOT NULL,
+  scheduled_date DATE NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'pending',
+  started_at DATETIME NULL DEFAULT NULL,
+  completed_at DATETIME NULL DEFAULT NULL,
+  cleaner_notes TEXT,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (apartment_id) REFERENCES apartments(id) ON DELETE CASCADE,
+  FOREIGN KEY (booking_id)   REFERENCES bookings(id)   ON DELETE SET NULL,
+  INDEX idx_date (scheduled_date),
+  INDEX idx_status (status),
+  INDEX idx_apt (apartment_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS cleaning_session_items (
+  id VARCHAR(32) PRIMARY KEY,
+  session_id VARCHAR(32) NOT NULL,
+  task_id VARCHAR(32),
+  label_snapshot VARCHAR(255) NOT NULL,
+  position INT NOT NULL DEFAULT 0,
+  checked TINYINT(1) NOT NULL DEFAULT 0,
+  checked_at DATETIME NULL DEFAULT NULL,
+  FOREIGN KEY (session_id) REFERENCES cleaning_sessions(id) ON DELETE CASCADE,
+  INDEX idx_session (session_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
 
 foreach (preg_split('/;\s*\n/', $schema) as $stmt) {
@@ -396,6 +435,42 @@ foreach ($defaultZones as $z) {
         [newId(), $z['name'], $z['slug'], $z['kind'], $z['image'], $z['position']]);
 }
 echo "✓ Zone/villaggi caricati\n";
+
+// Seed checklist pulizia default + token cleaner (idempotente)
+$defaultCleaningTasks = [
+    ['Cambio lenzuola e federe in tutte le camere', null],
+    ['Cambio asciugamani (bagno, viso, bidet)', null],
+    ['Bagno: WC, doccia, lavandino, specchio puliti', 'Controlla anche il bidet e cambia il tappetino se sporco'],
+    ['Cucina: piano cottura, forno, microonde, lavello', null],
+    ['Frigorifero: vuoto, pulito, scongelato se serve', 'Butta cibo dimenticato dagli ospiti'],
+    ['Pavimenti aspirati e lavati', null],
+    ['Polvere su mobili, mensole, comodini, TV', null],
+    ['Aria condizionata: filtri puliti, telecomando funzionante', null],
+    ['Spazzatura svuotata (umido + secco) e sacchetti nuovi', null],
+    ['Kit benvenuto: acqua, caffè, zucchero, sale', null],
+    ['Wifi: foglietto con nome rete e password visibile', null],
+    ['Tende, finestre, balcone in ordine', null],
+    ['Controllo lampadine, prese, rubinetti, scarichi', 'Segnala in note se qualcosa non funziona'],
+    ['Oggetti dimenticati dai clienti precedenti', 'Mettili in un sacchetto e avvisami'],
+    ['Foto finali dell\'appartamento pronte', 'Mandami 2-3 foto per conferma'],
+];
+$existsTasks = (int)val('SELECT COUNT(*) FROM cleaning_tasks');
+if (!$existsTasks) {
+    $pos = 1;
+    foreach ($defaultCleaningTasks as [$label, $desc]) {
+        q('INSERT INTO cleaning_tasks (id, label, description, position, active) VALUES (?, ?, ?, ?, 1)',
+            [newId(), $label, $desc, $pos++]);
+    }
+    echo "✓ Checklist pulizie default caricata (" . count($defaultCleaningTasks) . " voci)\n";
+}
+
+// Token segreto per il link condivisibile alle pulizie (idempotente)
+$existingToken = val('SELECT setting_value FROM settings WHERE setting_key = ?', ['cleaner_link_token']);
+if (!$existingToken) {
+    $newToken = bin2hex(random_bytes(16));
+    q('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)', ['cleaner_link_token', $newToken]);
+    echo "✓ Token link pulizie generato\n";
+}
 
 $count = (int)val('SELECT COUNT(*) FROM apartments');
 if ($count > 0 && !$reset) {

@@ -29,6 +29,9 @@ $titles = [
   '/admin/coupon.php' => ['Coupon', 'Sconti'],
   '/admin/impostazioni.php' => ['Impostazioni', 'Account e backup'],
   '/admin/notifiche.php' => ['Notifiche', 'Attività recente'],
+  '/admin/pulizie.php' => ['Pulizie', 'Checklist e link signora pulizie'],
+  '/admin/pulizie-checklist.php' => ['Checklist pulizie', 'Catalogo voci'],
+  '/admin/pulizia.php' => ['Sessione pulizia', 'Dettaglio'],
   '/admin/servizi.php' => ['Servizi extra', 'Veicoli, escursioni, transfer'],
   '/admin/servizio-edit.php' => ['Servizio', 'Modifica scheda'],
   '/admin/servizi-prenotazioni.php' => ['Prenotazioni servizi', 'Veicoli, escursioni, transfer'],
@@ -51,6 +54,7 @@ $pageMeta = $titles[$path] ?? ['Admin', ''];
     <?php navItem('/admin/zone.php', 'map-pin', 'Zone & villaggi', $path); ?>
     <?php navItem('/admin/calendario.php', 'calendar', 'Calendario', $path); ?>
     <?php navItem('/admin/prenotazioni.php', 'bookmark-check', 'Prenotazioni', $path); ?>
+    <?php navItem('/admin/pulizie.php', 'sparkles', 'Pulizie', $path); ?>
     <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 px-3 pb-1.5 pt-4">Servizi extra</div>
     <?php navItem('/admin/servizi.php', 'package', 'Catalogo servizi', $path); ?>
     <?php navItem('/admin/servizi-prenotazioni.php', 'clipboard-list', 'Prenotazioni servizi', $path); ?>

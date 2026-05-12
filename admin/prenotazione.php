@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../lib/auth.php';
 require_once __DIR__ . '/../lib/utils.php';
 require_once __DIR__ . '/../lib/messages.php';
+require_once __DIR__ . '/../lib/cleaning.php';
 requireAdmin();
 
 $id = $_GET['id'] ?? '';
@@ -18,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'status') {
         q('UPDATE bookings SET status = ? WHERE id = ?', [$_POST['status'], $b['id']]);
         logActivity('status', 'booking', $b['id'], $_POST['status']);
+        try { ensureCleaningSession($b['id']); } catch (Throwable $e) {}
         flash('Stato aggiornato');
     }
     if ($action === 'delete') {
