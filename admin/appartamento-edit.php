@@ -271,14 +271,27 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       </div>
     </div>
 
+    <?php $resortCalibrated = (bool)setting('resort_calibration'); ?>
     <div class="card p-4 sm:p-5 space-y-3 border-2 border-sky-200 dark:border-sky-500/30 bg-sky-50/40 dark:bg-sky-500/5 lg:col-span-2">
-      <div class="flex items-start gap-3">
-        <span class="h-9 w-9 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0"><i data-lucide="map-pinned" class="size-[18px]"></i></span>
-        <div>
-          <h3 class="font-display font-bold">Posizione nel resort (Domina Coral Bay)</h3>
-          <p class="text-xs text-ink-500 mt-0.5">Imposta il blocco e indica sulla mappa dove si trova l'appartamento. La signora delle pulizie vedrà queste informazioni con un puntatore animato.</p>
+      <div class="flex items-start justify-between gap-3 flex-wrap">
+        <div class="flex items-start gap-3 flex-1 min-w-0">
+          <span class="h-9 w-9 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0"><i data-lucide="map-pinned" class="size-[18px]"></i></span>
+          <div>
+            <h3 class="font-display font-bold">Posizione nel resort (Domina Coral Bay)</h3>
+            <p class="text-xs text-ink-500 mt-0.5">Imposta il blocco e indica sulla mappa dove si trova l'appartamento. La signora vedrà la sua posizione GPS live e la distanza fino a qui.</p>
+          </div>
         </div>
+        <a href="/admin/mappa-calibrazione.php" target="_blank" class="<?= $resortCalibrated ? 'btn-ghost text-emerald-700' : 'btn-primary bg-amber-500 hover:bg-amber-600 border-amber-600' ?> text-xs shrink-0">
+          <i data-lucide="<?= $resortCalibrated ? 'check-circle-2' : 'locate-fixed' ?>" class="size-[14px]"></i>
+          <?= $resortCalibrated ? 'Navigatore calibrato' : 'Calibra navigatore' ?>
+        </a>
       </div>
+      <?php if (!$resortCalibrated): ?>
+        <div class="text-xs bg-amber-100/70 border border-amber-300 text-amber-900 px-3 py-2 rounded-lg flex items-start gap-2">
+          <i data-lucide="alert-triangle" class="size-[14px] shrink-0 mt-0.5"></i>
+          <span><strong>Navigatore GPS spento</strong>: per attivarlo serve una calibrazione (5 minuti, una sola volta per tutto il resort). Clicca "Calibra navigatore" in alto.</span>
+        </div>
+      <?php endif; ?>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block">
           <span class="label">Numero blocco</span>
