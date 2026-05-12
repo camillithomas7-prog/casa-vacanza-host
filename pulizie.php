@@ -48,10 +48,13 @@ $doneRecent = rows("SELECT s.*, a.name AS apartment_name
                     ORDER BY s.completed_at DESC LIMIT 5", [date('Y-m-d', strtotime('-7 days'))]);
 
 $vapidPub = setting('vapid_public') ?: '';
+$pushDevices = (int)val("SELECT COUNT(*) FROM push_subscriptions WHERE role = 'cleaner'");
 
 $title = 'Pulizie';
 $metaDesc = 'Lista pulizie del giorno';
 $pwaManifest = '/manifest-cleaner.php?t=' . rawurlencode($token);
+$cleanerToken = $token;
+$cleanerActiveTab = 'today';
 require __DIR__ . '/partials/head.php';
 ?>
 <div class="min-h-screen bg-ink-50/40 dark:bg-ink-950">
@@ -65,38 +68,21 @@ require __DIR__ . '/partials/head.php';
     </div>
   </header>
 
-  <main class="container-narrow py-4 px-4 space-y-5 pb-20">
-    <!-- Bottone "Attiva notifiche" — best-effort, sparisce quando già concesso -->
+  <main class="container-narrow py-4 px-4 space-y-5 pb-28">
+    <!-- Mini banner che invita ad attivare le notifiche (compare solo se ancora 'default') -->
     <?php if ($vapidPub): ?>
-    <div id="push-bar" class="card p-3 sm:p-4 hidden bg-amber-50 border-amber-200" x-data x-init="
+    <a href="/pulizie-notifiche.php?t=<?= e($token) ?>" id="push-prompt" class="card p-3 sm:p-4 hidden bg-amber-50 border-amber-200 flex items-center gap-3 hover:bg-amber-100/70 transition" x-data x-init="
       try {
-        const state = (Notification.permission || 'default');
-        if (state === 'granted' || state === 'denied') {
-          if (state === 'granted') document.getElementById('push-on').classList.remove('hidden');
-          if (state === 'denied')  document.getElementById('push-denied').classList.remove('hidden');
-        } else {
-          document.getElementById('push-cta').classList.remove('hidden');
-        }
-        $el.classList.remove('hidden');
+        if ((Notification.permission || 'default') === 'default') { $el.classList.remove('hidden'); }
       } catch(e){}
     ">
-      <div id="push-cta" class="hidden flex items-start gap-3">
-        <i data-lucide="bell-ring" class="size-[20px] text-amber-700 shrink-0 mt-0.5"></i>
-        <div class="flex-1 min-w-0">
-          <div class="font-display font-bold text-sm text-amber-900">Ricevi notifica 24h prima</div>
-          <p class="text-xs text-amber-800/80 mt-0.5">Ti avvisiamo il giorno prima per ogni appartamento da pulire.</p>
-        </div>
-        <button type="button" id="push-enable-btn" class="btn-primary text-sm bg-emerald-500 hover:bg-emerald-600 border-emerald-600">
-          <i data-lucide="bell" class="size-[14px]"></i> Attiva
-        </button>
+      <i data-lucide="bell-ring" class="size-[20px] text-amber-700 shrink-0"></i>
+      <div class="flex-1 min-w-0">
+        <div class="font-display font-bold text-sm text-amber-900">Attiva le notifiche</div>
+        <p class="text-xs text-amber-800/80">Ricevi un avviso 24h prima di ogni pulizia.</p>
       </div>
-      <div id="push-on" class="hidden text-sm text-emerald-700 flex items-center gap-2">
-        <i data-lucide="bell-check" class="size-[16px]"></i> Notifiche attive su questo dispositivo
-      </div>
-      <div id="push-denied" class="hidden text-sm text-red-700 flex items-center gap-2">
-        <i data-lucide="bell-off" class="size-[16px]"></i> Notifiche bloccate. Abilita dalle impostazioni del browser.
-      </div>
-    </div>
+      <i data-lucide="chevron-right" class="size-[18px] text-amber-700"></i>
+    </a>
     <?php endif; ?>
     <?php
       $sections = [
@@ -166,40 +152,8 @@ require __DIR__ . '/partials/head.php';
     <?php endif; ?>
   </main>
 </div>
+<?php require __DIR__ . '/partials/cleaner-nav.php'; ?>
 <script>if (window.lucide) lucide.createIcons();</script>
-<?php if ($vapidPub): ?>
-<script>
-(function(){
-  const VAPID_PUBLIC = <?= json_encode($vapidPub) ?>;
-  const TOKEN = <?= json_encode($token) ?>;
-  function urlBase64ToUint8Array(b64) {
-    const pad = '='.repeat((4 - b64.length % 4) % 4);
-    const s = (b64 + pad).replace(/-/g, '+').replace(/_/g, '/');
-    const raw = atob(s);
-    return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
-  }
-  async function enablePush() {
-    try {
-      const perm = await Notification.requestPermission();
-      if (perm !== 'granted') { document.getElementById('push-cta').classList.add('hidden'); document.getElementById('push-denied').classList.remove('hidden'); return; }
-      const reg = await navigator.serviceWorker.register('/sw.js');
-      await navigator.serviceWorker.ready;
-      let sub = await reg.pushManager.getSubscription();
-      if (!sub) {
-        sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC) });
-      }
-      const body = { token: TOKEN, endpoint: sub.endpoint, keys: { p256dh: btoa(String.fromCharCode(...new Uint8Array(sub.getKey('p256dh')))).replace(/=+$/,'').replace(/\//g,'_').replace(/\+/g,'-'), auth: btoa(String.fromCharCode(...new Uint8Array(sub.getKey('auth')))).replace(/=+$/,'').replace(/\//g,'_').replace(/\+/g,'-') } };
-      const res = await fetch('/api/push-cleaner-subscribe.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
-      if (res.ok) { document.getElementById('push-cta').classList.add('hidden'); document.getElementById('push-on').classList.remove('hidden'); }
-    } catch(e) { console.error(e); }
-  }
-  document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('push-enable-btn');
-    if (btn) btn.addEventListener('click', enablePush);
-  });
-})();
-</script>
-<?php endif; ?>
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 </html>

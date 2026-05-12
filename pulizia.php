@@ -56,6 +56,9 @@ $items = rows('SELECT * FROM cleaning_session_items WHERE session_id = ? ORDER B
 
 $title = 'Pulizia · ' . $s['apartment_name'];
 $pwaManifest = '/manifest-cleaner.php?t=' . rawurlencode($token);
+$cleanerToken = $token;
+// Pagina di dettaglio: NON evidenzio una tab specifica nella bottom nav
+$cleanerActiveTab = '';
 require __DIR__ . '/partials/head.php';
 ?>
 <div class="min-h-screen bg-ink-50/40 dark:bg-ink-950 pb-32">
