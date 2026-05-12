@@ -17,6 +17,8 @@ if ($tablesReady) {
                      WHERE s.id IS NULL AND b.status NOT IN ('cancelled','rejected') AND b.check_out >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)");
     foreach ($missing as $m) { try { ensureCleaningSession($m['id']); } catch (Throwable $e) {} }
   } catch (Throwable $e) {}
+  // Best-effort: invia reminder push per le pulizie di domani (idempotente via reminder_sent_at)
+  try { sendCleaningReminders(); } catch (Throwable $e) {}
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -65,9 +67,10 @@ foreach ($sessions as $s) {
 }
 
 $cleanerLink = $tablesReady ? cleanerLinkUrl() : '';
-$totalTasks = 0;
+$totalTasks = 0; $cleanerDevices = 0;
 if ($tablesReady) {
   try { $totalTasks = (int)val('SELECT COUNT(*) FROM cleaning_tasks WHERE active = 1'); } catch (Throwable $e) {}
+  try { $cleanerDevices = (int)val("SELECT COUNT(*) FROM push_subscriptions WHERE role = 'cleaner'"); } catch (Throwable $e) {}
 }
 
 $title = 'Pulizie';
@@ -122,6 +125,19 @@ require __DIR__ . '/../partials/admin-shell-top.php';
             <input type="hidden" name="action" value="regen_token">
             <button class="btn-ghost text-sm text-ink-500 hover:text-red-600" title="Rigenera link"><i data-lucide="refresh-cw" class="size-[14px]"></i></button>
           </form>
+        </div>
+        <div class="mt-3 pt-3 border-t border-emerald-200/60 dark:border-emerald-500/20 flex items-center justify-between gap-3 text-xs flex-wrap">
+          <div class="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
+            <i data-lucide="bell" class="size-[14px]"></i>
+            <span><strong><?= $cleanerDevices ?></strong> <?= $cleanerDevices === 1 ? 'dispositivo iscritto' : 'dispositivi iscritti' ?> alle notifiche push <span class="text-ink-500">(reminder 24h prima)</span></span>
+          </div>
+          <details class="text-ink-500">
+            <summary class="cursor-pointer hover:text-ink-700">Cron job opzionale</summary>
+            <div class="mt-2 p-2 bg-white dark:bg-ink-900 rounded border border-ink-200 dark:border-ink-700 text-xs font-mono break-all max-w-md">
+              curl <?= e(rtrim(cfg('site.url') ?: '', '/')) ?>/api/cron-cleaning-reminders.php?key=<?= e(cleanerToken()) ?>
+            </div>
+            <div class="mt-1 text-[11px] text-ink-400">In hPanel Hostinger → Avanzate → Cron jobs. Esegui 1x al giorno (es. alle 18:00). Se non lo configuri, le reminder partono comunque quando apri questa pagina admin.</div>
+          </details>
         </div>
       </div>
     </div>

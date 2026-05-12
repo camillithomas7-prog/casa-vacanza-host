@@ -394,6 +394,8 @@ function ensureColumn(PDO $pdo, string $table, string $column, string $definitio
 $migrations = [
     ['apartments', 'manager_commission_pct', 'DECIMAL(5,2) NOT NULL DEFAULT 20'],
     ['apartments', 'owner_name', "VARCHAR(190) DEFAULT ''"],
+    ['push_subscriptions', 'role', "VARCHAR(20) NOT NULL DEFAULT 'admin'"],
+    ['cleaning_sessions', 'reminder_sent_at', "DATETIME NULL DEFAULT NULL"],
 ];
 foreach ($migrations as [$tbl, $col, $def]) {
     if (ensureColumn($pdo, $tbl, $col, $def)) echo "✓ Aggiunta colonna $tbl.$col\n";

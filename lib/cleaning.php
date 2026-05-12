@@ -67,3 +67,78 @@ function cleanerLinkUrl(): string {
     $base = rtrim(cfg('site.url') ?: ('https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')), '/');
     return $base . '/pulizie.php?t=' . $token;
 }
+
+/**
+ * Invia un push alle subscription "cleaner".
+ * Ritorna ['sent' => N, 'errors' => N].
+ */
+function sendPushToCleaners(array $payload): array {
+    require_once __DIR__ . '/notify.php';
+    require_once __DIR__ . '/webpush.php';
+    ensurePushSchema();
+    try {
+        $keys = vapidKeys();
+    } catch (Throwable $e) { return ['sent'=>0,'errors'=>1]; }
+    $subject = setting('push_subject') ?: ('mailto:' . (cfg('site.email') ?: 'admin@casavacanza.it'));
+    try {
+        $wp = new WebPush($keys['public'], $keys['private'], $subject);
+    } catch (Throwable $e) { return ['sent'=>0,'errors'=>1]; }
+    $subs = rows("SELECT * FROM push_subscriptions WHERE role = 'cleaner'");
+    $payloadJson = json_encode($payload, JSON_UNESCAPED_UNICODE);
+    $sent = 0; $errors = 0;
+    foreach ($subs as $sub) {
+        try {
+            $res = $wp->send($sub, $payloadJson);
+            if ($res['ok']) $sent++;
+            else {
+                $errors++;
+                if ($res['status'] === 404 || $res['status'] === 410) {
+                    q('DELETE FROM push_subscriptions WHERE id = ?', [$sub['id']]);
+                }
+            }
+        } catch (Throwable $e) { $errors++; }
+    }
+    return ['sent' => $sent, 'errors' => $errors];
+}
+
+/**
+ * Cerca pulizie con check-out domani (status != done) e ancora senza reminder,
+ * invia un push a tutti i "cleaner" e marca la sessione come notificata.
+ * Idempotente: non manda più di una volta per sessione.
+ */
+function sendCleaningReminders(): int {
+    $tomorrow = date('Y-m-d', strtotime('+1 day'));
+    try {
+        $sessions = rows("SELECT s.*, a.name AS apartment_name, a.address AS apartment_address
+                          FROM cleaning_sessions s
+                          JOIN apartments a ON a.id = s.apartment_id
+                          WHERE s.scheduled_date = ?
+                            AND s.status != 'done'
+                            AND s.reminder_sent_at IS NULL", [$tomorrow]);
+    } catch (Throwable $e) { return 0; }
+    if (!$sessions) return 0;
+
+    $count = count($sessions);
+    $link = cleanerLinkUrl();
+    if ($count === 1) {
+        $s = $sessions[0];
+        $payload = [
+            'type'  => 'cleaning_reminder',
+            'title' => 'Pulizia domani: ' . $s['apartment_name'],
+            'body'  => 'Check-out ' . date('d/m', strtotime($s['scheduled_date'])) . ($s['apartment_address'] ? ' · ' . $s['apartment_address'] : ''),
+            'link'  => $link,
+        ];
+    } else {
+        $payload = [
+            'type'  => 'cleaning_reminder',
+            'title' => 'Domani ' . $count . ' pulizie',
+            'body'  => 'Hai ' . $count . ' appartamenti da pulire. Apri la lista per i dettagli.',
+            'link'  => $link,
+        ];
+    }
+    try { sendPushToCleaners($payload); } catch (Throwable $e) {}
+    foreach ($sessions as $s) {
+        try { q('UPDATE cleaning_sessions SET reminder_sent_at = NOW() WHERE id = ?', [$s['id']]); } catch (Throwable $e) {}
+    }
+    return $count;
+}
