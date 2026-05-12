@@ -143,6 +143,30 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
   </div>
 
+  <!-- CALIBRAZIONE MAPPA -->
+  <?php $calibrationDone = (bool)setting('resort_calibration'); ?>
+  <div class="card p-5 sm:p-6 <?= $calibrationDone ? 'bg-gradient-to-br from-sky-50 to-white dark:from-sky-500/10 dark:to-transparent border-sky-200 dark:border-sky-500/30' : 'bg-gradient-to-br from-amber-50 to-white dark:from-amber-500/10 dark:to-transparent border-amber-200 dark:border-amber-500/30' ?>">
+    <div class="flex items-start gap-3">
+      <span class="h-11 w-11 rounded-2xl <?= $calibrationDone ? 'bg-sky-500' : 'bg-amber-500' ?> text-white flex items-center justify-center shadow-md shrink-0"><i data-lucide="locate-fixed" class="size-[20px]"></i></span>
+      <div class="flex-1 min-w-0">
+        <div class="font-display font-bold text-base">Navigatore mappa resort</div>
+        <p class="text-xs text-ink-500 mt-0.5">
+          <?php if ($calibrationDone): ?>
+            ✓ Mappa calibrata. La signora delle pulizie vede la sua posizione in tempo reale sulla mappa e la distanza dall'appartamento.
+          <?php else: ?>
+            Calibra la mappa una volta sola (3 punti GPS, 5 minuti): poi il navigatore mostra alla signora la sua posizione live mentre cammina nel resort.
+          <?php endif; ?>
+        </p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <a href="/admin/mappa-calibrazione.php" class="<?= $calibrationDone ? 'btn-outline' : 'btn-primary bg-amber-500 hover:bg-amber-600 border-amber-600' ?> text-sm">
+            <i data-lucide="<?= $calibrationDone ? 'settings-2' : 'locate-fixed' ?>" class="size-[14px]"></i>
+            <?= $calibrationDone ? 'Modifica calibrazione' : 'Calibra mappa ora' ?>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <?php endif; ?>
 
   <?php if ($tablesReady):

@@ -91,59 +91,235 @@ require __DIR__ . '/partials/head.php';
       </div>
     <?php endif; ?>
 
-    <?php if ($s['map_x'] !== null && $s['map_y'] !== null): ?>
-      <!-- POSIZIONE NEL RESORT -->
-      <div class="card overflow-hidden">
-        <div class="p-4 sm:p-5 border-b border-ink-100 dark:border-ink-800 bg-sky-50/50 dark:bg-sky-500/5 flex items-center gap-3">
-          <span class="h-10 w-10 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 text-white flex items-center justify-center shrink-0 shadow-md"><i data-lucide="map-pinned" class="size-[20px]"></i></span>
-          <div class="min-w-0 flex-1">
-            <div class="font-display font-bold">Posizione nel resort</div>
-            <div class="text-xs text-ink-500 mt-0.5">Domina Coral Bay <?= $s['block_number'] ? '· Blocco <strong class="text-sky-700">' . e($s['block_number']) . '</strong>' : '' ?></div>
+    <?php
+      $calibrationJson = setting('resort_calibration');
+      $hasCalibration = (bool)$calibrationJson;
+      $hasApartmentMap = $s['map_x'] !== null && $s['map_y'] !== null;
+    ?>
+    <?php if ($hasApartmentMap): ?>
+      <!-- NAVIGATORE LIVE -->
+      <div class="card overflow-hidden" id="nav-card">
+        <div class="p-4 sm:p-5 border-b border-ink-100 dark:border-ink-800 bg-sky-50/50 dark:bg-sky-500/5 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="h-10 w-10 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 text-white flex items-center justify-center shrink-0 shadow-md"><i data-lucide="navigation" class="size-[20px]"></i></span>
+            <div class="min-w-0 flex-1">
+              <div class="font-display font-bold">Navigatore</div>
+              <div class="text-xs text-ink-500 mt-0.5 truncate">Domina Coral Bay <?= $s['block_number'] ? '· Blocco <strong class="text-sky-700">' . e($s['block_number']) . '</strong>' : '' ?></div>
+            </div>
           </div>
+          <button type="button" id="nav-start-btn" class="btn-primary bg-emerald-500 hover:bg-emerald-600 border-emerald-600 text-sm shrink-0">
+            <i data-lucide="locate" class="size-[14px]"></i> Avvia
+          </button>
         </div>
-        <div class="relative bg-amber-50 dark:bg-ink-900" style="aspect-ratio: 2.05 / 1;">
-          <img src="/assets/resort-map.jpg?v=5" alt="Mappa resort Domina Coral Bay" class="absolute inset-0 w-full h-full object-contain" draggable="false">
-          <!-- Pulse ring -->
-          <div class="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none" style="left: <?= round((float)$s['map_x']*100,2) ?>%; top: <?= round((float)$s['map_y']*100,2) ?>%;">
-            <span class="block h-16 w-16 rounded-full bg-red-500/30 animate-ping"></span>
-            <span class="block absolute inset-0 m-auto h-6 w-6 rounded-full bg-red-500/60"></span>
-          </div>
-          <!-- Marker pin -->
-          <div class="absolute -translate-x-1/2 -translate-y-full pointer-events-none" style="left: <?= round((float)$s['map_x']*100,2) ?>%; top: <?= round((float)$s['map_y']*100,2) ?>%;">
+
+        <!-- Status banner -->
+        <div id="nav-status" class="hidden px-4 py-2 text-xs font-semibold text-center"></div>
+
+        <div class="relative bg-amber-50 dark:bg-ink-900" style="aspect-ratio: 2.05 / 1;" id="nav-map-wrap">
+          <img src="/assets/resort-map.jpg?v=5" alt="Mappa resort Domina Coral Bay" class="absolute inset-0 w-full h-full object-contain pointer-events-none" draggable="false">
+
+          <!-- SVG overlay for route line -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none" id="nav-route-svg">
+            <line id="nav-route-line" x1="0" y1="0" x2="0" y2="0" stroke="#0284c7" stroke-width="0.5" stroke-dasharray="1.5 1.2" stroke-linecap="round" opacity="0"/>
+          </svg>
+
+          <!-- Apartment pin (always shown) -->
+          <div class="absolute pointer-events-none" style="left: <?= round((float)$s['map_x']*100,3) ?>%; top: <?= round((float)$s['map_y']*100,3) ?>%; transform: translate(-50%, -100%);">
             <div class="relative" style="filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));">
-              <svg width="52" height="66" viewBox="0 0 44 56">
+              <span class="absolute left-1/2 -translate-x-1/2 -bottom-2 block h-3 w-3 rounded-full bg-red-500/40 animate-ping"></span>
+              <svg width="48" height="60" viewBox="0 0 44 56">
                 <defs>
-                  <linearGradient id="pinGradView" x1="0" x2="0" y1="0" y2="1">
+                  <linearGradient id="aptPinGrad" x1="0" x2="0" y1="0" y2="1">
                     <stop offset="0" stop-color="#f43f5e"/>
                     <stop offset="1" stop-color="#9f1239"/>
                   </linearGradient>
                 </defs>
-                <path d="M22 0 C 9 0, 0 10, 0 22 C 0 36, 22 56, 22 56 C 22 56, 44 36, 44 22 C 44 10, 35 0, 22 0 Z" fill="url(#pinGradView)" stroke="#fff" stroke-width="2.5"/>
+                <path d="M22 0 C 9 0, 0 10, 0 22 C 0 36, 22 56, 22 56 C 22 56, 44 36, 44 22 C 44 10, 35 0, 22 0 Z" fill="url(#aptPinGrad)" stroke="#fff" stroke-width="2.5"/>
                 <circle cx="22" cy="20" r="8" fill="#fff"/>
                 <text x="22" y="24" text-anchor="middle" font-family="Inter,system-ui" font-size="11" font-weight="800" fill="#9f1239"><?= e((string)$s['block_number']) ?: '!' ?></text>
               </svg>
             </div>
           </div>
+
+          <!-- Live cleaner position (hidden until GPS lock) -->
+          <div id="nav-me" class="absolute pointer-events-none hidden" style="left:0; top:0; transform: translate(-50%, -50%);">
+            <span class="absolute inset-0 m-auto h-12 w-12 rounded-full bg-blue-500/30 animate-ping"></span>
+            <span class="relative block h-5 w-5 rounded-full bg-blue-600 border-[3px] border-white shadow-lg"></span>
+          </div>
+
           <!-- Banner blocco -->
           <?php if ($s['block_number']): ?>
-            <div class="absolute top-3 left-3 bg-white/95 dark:bg-ink-900/95 backdrop-blur px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+            <div class="absolute top-3 left-3 bg-white/95 dark:bg-ink-900/95 backdrop-blur px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 pointer-events-none">
               <span class="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
               <span class="text-xs font-display font-bold text-ink-800 dark:text-ink-100">Blocco <?= e($s['block_number']) ?></span>
             </div>
           <?php endif; ?>
+
+          <!-- Distance + bearing badge (hidden until GPS lock) -->
+          <div id="nav-info" class="absolute top-3 right-3 bg-blue-600/95 backdrop-blur px-3 py-2 rounded-2xl shadow-xl text-white text-xs font-bold hidden pointer-events-none">
+            <div class="flex items-center gap-2">
+              <svg id="nav-arrow" width="20" height="20" viewBox="0 0 24 24" class="transition-transform">
+                <path d="M12 2 L18 20 L12 16 L6 20 Z" fill="white"/>
+              </svg>
+              <div>
+                <div id="nav-distance" class="text-base leading-none">—</div>
+                <div class="text-[10px] opacity-80 font-normal mt-0.5">all'appartamento</div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <!-- Action bar -->
+        <div class="p-3 sm:p-4 border-t border-ink-100 dark:border-ink-800 flex items-center justify-between gap-2 flex-wrap">
+          <div id="nav-gps-info" class="text-xs text-ink-500 flex-1 min-w-0">
+            <?php if ($hasCalibration): ?>
+              <span class="flex items-center gap-1.5"><i data-lucide="locate-off" class="size-[12px]"></i> Tocca <strong>Avvia</strong> per attivare il GPS</span>
+            <?php else: ?>
+              <span class="flex items-center gap-1.5 text-amber-700"><i data-lucide="alert-triangle" class="size-[12px]"></i> Navigatore non disponibile · mappa non calibrata</span>
+            <?php endif; ?>
+          </div>
+          <a id="nav-gmaps-btn" href="#" target="_blank" rel="noopener" class="btn-outline text-xs hidden">
+            <i data-lucide="external-link" class="size-[12px]"></i> Apri in Google Maps
+          </a>
+        </div>
+
         <?php if (trim($s['cleaner_directions'] ?? '')): ?>
           <div class="p-4 sm:p-5 bg-amber-50/60 dark:bg-amber-500/5 border-t border-amber-100 dark:border-amber-500/20">
             <div class="flex items-start gap-3">
-              <span class="h-8 w-8 rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300 flex items-center justify-center shrink-0"><i data-lucide="navigation" class="size-[16px]"></i></span>
+              <span class="h-8 w-8 rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300 flex items-center justify-center shrink-0"><i data-lucide="info" class="size-[16px]"></i></span>
               <div class="min-w-0 flex-1">
-                <div class="font-display font-bold text-sm text-amber-900 dark:text-amber-200">Come arrivarci</div>
+                <div class="font-display font-bold text-sm text-amber-900 dark:text-amber-200">Indicazioni di Patrizia</div>
                 <p class="text-sm text-amber-950/90 dark:text-amber-100/90 mt-1 whitespace-pre-line leading-relaxed"><?= e($s['cleaner_directions']) ?></p>
               </div>
             </div>
           </div>
         <?php endif; ?>
       </div>
+
+      <script src="/assets/resort-geo.js?v=1"></script>
+      <script>
+      (function(){
+        const CALIBRATION = <?= $calibrationJson ? $calibrationJson : 'null' ?>;
+        const APT_MAP_X = <?= json_encode((float)$s['map_x']) ?>;
+        const APT_MAP_Y = <?= json_encode((float)$s['map_y']) ?>;
+        const APT_NAME = <?= json_encode($s['apartment_name'] . ($s['block_number'] ? ' — Blocco ' . $s['block_number'] : '')) ?>;
+
+        const startBtn = document.getElementById('nav-start-btn');
+        const meEl = document.getElementById('nav-me');
+        const infoEl = document.getElementById('nav-info');
+        const distEl = document.getElementById('nav-distance');
+        const arrowEl = document.getElementById('nav-arrow');
+        const statusEl = document.getElementById('nav-status');
+        const gpsInfoEl = document.getElementById('nav-gps-info');
+        const gmapsBtn = document.getElementById('nav-gmaps-btn');
+        const routeLine = document.getElementById('nav-route-line');
+        const mapWrap = document.getElementById('nav-map-wrap');
+
+        let affine = null;
+        let aptGps = null;
+        if (CALIBRATION && Array.isArray(CALIBRATION) && CALIBRATION.length >= 3) {
+          affine = window.ResortGeo.solveAffine(CALIBRATION);
+          if (affine) {
+            aptGps = window.ResortGeo.fracToGps(affine, APT_MAP_X, APT_MAP_Y);
+            if (aptGps) {
+              gmapsBtn.href = 'https://www.google.com/maps/dir/?api=1&destination=' + aptGps.lat.toFixed(6) + ',' + aptGps.lng.toFixed(6) + '&travelmode=walking';
+              gmapsBtn.classList.remove('hidden');
+            }
+          }
+        }
+
+        // The pixel position of an object inside the map-wrap depends on the rendered image bbox
+        // (because object-contain may letterbox). We need to compute the *fractional position
+        // relative to the image content*, not the wrap.
+        // Since aspect-ratio of wrap (2.05) === aspect-ratio of image (2.05), the image fills
+        // the entire wrap with no letterbox: we can use the wrap as the reference.
+        // For safety we still let the absolute-positioned children use percent of the wrap.
+
+        function setStatus(msg, kind) {
+          if (!msg) { statusEl.classList.add('hidden'); return; }
+          statusEl.textContent = msg;
+          statusEl.className = 'px-4 py-2 text-xs font-semibold text-center ' + (
+            kind === 'error' ? 'bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-300' :
+            kind === 'warn'  ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300' :
+                               'bg-blue-100 text-blue-800 dark:bg-blue-500/20 dark:text-blue-300'
+          );
+        }
+
+        function showMeAt(fracX, fracY) {
+          meEl.style.left = (fracX * 100).toFixed(3) + '%';
+          meEl.style.top  = (fracY * 100).toFixed(3) + '%';
+          meEl.classList.remove('hidden');
+          // Route line from me to apartment, in normalized 0-100 coords
+          routeLine.setAttribute('x1', (fracX * 100).toFixed(2));
+          routeLine.setAttribute('y1', (fracY * 100).toFixed(2));
+          routeLine.setAttribute('x2', (APT_MAP_X * 100).toFixed(2));
+          routeLine.setAttribute('y2', (APT_MAP_Y * 100).toFixed(2));
+          routeLine.setAttribute('opacity', '0.8');
+        }
+
+        let watchId = null;
+        function startTracking() {
+          if (!('geolocation' in navigator)) {
+            setStatus('Il tuo browser non supporta il GPS', 'error');
+            return;
+          }
+          if (!affine) {
+            setStatus('Mappa non calibrata. Avvisa Patrizia.', 'error');
+            return;
+          }
+          startBtn.disabled = true;
+          startBtn.innerHTML = '<i data-lucide="loader" class="size-[14px] animate-spin"></i> Cerco GPS…';
+          if (window.lucide) try { lucide.createIcons(); } catch(e){}
+          setStatus('Attivazione GPS in corso… concedi il permesso al browser', 'info');
+
+          watchId = navigator.geolocation.watchPosition(function(pos){
+            const lat = pos.coords.latitude, lng = pos.coords.longitude, acc = pos.coords.accuracy;
+            const f = window.ResortGeo.gpsToFrac(affine, lat, lng);
+            if (!f) { setStatus('Errore conversione GPS', 'error'); return; }
+            // Clamp dot inside view but keep distance accurate to real GPS
+            const clampedX = Math.max(-0.05, Math.min(1.05, f.x));
+            const clampedY = Math.max(-0.05, Math.min(1.05, f.y));
+            showMeAt(clampedX, clampedY);
+
+            // Distance / bearing using REAL gps
+            if (aptGps) {
+              const dist = window.ResortGeo.haversineMeters(lat, lng, aptGps.lat, aptGps.lng);
+              const bear = window.ResortGeo.bearingDeg(lat, lng, aptGps.lat, aptGps.lng);
+              distEl.textContent = window.ResortGeo.formatDistance(dist);
+              arrowEl.style.transform = 'rotate(' + bear.toFixed(0) + 'deg)';
+              infoEl.classList.remove('hidden');
+              if (dist < 15) {
+                setStatus('Sei arrivato! ✓', 'info');
+              } else {
+                setStatus('GPS attivo · precisione ±' + Math.round(acc) + 'm', 'info');
+              }
+            } else {
+              setStatus('GPS attivo · precisione ±' + Math.round(acc) + 'm', 'info');
+            }
+
+            startBtn.innerHTML = '<i data-lucide="locate-fixed" class="size-[14px]"></i> Aggiorna';
+            startBtn.disabled = false;
+            if (window.lucide) try { lucide.createIcons(); } catch(e){}
+          }, function(err){
+            startBtn.disabled = false;
+            startBtn.innerHTML = '<i data-lucide="locate" class="size-[14px]"></i> Riprova';
+            if (window.lucide) try { lucide.createIcons(); } catch(e){}
+            if (err.code === 1) setStatus('Permesso GPS negato. Vai nelle impostazioni del browser per consentirlo.', 'error');
+            else if (err.code === 2) setStatus('GPS non disponibile. Vai all\'aperto e riprova.', 'warn');
+            else if (err.code === 3) setStatus('Timeout GPS. Riprova.', 'warn');
+            else setStatus('Errore GPS: ' + err.message, 'error');
+          }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
+        }
+
+        startBtn.addEventListener('click', function(){
+          if (watchId !== null) {
+            navigator.geolocation.clearWatch(watchId);
+            watchId = null;
+          }
+          startTracking();
+        });
+      })();
+      </script>
     <?php elseif (trim($s['cleaner_directions'] ?? '')): ?>
       <!-- Solo indicazioni testuali, senza mappa -->
       <div class="card p-4 sm:p-5 bg-amber-50/60 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/30">
