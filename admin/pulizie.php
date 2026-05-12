@@ -4,11 +4,20 @@ require_once __DIR__ . '/../lib/utils.php';
 require_once __DIR__ . '/../lib/cleaning.php';
 requireAdmin();
 
-// Auto-allinea: ricostruisce le sessioni mancanti per tutte le booking attive future
-$missing = rows("SELECT b.id FROM bookings b
-                 LEFT JOIN cleaning_sessions s ON s.booking_id = b.id
-                 WHERE s.id IS NULL AND b.status NOT IN ('cancelled','rejected') AND b.check_out >= CURDATE() - INTERVAL 1 DAY");
-foreach ($missing as $m) { try { ensureCleaningSession($m['id']); } catch (Throwable $e) {} }
+// Verifica esistenza tabelle (utile dopo deploy, prima di setup.php)
+$tablesReady = true;
+try { val('SELECT 1 FROM cleaning_sessions LIMIT 1'); }
+catch (Throwable $e) { $tablesReady = false; }
+
+if ($tablesReady) {
+  // Auto-allinea: ricostruisce le sessioni mancanti per tutte le booking attive future
+  try {
+    $missing = rows("SELECT b.id FROM bookings b
+                     LEFT JOIN cleaning_sessions s ON s.booking_id = b.id
+                     WHERE s.id IS NULL AND b.status NOT IN ('cancelled','rejected') AND b.check_out >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)");
+    foreach ($missing as $m) { try { ensureCleaningSession($m['id']); } catch (Throwable $e) {} }
+  } catch (Throwable $e) {}
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrfCheck($_POST['csrf'] ?? null);
@@ -31,15 +40,20 @@ $today = date('Y-m-d');
 $tomorrow = date('Y-m-d', strtotime('+1 day'));
 $weekEnd = date('Y-m-d', strtotime('+7 days'));
 
-$sessions = rows("SELECT s.*, a.name AS apartment_name, a.address AS apartment_address, b.code AS booking_code, c.name AS customer_name,
-                  (SELECT COUNT(*) FROM cleaning_session_items WHERE session_id = s.id) AS total_items,
-                  (SELECT COUNT(*) FROM cleaning_session_items WHERE session_id = s.id AND checked = 1) AS done_items
-                  FROM cleaning_sessions s
-                  JOIN apartments a ON a.id = s.apartment_id
-                  LEFT JOIN bookings b ON b.id = s.booking_id
-                  LEFT JOIN customers c ON c.id = b.customer_id
-                  WHERE s.scheduled_date >= ?
-                  ORDER BY s.scheduled_date ASC, a.name ASC", [date('Y-m-d', strtotime('-7 days'))]);
+$sessions = [];
+if ($tablesReady) {
+  try {
+    $sessions = rows("SELECT s.*, a.name AS apartment_name, a.address AS apartment_address, b.code AS booking_code, c.name AS customer_name,
+                      (SELECT COUNT(*) FROM cleaning_session_items WHERE session_id = s.id) AS total_items,
+                      (SELECT COUNT(*) FROM cleaning_session_items WHERE session_id = s.id AND checked = 1) AS done_items
+                      FROM cleaning_sessions s
+                      JOIN apartments a ON a.id = s.apartment_id
+                      LEFT JOIN bookings b ON b.id = s.booking_id
+                      LEFT JOIN customers c ON c.id = b.customer_id
+                      WHERE s.scheduled_date >= ?
+                      ORDER BY s.scheduled_date ASC, a.name ASC", [date('Y-m-d', strtotime('-7 days'))]);
+  } catch (Throwable $e) {}
+}
 
 $grouped = ['oggi' => [], 'domani' => [], 'settimana' => [], 'completate' => [], 'in_ritardo' => []];
 foreach ($sessions as $s) {
@@ -50,8 +64,11 @@ foreach ($sessions as $s) {
     if ($s['scheduled_date'] <= $weekEnd) { $grouped['settimana'][] = $s; continue; }
 }
 
-$cleanerLink = cleanerLinkUrl();
-$totalTasks = (int)val('SELECT COUNT(*) FROM cleaning_tasks WHERE active = 1');
+$cleanerLink = $tablesReady ? cleanerLinkUrl() : '';
+$totalTasks = 0;
+if ($tablesReady) {
+  try { $totalTasks = (int)val('SELECT COUNT(*) FROM cleaning_tasks WHERE active = 1'); } catch (Throwable $e) {}
+}
 
 $title = 'Pulizie';
 require __DIR__ . '/../partials/head.php';
@@ -63,11 +80,28 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       <h1 class="font-display text-2xl sm:text-3xl font-bold">Pulizie</h1>
       <p class="text-ink-500 text-sm mt-1">Gestisci la checklist e condividi il link con la signora delle pulizie.</p>
     </div>
+    <?php if ($tablesReady): ?>
     <div class="flex gap-2 flex-wrap">
       <a href="/admin/pulizie-checklist.php" class="btn-outline"><i data-lucide="list-checks" class="size-[16px]"></i> Checklist (<?= $totalTasks ?> voci)</a>
     </div>
+    <?php endif; ?>
   </div>
 
+  <?php if (!$tablesReady): ?>
+    <div class="card p-6 border-amber-300 bg-amber-50 dark:bg-amber-500/10">
+      <div class="flex items-start gap-3">
+        <i data-lucide="alert-triangle" class="size-[22px] text-amber-700 shrink-0 mt-0.5"></i>
+        <div class="flex-1">
+          <h3 class="font-display font-bold text-amber-900 dark:text-amber-200">Setup richiesto</h3>
+          <p class="text-sm text-amber-900/80 dark:text-amber-200/80 mt-1">Le tabelle del sistema pulizie non sono ancora state create. Apri <strong>una sola volta</strong> questo URL per inizializzare il database:</p>
+          <a href="/setup.php" target="_blank" class="btn-primary mt-3"><i data-lucide="play" class="size-[14px]"></i> Esegui /setup.php</a>
+          <p class="text-xs text-amber-800/70 mt-2">Crea 3 tabelle, carica 15 voci checklist e genera il token segreto. Dopo, ricarica questa pagina.</p>
+        </div>
+      </div>
+    </div>
+  <?php endif; ?>
+
+  <?php if ($tablesReady): ?>
   <!-- LINK CONDIVISIBILE -->
   <div class="card p-5 sm:p-6 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-500/10 dark:to-transparent border-emerald-200 dark:border-emerald-500/30" x-data="{copied:false}">
     <div class="flex items-start gap-3">
@@ -93,7 +127,9 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
   </div>
 
-  <?php
+  <?php endif; ?>
+
+  <?php if ($tablesReady):
     $sections = [
       ['in_ritardo', 'In ritardo',   'alert-triangle', 'border-red-300 dark:border-red-500/40 bg-red-50/40 dark:bg-red-500/5'],
       ['oggi',       'Oggi',          'sparkles',       'border-brand-300 dark:border-brand-500/40 bg-brand-50/40 dark:bg-brand-500/5'],
@@ -163,6 +199,6 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         </div>
       <?php endif; ?>
     </div>
-  <?php endforeach; ?>
+  <?php endforeach; endif; ?>
 </div>
 <?php require __DIR__ . '/../partials/admin-shell-bottom.php';
