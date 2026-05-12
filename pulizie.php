@@ -47,10 +47,8 @@ $doneRecent = rows("SELECT s.*, a.name AS apartment_name
                     WHERE s.status = 'done' AND s.completed_at >= ?
                     ORDER BY s.completed_at DESC LIMIT 5", [date('Y-m-d', strtotime('-7 days'))]);
 
-<?php
 $vapidPub = setting('vapid_public') ?: '';
-?>
-<?php
+
 $title = 'Pulizie';
 $metaDesc = 'Lista pulizie del giorno';
 require __DIR__ . '/partials/head.php';
