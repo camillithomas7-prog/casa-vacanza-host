@@ -32,14 +32,7 @@ require __DIR__ . '/partials/head.php';
         Il sistema notifiche non è ancora configurato. Avvisa Patrizia.
       </div>
     <?php else: ?>
-      <div class="card p-5 sm:p-6" id="push-card" x-data x-init="
-        try {
-          const state = (Notification.permission || 'default');
-          if (state === 'granted') document.getElementById('state-on').classList.remove('hidden');
-          else if (state === 'denied') document.getElementById('state-denied').classList.remove('hidden');
-          else document.getElementById('state-default').classList.remove('hidden');
-        } catch(e){ document.getElementById('state-unsupported').classList.remove('hidden'); }
-      ">
+      <div class="card p-5 sm:p-6" id="push-card">
         <!-- Stato: non ancora attivate -->
         <div id="state-default" class="hidden">
           <div class="text-center py-4">
@@ -157,9 +150,31 @@ require __DIR__ . '/partials/head.php';
       });
     } catch(e) { alert('Impossibile mostrare la notifica: ' + e.message); }
   }
+  function syncState() {
+    try {
+      let state;
+      if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+        document.getElementById('state-unsupported').classList.remove('hidden');
+        return;
+      }
+      state = Notification.permission || 'default';
+      ['state-default','state-on','state-denied','state-unsupported'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+      if (state === 'granted') document.getElementById('state-on').classList.remove('hidden');
+      else if (state === 'denied') document.getElementById('state-denied').classList.remove('hidden');
+      else document.getElementById('state-default').classList.remove('hidden');
+    } catch(e) {
+      const el = document.getElementById('state-unsupported');
+      if (el) el.classList.remove('hidden');
+    }
+    if (window.lucide) try { lucide.createIcons(); } catch(e){}
+  }
   document.addEventListener('DOMContentLoaded', () => {
+    syncState();
     const btn = document.getElementById('push-enable-btn');
-    if (btn) btn.addEventListener('click', enablePush);
+    if (btn) btn.addEventListener('click', async () => { await enablePush(); syncState(); });
     const tbtn = document.getElementById('push-test-btn');
     if (tbtn) tbtn.addEventListener('click', testPush);
   });
