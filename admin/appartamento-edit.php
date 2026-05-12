@@ -98,8 +98,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'owner_name' => trim($_POST['owner_name'] ?? ''),
         'block_number' => trim($_POST['block_number'] ?? ''),
         'cleaner_directions' => $_POST['cleaner_directions'] ?? '',
-        'map_x' => isset($_POST['map_x']) && $_POST['map_x'] !== '' ? (float)$_POST['map_x'] : null,
-        'map_y' => isset($_POST['map_y']) && $_POST['map_y'] !== '' ? (float)$_POST['map_y'] : null,
+        'gmaps_code' => trim($_POST['gmaps_code'] ?? ''),
+        'map_x' => null,
+        'map_y' => null,
         'active' => isset($_POST['active']) ? 1 : 0,
         'under_maintenance' => isset($_POST['under_maintenance']) ? 1 : 0,
         'cover_image' => $coverPath,
@@ -129,7 +130,7 @@ $zonesList = [];
 try {
     $zonesList = rows('SELECT name, kind FROM zones WHERE active = 1 ORDER BY kind ASC, position ASC, name ASC');
 } catch (Throwable $e) {}
-$defaults = ['name'=>'','slug'=>'','description'=>'','address'=>'','city'=>'','country'=>'Egitto','guests'=>2,'bedrooms'=>1,'bathrooms'=>1,'beds'=>1,'size_sqm'=>'','rules'=>'','check_in_time'=>'15:00','check_out_time'=>'11:00','base_price'=>80,'weekly_price'=>'','biweekly_price'=>'','triweekly_price'=>'','monthly_price'=>'','weekend_price'=>'','cleaning_fee'=>35,'security_deposit'=>0,'city_tax'=>2,'city_tax_max_nights'=>5,'long_stay_discount_7'=>5,'long_stay_discount_14'=>10,'long_stay_discount_30'=>20,'manager_commission_pct'=>20,'owner_name'=>'','active'=>1,'under_maintenance'=>0,'cover_image'=>'','block_number'=>'','cleaner_directions'=>'','map_x'=>null,'map_y'=>null];
+$defaults = ['name'=>'','slug'=>'','description'=>'','address'=>'','city'=>'','country'=>'Egitto','guests'=>2,'bedrooms'=>1,'bathrooms'=>1,'beds'=>1,'size_sqm'=>'','rules'=>'','check_in_time'=>'15:00','check_out_time'=>'11:00','base_price'=>80,'weekly_price'=>'','biweekly_price'=>'','triweekly_price'=>'','monthly_price'=>'','weekend_price'=>'','cleaning_fee'=>35,'security_deposit'=>0,'city_tax'=>2,'city_tax_max_nights'=>5,'long_stay_discount_7'=>5,'long_stay_discount_14'=>10,'long_stay_discount_30'=>20,'manager_commission_pct'=>20,'owner_name'=>'','active'=>1,'under_maintenance'=>0,'cover_image'=>'','block_number'=>'','cleaner_directions'=>'','gmaps_code'=>''];
 // Merge: i valori salvati sovrascrivono i default
 $f = $apt ? array_merge($defaults, $apt) : $defaults;
 
@@ -271,141 +272,46 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       </div>
     </div>
 
-    <?php $resortCalibrated = (bool)setting('resort_calibration'); ?>
     <div class="card p-4 sm:p-5 space-y-3 border-2 border-sky-200 dark:border-sky-500/30 bg-sky-50/40 dark:bg-sky-500/5 lg:col-span-2">
-      <div class="flex items-start justify-between gap-3 flex-wrap">
-        <div class="flex items-start gap-3 flex-1 min-w-0">
-          <span class="h-9 w-9 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0"><i data-lucide="map-pinned" class="size-[18px]"></i></span>
-          <div>
-            <h3 class="font-display font-bold">Posizione nel resort (Domina Coral Bay)</h3>
-            <p class="text-xs text-ink-500 mt-0.5">Imposta il blocco e indica sulla mappa dove si trova l'appartamento. La signora vedrà la sua posizione GPS live e la distanza fino a qui.</p>
-          </div>
-        </div>
-        <a href="/admin/mappa-calibrazione.php" target="_blank" class="<?= $resortCalibrated ? 'btn-ghost text-emerald-700' : 'btn-primary bg-amber-500 hover:bg-amber-600 border-amber-600' ?> text-xs shrink-0">
-          <i data-lucide="<?= $resortCalibrated ? 'check-circle-2' : 'locate-fixed' ?>" class="size-[14px]"></i>
-          <?= $resortCalibrated ? 'Navigatore calibrato' : 'Calibra navigatore' ?>
-        </a>
-      </div>
-      <?php if (!$resortCalibrated): ?>
-        <div class="text-xs bg-amber-100/70 border border-amber-300 text-amber-900 px-3 py-2 rounded-lg flex items-start gap-2">
-          <i data-lucide="alert-triangle" class="size-[14px] shrink-0 mt-0.5"></i>
-          <span><strong>Navigatore GPS spento</strong>: per attivarlo serve una calibrazione (5 minuti, una sola volta per tutto il resort). Clicca "Calibra navigatore" in alto.</span>
-        </div>
-      <?php endif; ?>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <label class="block">
-          <span class="label">Numero blocco</span>
-          <input class="input" type="text" name="block_number" id="block_number_input" value="<?= e((string)$f['block_number']) ?>" placeholder="es. 19, 47, K3">
-          <span class="text-[11px] text-ink-500 mt-1 block">Verrà mostrato nella lista pulizie e accanto al puntatore sulla mappa.</span>
-        </label>
-        <div class="block">
-          <span class="label">Coordinate marker</span>
-          <div class="flex items-center gap-2">
-            <input class="input flex-1 tabular-nums text-xs" type="text" id="map_xy_display" value="<?= $f['map_x'] !== null && $f['map_y'] !== null ? round((float)$f['map_x']*100,1) . '% , ' . round((float)$f['map_y']*100,1) . '%' : 'Non posizionato' ?>" readonly>
-            <button type="button" id="map_clear_btn" class="btn-outline text-xs">Reset</button>
-          </div>
-          <input type="hidden" name="map_x" id="map_x_input" value="<?= $f['map_x'] !== null ? e((string)$f['map_x']) : '' ?>">
-          <input type="hidden" name="map_y" id="map_y_input" value="<?= $f['map_y'] !== null ? e((string)$f['map_y']) : '' ?>">
-          <span class="text-[11px] text-ink-500 mt-1 block">Tocca/clicca sulla mappa o trascina il puntatore per posizionarlo.</span>
-        </div>
-      </div>
-
-      <div class="relative rounded-2xl overflow-hidden border-2 border-sky-200 dark:border-sky-500/30 bg-amber-50 dark:bg-ink-900 select-none" style="aspect-ratio: 2.05 / 1;">
-        <img src="/assets/resort-map.jpg?v=5" alt="Mappa resort Domina Coral Bay" id="resort_map_img" class="absolute inset-0 w-full h-full object-contain" draggable="false">
-        <div id="resort_marker" class="absolute z-10 -translate-x-1/2 -translate-y-full cursor-grab active:cursor-grabbing transition-opacity duration-200" style="left: <?= $f['map_x'] !== null ? round((float)$f['map_x']*100,2) : 50 ?>%; top: <?= $f['map_y'] !== null ? round((float)$f['map_y']*100,2) : 50 ?>%; <?= $f['map_x'] === null ? 'opacity:0;pointer-events:none;' : '' ?>">
-          <div class="relative">
-            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-2 bg-black/30 rounded-full blur-sm"></div>
-            <svg width="44" height="56" viewBox="0 0 44 56" class="drop-shadow-xl">
-              <defs>
-                <linearGradient id="pinGrad" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0" stop-color="#f43f5e"/>
-                  <stop offset="1" stop-color="#be123c"/>
-                </linearGradient>
-              </defs>
-              <path d="M22 0 C 9 0, 0 10, 0 22 C 0 36, 22 56, 22 56 C 22 56, 44 36, 44 22 C 44 10, 35 0, 22 0 Z" fill="url(#pinGrad)" stroke="#fff" stroke-width="2"/>
-              <circle cx="22" cy="20" r="7" fill="#fff"/>
-              <text x="22" y="24" text-anchor="middle" font-family="Inter,system-ui" font-size="11" font-weight="800" fill="#be123c" id="resort_marker_text"><?= e((string)$f['block_number']) ?: '?' ?></text>
-            </svg>
-          </div>
-        </div>
-        <div id="map_hint" class="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur text-white text-xs font-medium <?= $f['map_x'] !== null ? 'hidden' : '' ?>">
-          Tocca sulla mappa per posizionare
+      <div class="flex items-start gap-3">
+        <span class="h-9 w-9 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0"><i data-lucide="map-pinned" class="size-[18px]"></i></span>
+        <div>
+          <h3 class="font-display font-bold">Posizione su Google Maps</h3>
+          <p class="text-xs text-ink-500 mt-0.5">La signora delle pulizie aprirà un bottone che apre direttamente Google Maps con la navigazione fino all'appartamento.</p>
         </div>
       </div>
 
       <label class="block">
-        <span class="label">Indicazioni per la signora delle pulizie</span>
-        <textarea class="input min-h-[100px]" name="cleaner_directions" placeholder="Es: Entrata principale, gira a destra dopo la reception, oltre la piscina principale. L'appartamento è al primo piano. Le chiavi sono dal portiere del blocco."><?= e((string)$f['cleaner_directions']) ?></textarea>
-        <span class="text-[11px] text-ink-500 mt-1 block">Testo libero. Comparirà nella pagina di dettaglio della pulizia.</span>
+        <span class="label flex items-center gap-2">Plus Code di Google Maps <span class="badge-soft text-[10px]">obbligatorio per il bottone</span></span>
+        <input class="input font-mono tabular-nums" type="text" name="gmaps_code" value="<?= e((string)$f['gmaps_code']) ?>" placeholder="es. W9G6+MWJ Sharm El Sheikh oppure V75V+8Q3">
+        <div class="text-[11px] text-ink-500 mt-2 space-y-1">
+          <div><strong>Come ottenerlo</strong>:</div>
+          <ol class="list-decimal list-inside space-y-0.5 ml-1">
+            <li>Apri Google Maps sul telefono nel punto esatto dell'appartamento</li>
+            <li>Tocca a lungo sulla mappa → appare un segnaposto</li>
+            <li>Tocca il segnaposto → tocca il codice in alto (tipo <code class="bg-sky-100 dark:bg-sky-500/20 px-1 rounded">V75V+8Q3</code>)</li>
+            <li>Si apre la finestrella con il Plus Code completo (es. <code class="bg-sky-100 dark:bg-sky-500/20 px-1 rounded">W9G6+MWJ Sharm El Sheikh</code>) — copialo e incollalo qui</li>
+          </ol>
+        </div>
+        <?php if (!empty($f['gmaps_code'])): ?>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=<?= e(rawurlencode($f['gmaps_code'])) ?>&travelmode=walking" target="_blank" rel="noopener" class="btn-outline mt-2 text-xs inline-flex">
+            <i data-lucide="external-link" class="size-[12px]"></i> Anteprima: apri in Google Maps
+          </a>
+        <?php endif; ?>
       </label>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-sky-100 dark:border-sky-500/20">
+        <label class="block">
+          <span class="label">Numero blocco (opzionale)</span>
+          <input class="input" type="text" name="block_number" value="<?= e((string)$f['block_number']) ?>" placeholder="es. 19, 47, K3">
+          <span class="text-[11px] text-ink-500 mt-1 block">Mostrato come badge nella lista pulizie e nel dettaglio.</span>
+        </label>
+        <label class="block">
+          <span class="label">Indicazioni extra (opzionale)</span>
+          <textarea class="input min-h-[72px]" name="cleaner_directions" placeholder="Es: 1° piano, chiavi dal portiere del blocco"><?= e((string)$f['cleaner_directions']) ?></textarea>
+        </label>
+      </div>
     </div>
-
-    <script>
-    (function(){
-      const img = document.getElementById('resort_map_img');
-      const marker = document.getElementById('resort_marker');
-      const xInput = document.getElementById('map_x_input');
-      const yInput = document.getElementById('map_y_input');
-      const display = document.getElementById('map_xy_display');
-      const clearBtn = document.getElementById('map_clear_btn');
-      const hint = document.getElementById('map_hint');
-      const blockInput = document.getElementById('block_number_input');
-      const markerText = document.getElementById('resort_marker_text');
-      let dragging = false;
-
-      function setPos(x, y) {
-        x = Math.max(0, Math.min(1, x));
-        y = Math.max(0, Math.min(1, y));
-        marker.style.left = (x * 100).toFixed(2) + '%';
-        marker.style.top = (y * 100).toFixed(2) + '%';
-        marker.style.opacity = '1';
-        marker.style.pointerEvents = '';
-        xInput.value = x.toFixed(3);
-        yInput.value = y.toFixed(3);
-        display.value = (x * 100).toFixed(1) + '% , ' + (y * 100).toFixed(1) + '%';
-        if (hint) hint.classList.add('hidden');
-      }
-
-      function eventToFrac(e) {
-        const r = img.getBoundingClientRect();
-        const pt = e.touches ? e.touches[0] : e;
-        return { x: (pt.clientX - r.left) / r.width, y: (pt.clientY - r.top) / r.height };
-      }
-
-      img.addEventListener('click', (e) => {
-        if (dragging) return;
-        const p = eventToFrac(e);
-        setPos(p.x, p.y);
-      });
-
-      function startDrag(e) {
-        dragging = true;
-        e.preventDefault();
-      }
-      marker.addEventListener('mousedown', startDrag);
-      marker.addEventListener('touchstart', startDrag, {passive:false});
-
-      document.addEventListener('mousemove', (e) => { if (!dragging) return; const p = eventToFrac(e); setPos(p.x, p.y); });
-      document.addEventListener('touchmove', (e) => { if (!dragging) return; e.preventDefault(); const p = eventToFrac(e); setPos(p.x, p.y); }, {passive:false});
-      document.addEventListener('mouseup', () => { setTimeout(() => dragging = false, 50); });
-      document.addEventListener('touchend', () => { setTimeout(() => dragging = false, 50); });
-
-      clearBtn.addEventListener('click', () => {
-        xInput.value = '';
-        yInput.value = '';
-        display.value = 'Non posizionato';
-        marker.style.opacity = '0';
-        marker.style.pointerEvents = 'none';
-        if (hint) hint.classList.remove('hidden');
-      });
-
-      if (blockInput && markerText) {
-        blockInput.addEventListener('input', () => {
-          markerText.textContent = blockInput.value.trim().substring(0, 3) || '?';
-        });
-      }
-    })();
-    </script>
 
     <div class="card p-4 sm:p-5 space-y-3 border-2 border-brand-200 dark:border-brand-500/30 bg-brand-50/40 dark:bg-brand-500/5">
       <div class="flex items-start gap-3">

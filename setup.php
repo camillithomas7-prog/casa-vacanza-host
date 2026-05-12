@@ -400,6 +400,7 @@ $migrations = [
     ['apartments', 'map_x', "DECIMAL(6,3) NULL DEFAULT NULL"],
     ['apartments', 'map_y', "DECIMAL(6,3) NULL DEFAULT NULL"],
     ['apartments', 'cleaner_directions', "TEXT"],
+    ['apartments', 'gmaps_code', "VARCHAR(120) DEFAULT ''"],
 ];
 foreach ($migrations as [$tbl, $col, $def]) {
     if (ensureColumn($pdo, $tbl, $col, $def)) echo "✓ Aggiunta colonna $tbl.$col\n";
