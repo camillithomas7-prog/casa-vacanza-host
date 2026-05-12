@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../lib/auth.php';
 require_once __DIR__ . '/../lib/utils.php';
+require_once __DIR__ . '/../lib/cleaning.php';
 requireAdmin();
 ensureColumns();
 
@@ -99,6 +100,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'block_number' => trim($_POST['block_number'] ?? ''),
         'cleaner_directions' => $_POST['cleaner_directions'] ?? '',
         'gmaps_code' => trim($_POST['gmaps_code'] ?? ''),
+        'gmaps_resolved' => (function($code, $apt){
+            $code = trim($code);
+            if ($code === '') return '';
+            // Riusa il vecchio resolved se il codice non è cambiato
+            if ($apt && trim($apt['gmaps_code'] ?? '') === $code && !empty($apt['gmaps_resolved'])) {
+                return $apt['gmaps_resolved'];
+            }
+            $resolved = resolveGmapsCoords($code);
+            return $resolved ?? '';
+        })($_POST['gmaps_code'] ?? '', $apt),
         'map_x' => null,
         'map_y' => null,
         'active' => isset($_POST['active']) ? 1 : 0,
@@ -130,7 +141,7 @@ $zonesList = [];
 try {
     $zonesList = rows('SELECT name, kind FROM zones WHERE active = 1 ORDER BY kind ASC, position ASC, name ASC');
 } catch (Throwable $e) {}
-$defaults = ['name'=>'','slug'=>'','description'=>'','address'=>'','city'=>'','country'=>'Egitto','guests'=>2,'bedrooms'=>1,'bathrooms'=>1,'beds'=>1,'size_sqm'=>'','rules'=>'','check_in_time'=>'15:00','check_out_time'=>'11:00','base_price'=>80,'weekly_price'=>'','biweekly_price'=>'','triweekly_price'=>'','monthly_price'=>'','weekend_price'=>'','cleaning_fee'=>35,'security_deposit'=>0,'city_tax'=>2,'city_tax_max_nights'=>5,'long_stay_discount_7'=>5,'long_stay_discount_14'=>10,'long_stay_discount_30'=>20,'manager_commission_pct'=>20,'owner_name'=>'','active'=>1,'under_maintenance'=>0,'cover_image'=>'','block_number'=>'','cleaner_directions'=>'','gmaps_code'=>''];
+$defaults = ['name'=>'','slug'=>'','description'=>'','address'=>'','city'=>'','country'=>'Egitto','guests'=>2,'bedrooms'=>1,'bathrooms'=>1,'beds'=>1,'size_sqm'=>'','rules'=>'','check_in_time'=>'15:00','check_out_time'=>'11:00','base_price'=>80,'weekly_price'=>'','biweekly_price'=>'','triweekly_price'=>'','monthly_price'=>'','weekend_price'=>'','cleaning_fee'=>35,'security_deposit'=>0,'city_tax'=>2,'city_tax_max_nights'=>5,'long_stay_discount_7'=>5,'long_stay_discount_14'=>10,'long_stay_discount_30'=>20,'manager_commission_pct'=>20,'owner_name'=>'','active'=>1,'under_maintenance'=>0,'cover_image'=>'','block_number'=>'','cleaner_directions'=>'','gmaps_code'=>'','gmaps_resolved'=>''];
 // Merge: i valori salvati sovrascrivono i default
 $f = $apt ? array_merge($defaults, $apt) : $defaults;
 
@@ -282,22 +293,50 @@ require __DIR__ . '/../partials/admin-shell-top.php';
       </div>
 
       <label class="block">
-        <span class="label flex items-center gap-2">Plus Code di Google Maps <span class="badge-soft text-[10px]">obbligatorio per il bottone</span></span>
-        <input class="input font-mono tabular-nums" type="text" name="gmaps_code" value="<?= e((string)$f['gmaps_code']) ?>" placeholder="es. W9G6+MWJ Sharm El Sheikh oppure V75V+8Q3">
-        <div class="text-[11px] text-ink-500 mt-2 space-y-1">
-          <div><strong>Come ottenerlo</strong>:</div>
-          <ol class="list-decimal list-inside space-y-0.5 ml-1">
-            <li>Apri Google Maps sul telefono nel punto esatto dell'appartamento</li>
-            <li>Tocca a lungo sulla mappa → appare un segnaposto</li>
-            <li>Tocca il segnaposto → tocca il codice in alto (tipo <code class="bg-sky-100 dark:bg-sky-500/20 px-1 rounded">V75V+8Q3</code>)</li>
-            <li>Si apre la finestrella con il Plus Code completo (es. <code class="bg-sky-100 dark:bg-sky-500/20 px-1 rounded">W9G6+MWJ Sharm El Sheikh</code>) — copialo e incollalo qui</li>
-          </ol>
-        </div>
-        <?php if (!empty($f['gmaps_code'])): ?>
-          <a href="https://www.google.com/maps/dir/?api=1&destination=<?= e(rawurlencode($f['gmaps_code'])) ?>&travelmode=walking" target="_blank" rel="noopener" class="btn-outline mt-2 text-xs inline-flex">
-            <i data-lucide="external-link" class="size-[12px]"></i> Anteprima: apri in Google Maps
-          </a>
+        <span class="label flex items-center gap-2">Link o Plus Code di Google Maps <span class="badge-soft text-[10px]">obbligatorio</span></span>
+        <input class="input font-mono text-xs" type="text" name="gmaps_code" value="<?= e((string)$f['gmaps_code']) ?>" placeholder="es. https://maps.app.goo.gl/XmwqWBWQ9QDJFJ9Q7  oppure  W9G6+MWJ Sharm El Sheikh">
+        <?php if (!empty($f['gmaps_code'])):
+          $isUrl = (bool)preg_match('#^https?://#i', $f['gmaps_code']);
+          $resolved = trim((string)($f['gmaps_resolved'] ?? ''));
+        ?>
+          <div class="flex flex-wrap items-center gap-2 mt-2">
+            <a href="<?= e(gmapsNavUrl($f['gmaps_code'], $resolved)) ?>" target="_blank" rel="noopener" class="btn-outline text-xs">
+              <i data-lucide="external-link" class="size-[12px]"></i> Anteprima navigazione
+            </a>
+            <?php if ($resolved): ?>
+              <span class="text-[11px] text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5 font-medium">
+                <i data-lucide="check-circle-2" class="size-[12px]"></i>
+                Coordinate estratte: <code class="bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded font-mono"><?= e($resolved) ?></code> · la navigazione partirà subito
+              </span>
+            <?php elseif ($isUrl): ?>
+              <span class="text-[11px] text-amber-700 flex items-center gap-1.5">
+                <i data-lucide="info" class="size-[12px]"></i> Link non risolvibile lato server: la signora dovrà toccare "Indicazioni" dentro Google Maps
+              </span>
+            <?php endif; ?>
+          </div>
         <?php endif; ?>
+        <details class="text-[11px] text-ink-500 mt-3">
+          <summary class="cursor-pointer font-semibold text-ink-600 hover:text-ink-800">Come si ottiene? (clicca per istruzioni)</summary>
+          <div class="mt-2 space-y-3 pl-1">
+            <div>
+              <div class="font-semibold text-ink-700 dark:text-ink-200">Opzione 1 — Link condiviso (consigliato, più preciso)</div>
+              <ol class="list-decimal list-inside space-y-0.5 ml-1 mt-1">
+                <li>Apri Google Maps sul telefono nel punto esatto dell'appartamento</li>
+                <li>Tocca a lungo per piazzare un segnaposto</li>
+                <li>Tocca "Condividi" → "Copia link"</li>
+                <li>Incolla qui (sarà tipo <code class="bg-ink-100 dark:bg-ink-800 px-1 rounded">https://maps.app.goo.gl/...</code>)</li>
+              </ol>
+            </div>
+            <div>
+              <div class="font-semibold text-ink-700 dark:text-ink-200">Opzione 2 — Plus Code</div>
+              <ol class="list-decimal list-inside space-y-0.5 ml-1 mt-1">
+                <li>Tocca a lungo per il segnaposto → tocca il segnaposto</li>
+                <li>Tocca il codice tipo <code class="bg-ink-100 dark:bg-ink-800 px-1 rounded">V75V+8Q3</code></li>
+                <li>Copia il Plus Code completo (es. <code class="bg-ink-100 dark:bg-ink-800 px-1 rounded">W9G6+MWJ Sharm El Sheikh</code>)</li>
+              </ol>
+            </div>
+          </div>
+        </details>
       </label>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-sky-100 dark:border-sky-500/20">

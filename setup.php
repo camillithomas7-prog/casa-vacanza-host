@@ -401,7 +401,17 @@ $migrations = [
     ['apartments', 'map_y', "DECIMAL(6,3) NULL DEFAULT NULL"],
     ['apartments', 'cleaner_directions', "TEXT"],
     ['apartments', 'gmaps_code', "VARCHAR(120) DEFAULT ''"],
+    ['apartments', 'gmaps_resolved', "VARCHAR(64) DEFAULT ''"],
 ];
+
+// Espandi gmaps_code per accettare URL lunghi (idempotente)
+try {
+    $col = $pdo->query("SELECT CHARACTER_MAXIMUM_LENGTH FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'apartments' AND COLUMN_NAME = 'gmaps_code'")->fetchColumn();
+    if ($col !== false && (int)$col < 500) {
+        $pdo->exec("ALTER TABLE apartments MODIFY gmaps_code VARCHAR(500) DEFAULT ''");
+        echo "✓ Allargata colonna apartments.gmaps_code a VARCHAR(500)\n";
+    }
+} catch (Throwable $e) {}
 foreach ($migrations as [$tbl, $col, $def]) {
     if (ensureColumn($pdo, $tbl, $col, $def)) echo "✓ Aggiunta colonna $tbl.$col\n";
 }

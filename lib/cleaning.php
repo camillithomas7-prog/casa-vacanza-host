@@ -142,3 +142,99 @@ function sendCleaningReminders(): int {
     }
     return $count;
 }
+
+
+// === Google Maps navigation helpers =====================================
+
+/**
+ * Risolve un Plus Code o URL Google Maps in coordinate "lat,lng".
+ * Se è un short link (maps.app.goo.gl / goo.gl/maps), segue i redirect
+ * ed estrae @lat,lng dall URL finale. Ritorna null se non risolvibile.
+ */
+function resolveGmapsCoords(string $codeOrUrl): ?string {
+    $s = trim($codeOrUrl);
+    if ($s === "") return null;
+
+    // Cerca tutti i pattern noti di lat,lng in una stringa
+    $extract = function(string $text): ?string {
+        // @lat,lng (es: /place/.../@27.86,34.32,17z)
+        if (preg_match("#@(-?\d{1,3}\.\d{4,}),(-?\d{1,3}\.\d{4,})#", $text, $m)) return $m[1] . "," . $m[2];
+        // /search/lat,+?lng (es: redirect dei maps.app.goo.gl)
+        if (preg_match("#/search/(-?\d{1,3}\.\d{4,}),\+?(-?\d{1,3}\.\d{4,})#", $text, $m)) return $m[1] . "," . $m[2];
+        // /place/lat,+?lng
+        if (preg_match("#/place/(-?\d{1,3}\.\d{4,}),\+?(-?\d{1,3}\.\d{4,})#", $text, $m)) return $m[1] . "," . $m[2];
+        // !3dLAT!4dLNG (pattern interno nelle pagine HTML)
+        if (preg_match("/!3d(-?\d{1,3}\.\d{4,})!4d(-?\d{1,3}\.\d{4,})/", $text, $m)) return $m[1] . "," . $m[2];
+        // ?q=lat,lng / ?ll=lat,lng / &destination=lat,lng (anche URL-encoded virgola)
+        if (preg_match("#[?&](?:q|ll|center|destination)=(-?\d{1,3}\.\d{4,})(?:,|%2C|%2c)\+?(-?\d{1,3}\.\d{4,})#", $text, $m)) return $m[1] . "," . $m[2];
+        return null;
+    };
+
+    // 1. Stringa già nel formato "lat,lng"
+    if (preg_match("/^(-?\d{1,3}\.\d+),\s*(-?\d{1,3}\.\d+)$/", $s, $m)) {
+        return $m[1] . "," . $m[2];
+    }
+
+    // 2. URL Google Maps "lungo": prova a estrarre direttamente
+    if ($c = $extract($s)) return $c;
+
+    // 3. Short link: prima leggi la Location header del 302, poi fallback al body
+    if (preg_match("#^https?://(maps\.app\.goo\.gl|goo\.gl/maps|g\.co/kgs|maps\.google\.com)/#i", $s) && function_exists("curl_init")) {
+        // Tentativo 1: solo la Location del 302 (la rotta diretta più affidabile)
+        $ch = curl_init($s);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => false,
+            CURLOPT_TIMEOUT        => 6,
+            CURLOPT_CONNECTTIMEOUT => 4,
+            CURLOPT_USERAGENT      => "Mozilla/5.0 (compatible; CasaVacanza/1.0)",
+            CURLOPT_HEADER         => true,
+            CURLOPT_NOBODY         => true,
+            CURLOPT_SSL_VERIFYPEER => true,
+        ]);
+        $headers = @curl_exec($ch);
+        if (is_string($headers) && preg_match("#^location:\s*(\S+)#im", $headers, $loc)) {
+            $locUrl = trim($loc[1]);
+            if ($c = $extract($locUrl)) return $c;
+        }
+
+        // Tentativo 2: segui tutti i redirect e cerca nel body
+        $ch = curl_init($s);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS      => 6,
+            CURLOPT_TIMEOUT        => 8,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_USERAGENT      => "Mozilla/5.0 (compatible; CasaVacanza/1.0)",
+            CURLOPT_SSL_VERIFYPEER => true,
+        ]);
+        $body = @curl_exec($ch);
+        $final = (string)@curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+        if ($final && ($c = $extract($final))) return $c;
+        if (is_string($body) && ($c = $extract($body))) return $c;
+    }
+
+    return null;
+}
+
+/**
+ * Restituisce l URL ottimale di Google Maps per la navigazione a piedi
+ * verso un appartamento. Preferisce le coordinate risolte (parte direttamente
+ * con il navigatore); altrimenti apre il link/Plus Code come destinazione.
+ */
+function gmapsNavUrl(string $code, ?string $resolved = null): string {
+    $code = trim($code);
+    $resolved = trim((string)$resolved);
+    if ($resolved !== "" && preg_match("/^-?\d+\.\d+,-?\d+\.\d+$/", $resolved)) {
+        return "https://www.google.com/maps/dir/?api=1&destination=" . rawurlencode($resolved) . "&travelmode=walking";
+    }
+    if ($code === "") return "";
+    if (preg_match("#^https?://#i", $code)) {
+        // Link diretto: apre Google Maps sul pin, lutente tocca "Indicazioni"
+        return $code;
+    }
+    // Plus Code o indirizzo testuale: parte direttamente con la navigazione
+    return "https://www.google.com/maps/dir/?api=1&destination=" . rawurlencode($code) . "&travelmode=walking";
+}
+

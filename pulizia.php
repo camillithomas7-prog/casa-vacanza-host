@@ -9,7 +9,7 @@ if (!$valid) { http_response_code(401); echo 'Link non valido'; exit; }
 
 $sid = $_GET['id'] ?? '';
 $s = row("SELECT s.*, a.name AS apartment_name, a.address AS apartment_address, a.check_out_time, a.rules,
-          a.block_number, a.cleaner_directions, a.gmaps_code,
+          a.block_number, a.cleaner_directions, a.gmaps_code, a.gmaps_resolved,
           b.code AS booking_code, b.check_in, b.check_out, b.guests, c.name AS customer_name
           FROM cleaning_sessions s
           JOIN apartments a ON a.id = s.apartment_id
@@ -91,11 +91,16 @@ require __DIR__ . '/partials/head.php';
       </div>
     <?php endif; ?>
 
-    <?php $gmapsCode = trim($s['gmaps_code'] ?? ''); $hasCleanerInfo = $gmapsCode || $s['block_number'] || trim($s['cleaner_directions'] ?? ''); ?>
+    <?php
+      $gmapsCode = trim($s['gmaps_code'] ?? '');
+      $gmapsResolved = trim($s['gmaps_resolved'] ?? '');
+      $navUrl = $gmapsCode ? gmapsNavUrl($gmapsCode, $gmapsResolved) : '';
+      $hasCleanerInfo = $gmapsCode || $s['block_number'] || trim($s['cleaner_directions'] ?? '');
+    ?>
     <?php if ($hasCleanerInfo): ?>
       <div class="card overflow-hidden">
-        <?php if ($gmapsCode): ?>
-          <a href="https://www.google.com/maps/dir/?api=1&destination=<?= e(rawurlencode($gmapsCode)) ?>&travelmode=walking"
+        <?php if ($navUrl): ?>
+          <a href="<?= e($navUrl) ?>"
              target="_blank" rel="noopener"
              class="block p-5 sm:p-6 bg-gradient-to-br from-sky-500 to-blue-600 text-white relative group active:scale-[0.98] transition">
             <div class="flex items-center gap-4">
@@ -104,7 +109,15 @@ require __DIR__ . '/partials/head.php';
               </span>
               <div class="flex-1 min-w-0">
                 <div class="font-display font-bold text-lg sm:text-xl leading-tight">Avvia navigazione</div>
-                <div class="text-xs sm:text-sm text-white/85 mt-1">Si apre Google Maps con il percorso fino all'appartamento</div>
+                <div class="text-xs sm:text-sm text-white/85 mt-1">
+                  <?php if ($gmapsResolved): ?>
+                    Si apre Google Maps con il percorso a piedi fino all'appartamento
+                  <?php elseif (preg_match('#^https?://#i', $gmapsCode)): ?>
+                    Si apre Google Maps sul punto dell'appartamento — tocca "Indicazioni"
+                  <?php else: ?>
+                    Si apre Google Maps con il percorso fino all'appartamento
+                  <?php endif; ?>
+                </div>
                 <?php if ($s['block_number']): ?>
                   <div class="mt-2 inline-flex items-center gap-1.5 bg-white/20 backdrop-blur px-2.5 py-1 rounded-full text-[11px] font-bold">
                     <i data-lucide="map-pin" class="size-[12px]"></i> Blocco <?= e($s['block_number']) ?>
