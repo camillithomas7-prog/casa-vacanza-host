@@ -55,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $items = rows('SELECT * FROM cleaning_session_items WHERE session_id = ? ORDER BY position ASC', [$s['id']]);
 
 $title = 'Pulizia · ' . $s['apartment_name'];
+$pwaManifest = '/manifest-cleaner.php?t=' . rawurlencode($token);
 require __DIR__ . '/partials/head.php';
 ?>
 <div class="min-h-screen bg-ink-50/40 dark:bg-ink-950 pb-32">

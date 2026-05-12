@@ -51,6 +51,7 @@ $vapidPub = setting('vapid_public') ?: '';
 
 $title = 'Pulizie';
 $metaDesc = 'Lista pulizie del giorno';
+$pwaManifest = '/manifest-cleaner.php?t=' . rawurlencode($token);
 require __DIR__ . '/partials/head.php';
 ?>
 <div class="min-h-screen bg-ink-50/40 dark:bg-ink-950">
