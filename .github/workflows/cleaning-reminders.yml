@@ -1,0 +1,32 @@
+name: Cleaning reminders (push 24h prima)
+
+# Esegue ogni giorno alle 16:00 UTC ≈ 18:00 ora italiana (estate) / 17:00 (inverno).
+# GitHub Actions non garantisce esecuzione esatta al minuto — può variare di ~5-15 min.
+# Manuale: tab "Actions" → "Cleaning reminders" → "Run workflow".
+on:
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger cleaning reminders endpoint
+        env:
+          CRON_KEY: ${{ secrets.CLEANING_CRON_KEY }}
+          SITE_URL: https://sienna-caribou-611155.hostingersite.com
+        run: |
+          if [ -z "$CRON_KEY" ]; then
+            echo "::error::Secret CLEANING_CRON_KEY non configurata nel repo. Impostala in: Settings → Secrets and variables → Actions → New repository secret."
+            exit 1
+          fi
+          echo "Calling cleaning reminders endpoint..."
+          HTTP_CODE=$(curl -s -o /tmp/resp.json -w "%{http_code}" -m 30 "$SITE_URL/api/cron-cleaning-reminders.php?key=$CRON_KEY")
+          echo "HTTP $HTTP_CODE"
+          cat /tmp/resp.json
+          echo
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Endpoint ha risposto $HTTP_CODE (atteso 200)"
+            exit 1
+          fi
