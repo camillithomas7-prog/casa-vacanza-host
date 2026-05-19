@@ -393,7 +393,13 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   </div>
 </form>
 
-<?php if ($apt): ?>
+<?php if (!$apt): ?>
+<div class="card p-5 mt-5 border-2 border-dashed border-brand-300 bg-brand-50/50 dark:bg-brand-500/5 text-center">
+  <div class="h-14 w-14 mx-auto rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center mb-3"><i data-lucide="image-plus" class="size-[26px]"></i></div>
+  <h3 class="font-display font-bold text-lg">Foto e video</h3>
+  <p class="text-ink-500 text-sm mt-1 max-w-md mx-auto">Compila prima i dati principali qui sopra e clicca <b>Salva</b>. Subito dopo potrai caricare la galleria di foto e video.</p>
+</div>
+<?php else: ?>
 <div class="card p-4 sm:p-5 mt-5">
   <h3 class="font-display font-bold mb-3">Galleria foto e video</h3>
   <form method="post" enctype="multipart/form-data" class="flex flex-wrap items-center gap-3 mb-4">
