@@ -19,6 +19,47 @@ function pickRulePrice(int $ts, array $rules): ?float {
 
 function computeQuote(array $apt, array $rules, string $checkIn, string $checkOut, int $guests, float $couponPercent = 0): array {
     $nights = nightsBetween($checkIn, $checkOut);
+    $weekly = (float)($apt['weekly_price'] ?? 0);
+
+    if (isWeeklyOnly() && $weekly > 0 && in_array($nights, [7,14,21,30], true)) {
+        // ── MODALITÀ SOLO SETTIMANALE ──
+        // Riferimento: prezzo proporzionale alla tariffa settimanale.
+        // "Risparmio" = differenza tra riferimento e prezzo pacchetto.
+        $nightlyTotal = $weekly * ($nights / 7); // valore teorico se moltiplicassi a settimane
+        $package = $weekly; $packageLabel = '1 settimana';
+        if ($nights === 14) {
+            $package = !empty($apt['biweekly_price']) ? (float)$apt['biweekly_price'] : $weekly * 2;
+            $packageLabel = '2 settimane';
+        } elseif ($nights === 21) {
+            $package = !empty($apt['triweekly_price']) ? (float)$apt['triweekly_price'] : $weekly * 3;
+            $packageLabel = '3 settimane';
+        } elseif ($nights === 30) {
+            $package = !empty($apt['monthly_price']) ? (float)$apt['monthly_price'] : $weekly * (30/7);
+            $packageLabel = '1 mese';
+        }
+        $savings = max(0, round($nightlyTotal - $package, 2));
+        $discount = $savings;
+        $discountLabel = $savings > 0 ? "Risparmio {$packageLabel}" : null;
+        $packageBase = $package; // base da cui partono coupon/fee
+
+        if ($couponPercent > 0) {
+            $cd = $packageBase * ($couponPercent / 100);
+            $discount += $cd;
+            $discountLabel = ($discountLabel ? $discountLabel . ' + ' : '') . "Coupon -{$couponPercent}%";
+            $packageBase -= $cd;
+        }
+
+        $cleaningFee = (float)$apt['cleaning_fee'];
+        $taxNights = min($nights, (int)$apt['city_tax_max_nights'] ?: $nights);
+        $cityTax = (float)$apt['city_tax'] * max(1, $guests) * $taxNights;
+        $subtotal = $packageBase + $cleaningFee;
+        $total = $subtotal + $cityTax;
+        $breakdown = [];
+
+        return compact('nights','nightlyTotal','cleaningFee','cityTax','discount','discountLabel','subtotal','total','breakdown','savings','packageLabel');
+    }
+
+    // ── MODALITÀ CLASSICA (notte/weekend) ──
     $days = daysRange($checkIn, $checkOut);
     $breakdown = [];
     $nightlyTotal = 0;
@@ -41,14 +82,6 @@ function computeQuote(array $apt, array $rules, string $checkIn, string $checkOu
         $discount = $nightlyTotal - $apt['biweekly_price']; $discountLabel = '2 settimane';
     } elseif ($nights >= 7 && !empty($apt['weekly_price']) && $apt['weekly_price'] < $nightlyTotal) {
         $discount = $nightlyTotal - $apt['weekly_price']; $discountLabel = 'Tariffa settimanale';
-    }
-
-    if (!$discountLabel) {
-        $pct = 0;
-        if ($nights >= 30) $pct = (float)$apt['long_stay_discount_30'];
-        elseif ($nights >= 14) $pct = (float)$apt['long_stay_discount_14'];
-        elseif ($nights >= 7)  $pct = (float)$apt['long_stay_discount_7'];
-        if ($pct > 0) { $discount = $nightlyTotal * ($pct / 100); $discountLabel = "Sconto soggiorno $pct%"; }
     }
 
     if ($couponPercent > 0) {

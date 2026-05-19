@@ -411,12 +411,19 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <label class="block"><span class="label">Mensile</span><input class="input" type="number" step="0.01" name="monthly_price" value="<?= e((string)$f['monthly_price']) ?>"></label>
       </div>
       <?php endif; ?>
+      <?php if (isWeeklyOnly()): ?>
+        <input type="hidden" name="long_stay_discount_7" value="<?= e((string)$f['long_stay_discount_7']) ?>">
+        <input type="hidden" name="long_stay_discount_14" value="<?= e((string)$f['long_stay_discount_14']) ?>">
+        <input type="hidden" name="long_stay_discount_30" value="<?= e((string)$f['long_stay_discount_30']) ?>">
+        <div class="text-xs text-ink-500 pt-2">💡 Il <b>risparmio</b> per 2/3 settimane o 1 mese viene calcolato automaticamente confrontando il prezzo pacchetto con la tariffa settimanale × numero settimane. Il cliente vede in chiaro "Stai risparmiando €X".</div>
+      <?php else: ?>
       <h3 class="font-display font-bold pt-2">Sconti automatici %</h3>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <label class="block"><span class="label">>7 notti</span><input class="input" type="number" name="long_stay_discount_7" value="<?= e((string)$f['long_stay_discount_7']) ?>"></label>
         <label class="block"><span class="label">>14 notti</span><input class="input" type="number" name="long_stay_discount_14" value="<?= e((string)$f['long_stay_discount_14']) ?>"></label>
         <label class="block"><span class="label">>30 notti</span><input class="input" type="number" name="long_stay_discount_30" value="<?= e((string)$f['long_stay_discount_30']) ?>"></label>
       </div>
+      <?php endif; ?>
     </div>
 
     <div class="card p-4 sm:p-5 space-y-3">

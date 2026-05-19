@@ -247,11 +247,26 @@ require __DIR__ . '/partials/site-header.php';
             <input class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 placeholder:text-ink-300 placeholder:font-normal mt-0.5" placeholder="<?= e(t('apt.coupon_ph')) ?>" x-model="coupon" @input.debounce.500="quote()">
           </label>
 
+          <template x-if="q && q.nights > 0 && q.savings > 0">
+            <div class="rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-500/15 dark:to-teal-500/15 border border-emerald-200 dark:border-emerald-500/30 p-3.5 animate-slide-up">
+              <div class="flex items-center gap-2.5">
+                <div class="h-9 w-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0"><i data-lucide="piggy-bank" class="size-[18px]"></i></div>
+                <div class="text-sm">
+                  <div class="font-semibold text-emerald-700 dark:text-emerald-300">Stai risparmiando <span x-text="fmt(q.savings)" class="tabular-nums"></span></div>
+                  <div class="text-xs text-emerald-600/80 dark:text-emerald-400/80">avendo prenotato <span x-text="q.packageLabel"></span> invece di pagare a settimana</div>
+                </div>
+              </div>
+            </div>
+          </template>
+
           <template x-if="q && q.nights > 0">
             <div class="rounded-xl bg-ink-50 dark:bg-ink-900/40 p-4 text-sm space-y-2 animate-slide-up">
-              <div class="flex justify-between"><span class="text-ink-500"><span x-text="q.nights"></span> <?= e(t('apt.summary.nights')) ?></span><span class="font-medium tabular-nums" x-text="fmt(q.nightlyTotal)"></span></div>
-              <template x-if="q.discount > 0">
-                <div class="flex justify-between text-emerald-600"><span x-text="q.discountLabel"></span><span class="tabular-nums" x-text="'-' + fmt(q.discount)"></span></div>
+              <div class="flex justify-between">
+                <span class="text-ink-500" x-text="q.packageLabel || (q.nights + ' <?= e(t('apt.summary.nights')) ?>')"></span>
+                <span class="font-medium tabular-nums" x-text="fmt(q.subtotal - q.cleaningFee + (q.discount && !q.savings ? q.discount : 0))"></span>
+              </div>
+              <template x-if="q.savings > 0">
+                <div class="flex justify-between text-emerald-600 text-xs"><span>↳ Risparmio</span><span class="tabular-nums" x-text="'-' + fmt(q.savings)"></span></div>
               </template>
               <div class="flex justify-between"><span class="text-ink-500"><?= e(t('form.cleaning')) ?></span><span class="tabular-nums" x-text="fmt(q.cleaningFee)"></span></div>
               <div class="flex justify-between"><span class="text-ink-500"><?= e(t('form.city_tax')) ?></span><span class="tabular-nums" x-text="fmt(q.cityTax)"></span></div>
