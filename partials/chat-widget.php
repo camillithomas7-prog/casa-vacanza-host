@@ -65,10 +65,10 @@ $chatPhone = setting('contact_phone', cfg('site.phone'));
   </div>
   <div class="cv-chat-body" id="cv-chat-body"></div>
   <div class="cv-chat-quick" id="cv-chat-quick">
-    <button class="cv-quick-btn" data-msg="Che appartamenti avete disponibili?">📍 Appartamenti</button>
-    <button class="cv-quick-btn" data-msg="Quali prezzi avete?">💰 Prezzi</button>
-    <button class="cv-quick-btn" data-msg="Avete qualcosa con vista mare?">🌊 Vista mare</button>
-    <button class="cv-quick-btn" data-msg="Come si prenota?">📅 Prenotazione</button>
+    <button class="cv-quick-btn" data-msg="Cosa avete a giugno per 2 persone?">📅 Giugno · 2 pax</button>
+    <button class="cv-quick-btn" data-msg="Avete un appartamento vista mare sotto i 400€ a settimana?">🌊 Vista mare</button>
+    <button class="cv-quick-btn" data-msg="Cerco qualcosa per famiglia con piscina">👨‍👩‍👧 Famiglia</button>
+    <button class="cv-quick-btn" data-msg="Quali sono i 3 più economici?">💰 Economici</button>
   </div>
   <form class="cv-chat-input" id="cv-chat-form">
     <textarea id="cv-chat-text" placeholder="Scrivi un messaggio..." rows="1"></textarea>
@@ -131,7 +131,7 @@ $chatPhone = setting('contact_phone', cfg('site.phone'));
     if (!history.length) {
       const hour = new Date().getHours();
       const greet = hour < 12 ? 'Buongiorno' : (hour < 19 ? 'Ciao' : 'Buonasera');
-      addMsg('assistant', `${greet}! Sono ${NAME}, lavoro con Patrizia 😊\nDimmi pure: cerchi un appartamento per qualche giorno a Sharm? Posso aiutarti a trovare quello giusto.`);
+      addMsg('assistant', `${greet}! Sono ${NAME}, lavoro con Patrizia 😊\nDimmi due cose veloci e ti propongo subito 2-3 appartamenti giusti per te:\n• **Quando** vorresti venire a Sharm?\n• **In quanti** siete?`);
     } else {
       history.forEach(m => addMsg(m.role, m.content, m.cards));
     }
