@@ -79,6 +79,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // save
+    $bedsDouble = max(0, (int)($_POST['beds_double'] ?? 0));
+    $bedsSingle = max(0, (int)($_POST['beds_single'] ?? 0));
+    $bedsSofa   = max(0, (int)($_POST['beds_sofa'] ?? 0));
+    $bedsTotal  = $bedsDouble + $bedsSingle + $bedsSofa;
+    if ($bedsTotal === 0) $bedsTotal = max(1, (int)($_POST['beds'] ?? 1));
+
     $data = [
         'name' => trim($_POST['name'] ?? ''),
         'slug' => trim($_POST['slug'] ?? '') ?: slugify($_POST['name'] ?? ''),
@@ -89,7 +95,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'guests' => (int)($_POST['guests'] ?? 2),
         'bedrooms' => (int)($_POST['bedrooms'] ?? 1),
         'bathrooms' => (int)($_POST['bathrooms'] ?? 1),
-        'beds' => (int)($_POST['beds'] ?? 1),
+        'beds' => $bedsTotal,
+        'beds_double' => $bedsDouble,
+        'beds_single' => $bedsSingle,
+        'beds_sofa' => $bedsSofa,
         'size_sqm' => $_POST['size_sqm'] !== '' ? (int)$_POST['size_sqm'] : null,
         'amenities' => json_encode(array_values(array_filter(array_map('trim', explode(',', $_POST['amenities'] ?? ''))))),
         'rules' => $_POST['rules'] ?? '',
@@ -154,7 +163,7 @@ $zonesList = [];
 try {
     $zonesList = rows('SELECT name, kind FROM zones WHERE active = 1 ORDER BY kind ASC, position ASC, name ASC');
 } catch (Throwable $e) {}
-$defaults = ['name'=>'','slug'=>'','description'=>'','address'=>'','city'=>'','country'=>'Egitto','guests'=>2,'bedrooms'=>1,'bathrooms'=>1,'beds'=>1,'size_sqm'=>'','rules'=>'','check_in_time'=>'15:00','check_out_time'=>'11:00','base_price'=>80,'weekly_price'=>'','biweekly_price'=>'','triweekly_price'=>'','monthly_price'=>'','weekend_price'=>'','cleaning_fee'=>35,'security_deposit'=>0,'city_tax'=>2,'city_tax_max_nights'=>5,'long_stay_discount_7'=>5,'long_stay_discount_14'=>10,'long_stay_discount_30'=>20,'manager_commission_pct'=>20,'owner_name'=>'','active'=>1,'under_maintenance'=>0,'cover_image'=>'','block_number'=>'','cleaner_directions'=>'','gmaps_code'=>'','gmaps_resolved'=>''];
+$defaults = ['name'=>'','slug'=>'','description'=>'','address'=>'','city'=>'','country'=>'Egitto','guests'=>2,'bedrooms'=>1,'bathrooms'=>1,'beds'=>1,'beds_double'=>0,'beds_single'=>0,'beds_sofa'=>0,'size_sqm'=>'','rules'=>'','check_in_time'=>'15:00','check_out_time'=>'11:00','base_price'=>80,'weekly_price'=>'','biweekly_price'=>'','triweekly_price'=>'','monthly_price'=>'','weekend_price'=>'','cleaning_fee'=>35,'security_deposit'=>0,'city_tax'=>2,'city_tax_max_nights'=>5,'long_stay_discount_7'=>5,'long_stay_discount_14'=>10,'long_stay_discount_30'=>20,'manager_commission_pct'=>20,'owner_name'=>'','active'=>1,'under_maintenance'=>0,'cover_image'=>'','block_number'=>'','cleaner_directions'=>'','gmaps_code'=>'','gmaps_resolved'=>''];
 // Merge: i valori salvati sovrascrivono i default
 $f = $apt ? array_merge($defaults, $apt) : $defaults;
 
@@ -256,8 +265,25 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <label class="block"><span class="label">Ospiti</span><input class="input" type="number" min="1" name="guests" value="<?= (int)$f['guests'] ?>"></label>
         <label class="block"><span class="label">Dimensione (mq)</span><input class="input" type="number" name="size_sqm" value="<?= e((string)$f['size_sqm']) ?>"></label>
         <label class="block"><span class="label">Camere</span><input class="input" type="number" min="0" name="bedrooms" value="<?= (int)$f['bedrooms'] ?>"></label>
-        <label class="block"><span class="label">Letti</span><input class="input" type="number" min="1" name="beds" value="<?= (int)$f['beds'] ?>"></label>
         <label class="block"><span class="label">Bagni</span><input class="input" type="number" min="0" name="bathrooms" value="<?= (int)$f['bathrooms'] ?>"></label>
+        <div class="sm:col-span-2">
+          <span class="label">Dettaglio letti</span>
+          <div class="grid grid-cols-3 gap-2">
+            <label class="block">
+              <input class="input text-center" type="number" min="0" max="20" name="beds_double" value="<?= (int)$f['beds_double'] ?>">
+              <span class="text-[11px] text-ink-500 mt-1 block text-center">🛏️ Matrimoniali</span>
+            </label>
+            <label class="block">
+              <input class="input text-center" type="number" min="0" max="20" name="beds_single" value="<?= (int)$f['beds_single'] ?>">
+              <span class="text-[11px] text-ink-500 mt-1 block text-center">🛌 Singoli</span>
+            </label>
+            <label class="block">
+              <input class="input text-center" type="number" min="0" max="20" name="beds_sofa" value="<?= (int)$f['beds_sofa'] ?>">
+              <span class="text-[11px] text-ink-500 mt-1 block text-center">🛋️ Divani letto</span>
+            </label>
+          </div>
+          <span class="text-[11px] text-ink-500 mt-1 block">Il totale (<?= (int)$f['beds'] ?> letto<?= (int)$f['beds'] === 1 ? '' : 'i' ?>) viene calcolato automaticamente dalla somma.</span>
+        </div>
         <label class="block"><span class="label">Servizi (separati da virgola)</span><input class="input" name="amenities" value="<?= e($amenitiesStr) ?>" placeholder="WiFi, Aria, Parcheggio"></label>
         <label class="block"><span class="label">Check-in</span><input class="input" type="time" name="check_in_time" value="<?= e($f['check_in_time']) ?>"></label>
         <label class="block"><span class="label">Check-out</span><input class="input" type="time" name="check_out_time" value="<?= e($f['check_out_time']) ?>"></label>

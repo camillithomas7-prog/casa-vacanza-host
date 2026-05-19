@@ -70,6 +70,9 @@ function ensureColumns(): void {
         // [tabella, colonna, definizione]
         ['apartments', 'manager_commission_pct', 'DECIMAL(5,2) NOT NULL DEFAULT 20'],
         ['apartments', 'owner_name', "VARCHAR(190) DEFAULT ''"],
+        ['apartments', 'beds_double', 'TINYINT UNSIGNED NOT NULL DEFAULT 0'],
+        ['apartments', 'beds_single', 'TINYINT UNSIGNED NOT NULL DEFAULT 0'],
+        ['apartments', 'beds_sofa',   'TINYINT UNSIGNED NOT NULL DEFAULT 0'],
     ];
     try {
         foreach ($migrations as [$tbl, $col, $def]) {
