@@ -50,13 +50,13 @@ function computeQuote(array $apt, array $rules, string $checkIn, string $checkOu
         }
 
         $cleaningFee = (float)$apt['cleaning_fee'];
-        $taxNights = min($nights, (int)$apt['city_tax_max_nights'] ?: $nights);
-        $cityTax = (float)$apt['city_tax'] * max(1, $guests) * $taxNights;
+        $cityTax = 0; // Tassa di soggiorno rimossa dal sistema
         $subtotal = $packageBase + $cleaningFee;
-        $total = $subtotal + $cityTax;
+        $total = $subtotal;
+        $securityDeposit = round($subtotal * (securityDepositPct() / 100), 2);
         $breakdown = [];
 
-        return compact('nights','nightlyTotal','cleaningFee','cityTax','discount','discountLabel','subtotal','total','breakdown','savings','packageLabel');
+        return compact('nights','nightlyTotal','cleaningFee','cityTax','discount','discountLabel','subtotal','total','breakdown','savings','packageLabel','securityDeposit');
     }
 
     // ── MODALITÀ CLASSICA (notte/weekend) ──
@@ -91,10 +91,10 @@ function computeQuote(array $apt, array $rules, string $checkIn, string $checkOu
     }
 
     $cleaningFee = (float)$apt['cleaning_fee'];
-    $taxNights = min($nights, (int)$apt['city_tax_max_nights'] ?: $nights);
-    $cityTax = (float)$apt['city_tax'] * max(1, $guests) * $taxNights;
+    $cityTax = 0; // Tassa di soggiorno rimossa
     $subtotal = $nightlyTotal - $discount + $cleaningFee;
-    $total = $subtotal + $cityTax;
+    $total = $subtotal;
+    $securityDeposit = round($subtotal * (securityDepositPct() / 100), 2);
 
-    return compact('nights','nightlyTotal','cleaningFee','cityTax','discount','discountLabel','subtotal','total','breakdown');
+    return compact('nights','nightlyTotal','cleaningFee','cityTax','discount','discountLabel','subtotal','total','breakdown','securityDeposit');
 }

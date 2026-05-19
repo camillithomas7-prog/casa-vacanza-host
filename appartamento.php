@@ -205,7 +205,7 @@ require __DIR__ . '/partials/site-header.php';
           </div>
           <?php if ($rating): ?><div class="text-sm flex items-center gap-1"><i data-lucide="star" class="size-[14px] fill-amber-400 text-amber-400"></i> <strong><?= number_format($rating, 1) ?></strong></div><?php endif; ?>
         </div>
-        <div class="text-xs text-ink-500 mb-5"><?= e(t('apt.detail.fees_line', ['c' => fmtMoney((float)$a['cleaning_fee']), 't' => fmtMoney((float)$a['city_tax'])])) ?></div>
+        <div class="text-xs text-ink-500 mb-5">Pulizie <?= fmtMoney((float)$a['cleaning_fee']) ?> · Cauzione <?= (int)setting('security_deposit_pct', '20') ?>% rimborsabile</div>
 
         <template x-if="done">
           <div class="text-center py-6 animate-fade-in">
@@ -276,8 +276,24 @@ require __DIR__ . '/partials/site-header.php';
                 <div class="flex justify-between text-emerald-600 text-xs"><span>↳ Risparmio</span><span class="tabular-nums" x-text="'-' + fmt(q.savings)"></span></div>
               </template>
               <div class="flex justify-between"><span class="text-ink-500"><?= e(t('form.cleaning')) ?></span><span class="tabular-nums" x-text="fmt(q.cleaningFee)"></span></div>
-              <div class="flex justify-between"><span class="text-ink-500"><?= e(t('form.city_tax')) ?></span><span class="tabular-nums" x-text="fmt(q.cityTax)"></span></div>
+              <template x-if="q.cityTax > 0">
+                <div class="flex justify-between"><span class="text-ink-500"><?= e(t('form.city_tax')) ?></span><span class="tabular-nums" x-text="fmt(q.cityTax)"></span></div>
+              </template>
               <div class="flex justify-between font-display font-bold text-base pt-2 mt-1 border-t border-ink-200 dark:border-ink-700/80"><span><?= e(t('form.total')) ?></span><span class="tabular-nums" x-text="fmt(q.total)"></span></div>
+              <template x-if="q.securityDeposit > 0">
+                <div class="mt-2 pt-2 border-t border-dashed border-ink-200 dark:border-ink-700/60">
+                  <div class="flex justify-between items-start gap-2">
+                    <div class="flex items-start gap-1.5">
+                      <i data-lucide="shield-check" class="size-[14px] text-sky-600 mt-0.5 shrink-0"></i>
+                      <div>
+                        <div class="text-ink-700 dark:text-ink-200 text-xs font-medium">Cauzione (rimborsabile)</div>
+                        <div class="text-[10px] text-ink-500">Versata al check-in · restituita a fine soggiorno</div>
+                      </div>
+                    </div>
+                    <span class="tabular-nums text-sm font-medium text-sky-700 dark:text-sky-300" x-text="fmt(q.securityDeposit)"></span>
+                  </div>
+                </div>
+              </template>
             </div>
           </template>
 

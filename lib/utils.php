@@ -34,6 +34,10 @@ function isWeeklyOnly(): bool {
     return setting('weekly_only_mode', '1') === '1';
 }
 
+function securityDepositPct(): float {
+    return (float) setting('security_deposit_pct', '20');
+}
+
 function weeklyPriceOf(array $apt): float {
     if (!empty($apt['weekly_price'])) return (float)$apt['weekly_price'];
     return (float)$apt['base_price'] * 7;

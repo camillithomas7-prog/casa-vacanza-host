@@ -427,14 +427,23 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
 
     <div class="card p-4 sm:p-5 space-y-3">
-      <h3 class="font-display font-bold">Tasse & fee</h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <label class="block"><span class="label">Pulizie (€)</span><input class="input" type="number" step="0.01" name="cleaning_fee" value="<?= e((string)$f['cleaning_fee']) ?>"></label>
-        <label class="block"><span class="label">Cauzione (€)</span><input class="input" type="number" step="0.01" name="security_deposit" value="<?= e((string)$f['security_deposit']) ?>"></label>
-        <label class="block"><span class="label">Tassa soggiorno €/p/notte</span><input class="input" type="number" step="0.01" name="city_tax" value="<?= e((string)$f['city_tax']) ?>"></label>
-        <label class="block"><span class="label">Notti max tassa</span><input class="input" type="number" name="city_tax_max_nights" value="<?= e((string)$f['city_tax_max_nights']) ?>"></label>
+      <h3 class="font-display font-bold">Fee & stato</h3>
+      <label class="block">
+        <span class="label">Spese di pulizia (€)</span>
+        <input class="input" type="number" step="0.01" name="cleaning_fee" value="<?= e((string)$f['cleaning_fee']) ?>" placeholder="35">
+        <span class="text-[11px] text-ink-500 mt-1 block">Costo fisso aggiunto a ogni prenotazione.</span>
+      </label>
+      <div class="p-3 rounded-xl bg-sky-50 dark:bg-sky-500/10 border border-sky-200 dark:border-sky-500/30 flex items-start gap-2.5 text-sm">
+        <i data-lucide="shield-check" class="size-[18px] text-sky-600 shrink-0 mt-0.5"></i>
+        <div>
+          <div class="font-semibold text-sky-900 dark:text-sky-200">Cauzione automatica: <?= e(setting('security_deposit_pct', '20')) ?>%</div>
+          <div class="text-xs text-sky-700 dark:text-sky-300/80 mt-0.5">Calcolata sul totale prenotazione. Rimborsabile a fine soggiorno. <a href="/admin/impostazioni.php" class="underline">Cambia percentuale</a>.</div>
+        </div>
       </div>
-      <div class="flex flex-wrap gap-4 pt-2">
+      <input type="hidden" name="security_deposit" value="0">
+      <input type="hidden" name="city_tax" value="0">
+      <input type="hidden" name="city_tax_max_nights" value="0">
+      <div class="flex flex-wrap gap-4 pt-1">
         <label class="flex items-center gap-2"><input type="checkbox" name="active" <?= $f['active'] ? 'checked' : '' ?>> Attivo (visibile sul sito)</label>
         <label class="flex items-center gap-2"><input type="checkbox" name="under_maintenance" <?= $f['under_maintenance'] ? 'checked' : '' ?>> In manutenzione</label>
       </div>
