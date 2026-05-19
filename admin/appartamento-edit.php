@@ -433,11 +433,11 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <input class="input" type="number" step="0.01" name="cleaning_fee" value="<?= e((string)$f['cleaning_fee']) ?>" placeholder="35">
         <span class="text-[11px] text-ink-500 mt-1 block">Costo fisso aggiunto a ogni prenotazione.</span>
       </label>
-      <div class="p-3 rounded-xl bg-sky-50 dark:bg-sky-500/10 border border-sky-200 dark:border-sky-500/30 flex items-start gap-2.5 text-sm">
-        <i data-lucide="shield-check" class="size-[18px] text-sky-600 shrink-0 mt-0.5"></i>
+      <div class="p-3 rounded-xl bg-brand-50 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/30 flex items-start gap-2.5 text-sm">
+        <i data-lucide="lock" class="size-[18px] text-brand-600 shrink-0 mt-0.5"></i>
         <div>
-          <div class="font-semibold text-sky-900 dark:text-sky-200">Cauzione automatica: <?= e(setting('security_deposit_pct', '20')) ?>%</div>
-          <div class="text-xs text-sky-700 dark:text-sky-300/80 mt-0.5">Calcolata sul totale prenotazione. Rimborsabile a fine soggiorno. <a href="/admin/impostazioni.php" class="underline">Cambia percentuale</a>.</div>
+          <div class="font-semibold text-brand-900 dark:text-brand-200">Caparra automatica: <?= e(setting('security_deposit_pct', '20')) ?>%</div>
+          <div class="text-xs text-brand-700 dark:text-brand-300/80 mt-0.5">Cifra che il cliente versa subito online per <b>confermare</b> la prenotazione. Il saldo rimanente si paga all'arrivo. <a href="/admin/impostazioni.php" class="underline">Cambia percentuale</a>.</div>
         </div>
       </div>
       <input type="hidden" name="security_deposit" value="0">

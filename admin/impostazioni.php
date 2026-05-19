@@ -20,6 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Cauzione %
         $sdp = max(0, min(100, (float)($_POST['security_deposit_pct'] ?? 20)));
         q('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)', ['security_deposit_pct', (string)$sdp]);
+        // Regola non fumatori globale
+        $nsm = isset($_POST['rules_no_smoking_global']) ? '1' : '0';
+        q('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)', ['rules_no_smoking_global', $nsm]);
         $msg = 'Impostazioni salvate';
     }
     if ($action === 'save_features') {
@@ -108,12 +111,12 @@ require __DIR__ . '/../partials/admin-shell-top.php';
           </div>
         </label>
         <label class="block mt-3">
-          <span class="label flex items-center gap-1.5"><i data-lucide="shield-check" class="size-[14px] text-sky-600"></i> Cauzione automatica (%)</span>
+          <span class="label flex items-center gap-1.5"><i data-lucide="lock" class="size-[14px] text-brand-600"></i> Caparra per confermare (%)</span>
           <div class="relative">
             <input class="input pr-10" type="number" step="0.5" min="0" max="100" name="security_deposit_pct" value="<?= e($settings['security_deposit_pct'] ?? '20') ?>">
             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 text-sm">%</span>
           </div>
-          <span class="text-[11px] text-ink-500 mt-1 block">Calcolata in automatico su ogni prenotazione (% sul soggiorno + pulizie, esclusa tassa di soggiorno). Mostrata al cliente come voce separata "rimborsabile a fine soggiorno". Imposta 0 per disattivare.</span>
+          <span class="text-[11px] text-ink-500 mt-1 block">Percentuale del totale che il cliente versa subito online per <b>bloccare le date</b>. Il saldo rimanente lo paga all'arrivo direttamente a Patrizia. Imposta 0 per disattivare.</span>
         </label>
       </div>
       <div class="pt-3 border-t border-ink-100 dark:border-ink-800/80">

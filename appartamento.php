@@ -144,11 +144,26 @@ require __DIR__ . '/partials/site-header.php';
         </div>
       </div>
 
-      <?php if ($a['rules']): ?>
+      <?php
+        $globalNoSmoking = setting('rules_no_smoking_global', '1') === '1';
+        $hasRules = !empty(trim($a['rules'] ?? '')) || $globalNoSmoking;
+      ?>
+      <?php if ($hasRules): ?>
         <div>
           <h2 class="font-serif text-3xl font-semibold tracking-tight mb-4"><?= e(t('apt.rules')) ?></h2>
-          <div class="card p-6">
-            <p class="text-ink-700 dark:text-ink-300 whitespace-pre-line leading-relaxed"><?= e($a['rules']) ?></p>
+          <div class="card p-6 space-y-3">
+            <?php if ($globalNoSmoking): ?>
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30">
+                <div class="h-9 w-9 rounded-xl bg-red-100 dark:bg-red-500/20 text-red-600 flex items-center justify-center shrink-0 text-lg">🚭</div>
+                <div>
+                  <div class="font-semibold text-red-900 dark:text-red-200">Solo non fumatori all'interno</div>
+                  <div class="text-sm text-red-700 dark:text-red-300/80 mt-0.5">È possibile fumare esclusivamente sul balcone o in terrazzo.</div>
+                </div>
+              </div>
+            <?php endif; ?>
+            <?php if (!empty(trim($a['rules'] ?? ''))): ?>
+              <p class="text-ink-700 dark:text-ink-300 whitespace-pre-line leading-relaxed"><?= e($a['rules']) ?></p>
+            <?php endif; ?>
           </div>
         </div>
       <?php endif; ?>
@@ -205,7 +220,7 @@ require __DIR__ . '/partials/site-header.php';
           </div>
           <?php if ($rating): ?><div class="text-sm flex items-center gap-1"><i data-lucide="star" class="size-[14px] fill-amber-400 text-amber-400"></i> <strong><?= number_format($rating, 1) ?></strong></div><?php endif; ?>
         </div>
-        <div class="text-xs text-ink-500 mb-5">Pulizie <?= fmtMoney((float)$a['cleaning_fee']) ?> · Cauzione <?= (int)setting('security_deposit_pct', '20') ?>% rimborsabile</div>
+        <div class="text-xs text-ink-500 mb-5">Pulizie <?= fmtMoney((float)$a['cleaning_fee']) ?> · Caparra <?= (int)setting('security_deposit_pct', '20') ?>% per confermare</div>
 
         <template x-if="done">
           <div class="text-center py-6 animate-fade-in">
@@ -291,13 +306,13 @@ require __DIR__ . '/partials/site-header.php';
                 <div class="mt-2 pt-2 border-t border-dashed border-ink-200 dark:border-ink-700/60">
                   <div class="flex justify-between items-start gap-2">
                     <div class="flex items-start gap-1.5">
-                      <i data-lucide="shield-check" class="size-[14px] text-sky-600 mt-0.5 shrink-0"></i>
+                      <i data-lucide="lock" class="size-[14px] text-brand-600 mt-0.5 shrink-0"></i>
                       <div>
-                        <div class="text-ink-700 dark:text-ink-200 text-xs font-medium">Cauzione (rimborsabile)</div>
-                        <div class="text-[10px] text-ink-500">Versata al check-in · restituita a fine soggiorno</div>
+                        <div class="text-ink-700 dark:text-ink-200 text-xs font-medium">Caparra per confermare la prenotazione</div>
+                        <div class="text-[10px] text-ink-500">Versa solo questa cifra ora per bloccare le date · il saldo lo paghi all'arrivo</div>
                       </div>
                     </div>
-                    <span class="tabular-nums text-sm font-medium text-sky-700 dark:text-sky-300" x-text="fmt(q.securityDeposit)"></span>
+                    <span class="tabular-nums text-sm font-bold text-brand-700 dark:text-brand-300" x-text="fmt(q.securityDeposit)"></span>
                   </div>
                 </div>
               </template>
