@@ -3,7 +3,19 @@ require_once __DIR__ . '/../lib/auth.php';
 require_once __DIR__ . '/../lib/utils.php';
 requireAdmin();
 
-$items = rows('SELECT a.*, (SELECT url FROM photos WHERE apartment_id = a.id ORDER BY position ASC LIMIT 1) AS photo, (SELECT COUNT(*) FROM bookings WHERE apartment_id = a.id) AS bookings_count, (SELECT COALESCE(SUM(total),0) FROM bookings WHERE apartment_id = a.id AND status != "cancelled") AS revenue FROM apartments a ORDER BY a.created_at DESC');
+$zoneFilter = trim($_GET['zona'] ?? '');
+$searchQ = trim($_GET['q'] ?? '');
+
+// Lista zone distinte (per i chip filtro) con conteggio
+$zoneCounts = rows("SELECT city, COUNT(*) AS n FROM apartments WHERE city IS NOT NULL AND city != '' GROUP BY city ORDER BY n DESC, city ASC");
+$totAll = (int)val('SELECT COUNT(*) FROM apartments');
+
+$where = []; $params = [];
+if ($zoneFilter !== '') { $where[] = 'a.city = ?'; $params[] = $zoneFilter; }
+if ($searchQ !== '') { $where[] = '(a.name LIKE ? OR a.description LIKE ?)'; $params[] = "%$searchQ%"; $params[] = "%$searchQ%"; }
+$whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+$items = rows("SELECT a.*, (SELECT url FROM photos WHERE apartment_id = a.id ORDER BY position ASC LIMIT 1) AS photo, (SELECT COUNT(*) FROM bookings WHERE apartment_id = a.id) AS bookings_count, (SELECT COALESCE(SUM(total),0) FROM bookings WHERE apartment_id = a.id AND status != 'cancelled') AS revenue FROM apartments a $whereSql ORDER BY a.created_at DESC", $params);
 
 $title = 'Appartamenti';
 require __DIR__ . '/../partials/head.php';
@@ -13,9 +25,39 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   <div class="flex items-center justify-between flex-wrap gap-3">
     <div>
       <h1 class="font-serif text-3xl font-semibold tracking-tight">Appartamenti</h1>
-      <p class="text-ink-500 mt-1">Gestisci la tua flotta di proprietà · <?= count($items) ?> totali</p>
+      <p class="text-ink-500 mt-1">
+        Gestisci la tua flotta di proprietà ·
+        <?php if ($zoneFilter || $searchQ): ?>
+          <b><?= count($items) ?></b> su <?= $totAll ?> totali
+        <?php else: ?>
+          <?= count($items) ?> totali
+        <?php endif; ?>
+      </p>
     </div>
     <a href="/admin/appartamento-edit.php" class="btn-primary"><i data-lucide="plus" class="size-[18px]"></i> Nuovo appartamento</a>
+  </div>
+
+  <div class="card p-3 sm:p-4 space-y-3">
+    <form method="get" class="relative">
+      <i data-lucide="search" class="size-[16px] absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none"></i>
+      <input type="text" name="q" value="<?= e($searchQ) ?>" placeholder="Cerca per nome o descrizione..." class="input pl-10 pr-10">
+      <?php if ($zoneFilter): ?><input type="hidden" name="zona" value="<?= e($zoneFilter) ?>"><?php endif; ?>
+      <?php if ($searchQ): ?>
+        <a href="?<?= http_build_query(array_filter(['zona' => $zoneFilter])) ?>" class="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-red-500" title="Cancella ricerca"><i data-lucide="x" class="size-[16px]"></i></a>
+      <?php endif; ?>
+    </form>
+
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="text-[11px] font-semibold uppercase tracking-wider text-ink-500 mr-1">Zona:</span>
+      <a href="?<?= http_build_query(array_filter(['q' => $searchQ])) ?>" class="px-3 py-1.5 rounded-full text-xs font-medium border transition <?= $zoneFilter === '' ? 'bg-brand-500 text-white border-brand-500' : 'border-ink-200 text-ink-600 hover:bg-ink-50 dark:border-ink-700 dark:hover:bg-ink-800' ?>">
+        Tutte (<?= $totAll ?>)
+      </a>
+      <?php foreach ($zoneCounts as $z): ?>
+        <a href="?<?= http_build_query(array_filter(['zona' => $z['city'], 'q' => $searchQ])) ?>" class="px-3 py-1.5 rounded-full text-xs font-medium border transition <?= $zoneFilter === $z['city'] ? 'bg-brand-500 text-white border-brand-500' : 'border-ink-200 text-ink-600 hover:bg-ink-50 dark:border-ink-700 dark:hover:bg-ink-800' ?>">
+          <?= e($z['city']) ?> <span class="opacity-70">(<?= (int)$z['n'] ?>)</span>
+        </a>
+      <?php endforeach; ?>
+    </div>
   </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -52,9 +94,15 @@ require __DIR__ . '/../partials/admin-shell-top.php';
   <?php if (!$items): ?>
     <div class="card p-14 text-center">
       <div class="h-16 w-16 mx-auto rounded-2xl bg-brand-50 dark:bg-brand-500/15 text-brand-600 flex items-center justify-center mb-4"><i data-lucide="building-2" class="size-[28px]"></i></div>
-      <div class="font-display font-bold text-xl">Nessun appartamento</div>
-      <div class="text-ink-500 mt-1">Crea il primo per iniziare a gestire prenotazioni.</div>
-      <a href="/admin/appartamento-edit.php" class="btn-primary mt-6 inline-flex"><i data-lucide="plus" class="size-[18px]"></i> Crea primo appartamento</a>
+      <?php if ($zoneFilter || $searchQ): ?>
+        <div class="font-display font-bold text-xl">Nessun risultato</div>
+        <div class="text-ink-500 mt-1">Nessun appartamento trovato per i filtri applicati.</div>
+        <a href="/admin/appartamenti.php" class="btn-outline mt-6 inline-flex"><i data-lucide="x" class="size-[16px]"></i> Cancella filtri</a>
+      <?php else: ?>
+        <div class="font-display font-bold text-xl">Nessun appartamento</div>
+        <div class="text-ink-500 mt-1">Crea il primo per iniziare a gestire prenotazioni.</div>
+        <a href="/admin/appartamento-edit.php" class="btn-primary mt-6 inline-flex"><i data-lucide="plus" class="size-[18px]"></i> Crea primo appartamento</a>
+      <?php endif; ?>
     </div>
   <?php endif; ?>
 </div>
