@@ -112,6 +112,23 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
           </select>
         </div>
       </label>
+      <?php if (isWeeklyOnly()): ?>
+      <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
+        <i data-lucide="calendar" class="size-[18px] text-brand-500 shrink-0"></i>
+        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Giorno di arrivo</div>
+          <input type="date" name="from" class="w-full bg-transparent outline-none text-sm font-medium"></div>
+      </label>
+      <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
+        <i data-lucide="hourglass" class="size-[18px] text-brand-500 shrink-0"></i>
+        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Durata</div>
+          <select name="weeks" class="w-full bg-transparent outline-none text-sm font-medium">
+            <option value="1">1 settimana</option>
+            <option value="2">2 settimane</option>
+            <option value="3">3 settimane</option>
+            <option value="4">1 mese</option>
+          </select></div>
+      </label>
+      <?php else: ?>
       <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
         <i data-lucide="calendar" class="size-[18px] text-brand-500 shrink-0"></i>
         <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.checkin')) ?></div>
@@ -122,6 +139,7 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
         <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.checkout')) ?></div>
           <input type="date" name="to" class="w-full bg-transparent outline-none text-sm font-medium"></div>
       </label>
+      <?php endif; ?>
       <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
         <i data-lucide="users" class="size-[18px] text-brand-500 shrink-0"></i>
         <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.guests')) ?></div>

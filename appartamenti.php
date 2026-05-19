@@ -48,6 +48,24 @@ require __DIR__ . '/partials/site-header.php';
           </select>
         </div>
       </label>
+      <?php if (isWeeklyOnly()): ?>
+      <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
+        <i data-lucide="calendar" class="size-[18px] text-brand-500 shrink-0"></i>
+        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Giorno di arrivo</div>
+          <input type="date" name="from" value="<?= e($_GET['from'] ?? '') ?>" class="w-full bg-transparent outline-none text-sm font-medium"></div>
+      </label>
+      <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
+        <i data-lucide="hourglass" class="size-[18px] text-brand-500 shrink-0"></i>
+        <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">Durata</div>
+          <select name="weeks" class="w-full bg-transparent outline-none text-sm font-medium">
+            <?php $wk = (int)($_GET['weeks'] ?? 1); ?>
+            <option value="1" <?= $wk === 1 ? 'selected' : '' ?>>1 settimana</option>
+            <option value="2" <?= $wk === 2 ? 'selected' : '' ?>>2 settimane</option>
+            <option value="3" <?= $wk === 3 ? 'selected' : '' ?>>3 settimane</option>
+            <option value="4" <?= $wk === 4 ? 'selected' : '' ?>>1 mese</option>
+          </select></div>
+      </label>
+      <?php else: ?>
       <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
         <i data-lucide="calendar" class="size-[18px] text-brand-500 shrink-0"></i>
         <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.checkin')) ?></div>
@@ -58,6 +76,7 @@ require __DIR__ . '/partials/site-header.php';
         <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.checkout')) ?></div>
           <input type="date" name="to" value="<?= e($_GET['to'] ?? '') ?>" class="w-full bg-transparent outline-none text-sm font-medium"></div>
       </label>
+      <?php endif; ?>
       <label class="flex items-center gap-3 px-4 py-3 rounded-xl ring-focus border border-transparent border-l-ink-100 dark:border-l-ink-800">
         <i data-lucide="users" class="size-[18px] text-brand-500 shrink-0"></i>
         <div class="flex-1"><div class="text-[11px] font-semibold uppercase tracking-wider text-ink-500"><?= e(t('common.guests')) ?></div>
@@ -65,6 +84,15 @@ require __DIR__ . '/partials/site-header.php';
       </label>
       <button class="btn-primary h-12 md:h-full px-6 md:px-5"><i data-lucide="search" class="size-[18px]"></i> <?= e(t('common.search')) ?></button>
     </form>
+
+    <?php if (isWeeklyOnly()): ?>
+    <div class="mt-5 p-3.5 rounded-xl bg-sky-50 dark:bg-sky-500/10 border border-sky-200 dark:border-sky-500/30 text-sm flex items-start gap-2.5">
+      <i data-lucide="info" class="size-[18px] text-sky-600 shrink-0 mt-0.5"></i>
+      <div class="text-sky-900 dark:text-sky-200">
+        <b>Soggiorni minimi di 1 settimana.</b> Puoi scegliere qualsiasi giorno della settimana come arrivo: noi calcoliamo automaticamente la fine in base alla durata scelta (1, 2, 3 settimane o 1 mese).
+      </div>
+    </div>
+    <?php endif; ?>
 
     <div class="flex items-center gap-2 flex-wrap mt-5 text-sm">
       <span class="text-ink-500"><?= e(t('apt_list.quickfilters')) ?></span>

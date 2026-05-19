@@ -80,6 +80,8 @@ function calPicker(aptId) {
     aptId,
     from: '',
     to: '',
+    weeklyOnly: <?= isWeeklyOnly() ? 'true' : 'false' ?>,
+    weeks: 1,
     get nights() {
       if (!this.from || !this.to) return 0;
       return Math.round((new Date(this.to) - new Date(this.from)) / 86400000);
@@ -89,8 +91,23 @@ function calPicker(aptId) {
         const saved = JSON.parse(sessionStorage.getItem('cv_book_' + this.aptId) || '{}');
         if (saved.from) this.from = saved.from;
         if (saved.to) this.to = saved.to;
+        if (saved.weeks) this.weeks = parseInt(saved.weeks) || 1;
       } catch(e) {}
+      // Sync con il bookingForm sulla pagina: ascolta i cambi di durata
+      window.addEventListener('cv-weeks-change', (e) => {
+        this.weeks = parseInt(e.detail.weeks) || 1;
+        if (this.from) this.recalcTo();
+      });
       this.$nextTick(() => { if (window.lucide) lucide.createIcons(); });
+    },
+    recalcTo() {
+      if (!this.from) { this.to = ''; return; }
+      const w = parseInt(this.weeks) || 1;
+      const nights = w === 4 ? 30 : w * 7;
+      const d = new Date(this.from + 'T00:00:00');
+      d.setDate(d.getDate() + nights);
+      const yyyy = d.getFullYear(), mm = String(d.getMonth() + 1).padStart(2, '0'), dd = String(d.getDate()).padStart(2, '0');
+      this.to = `${yyyy}-${mm}-${dd}`;
     },
     fmtIt(d) {
       if (!d) return '';
@@ -103,6 +120,18 @@ function calPicker(aptId) {
       return def;
     },
     pick(d) {
+      if (this.weeklyOnly) {
+        // Modalità solo settimanale: 1 click = arrivo. Il check-out è auto.
+        this.from = d;
+        this.recalcTo();
+        this.persist();
+        window.dispatchEvent(new CustomEvent('cv-cal-pick', { detail: { from: this.from, to: this.to } }));
+        setTimeout(() => {
+          const f = document.getElementById('booking-form');
+          if (f) f.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+        return;
+      }
       if (!this.from || (this.from && this.to)) {
         this.from = d; this.to = '';
       } else if (d <= this.from) {
@@ -125,7 +154,7 @@ function calPicker(aptId) {
       window.dispatchEvent(new CustomEvent('cv-cal-pick', { detail: { from: '', to: '' } }));
     },
     persist() {
-      try { sessionStorage.setItem('cv_book_' + this.aptId, JSON.stringify({ from: this.from, to: this.to })); } catch(e) {}
+      try { sessionStorage.setItem('cv_book_' + this.aptId, JSON.stringify({ from: this.from, to: this.to, weeks: this.weeks })); } catch(e) {}
     }
   };
 }

@@ -219,9 +219,13 @@ require __DIR__ . '/partials/site-header.php';
 
         <form x-show="!done" @submit.prevent="submit" class="space-y-2.5">
           <?php if (isWeeklyOnly()): ?>
+            <div class="rounded-xl bg-sky-50 dark:bg-sky-500/10 border border-sky-200 dark:border-sky-500/30 p-3 flex items-start gap-2 text-xs text-sky-900 dark:text-sky-200">
+              <i data-lucide="info" class="size-[14px] text-sky-600 shrink-0 mt-0.5"></i>
+              <div><b>Come funziona:</b> scegli quanto vuoi restare (1, 2, 3 sett. o 1 mese) e poi il giorno di arrivo che preferisci. La data di partenza la calcoliamo noi.</div>
+            </div>
             <label class="block px-3.5 py-2.5 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm cursor-pointer hover:bg-ink-50/40 dark:hover:bg-ink-900/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
-              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400">Durata soggiorno</span>
-              <select class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5" x-model.number="weeks" @change="updateCheckout(); quote();">
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400">1. Durata soggiorno</span>
+              <select class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5" x-model.number="weeks" @change="onWeeksChange();">
                 <option value="1">1 settimana (7 notti)</option>
                 <option value="2">2 settimane (14 notti)</option>
                 <option value="3">3 settimane (21 notti)</option>
@@ -229,10 +233,13 @@ require __DIR__ . '/partials/site-header.php';
               </select>
             </label>
             <label class="block px-3.5 py-2.5 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm cursor-pointer hover:bg-ink-50/40 dark:hover:bg-ink-900/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
-              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('apt.checkin')) ?> · giorno di arrivo</span>
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400">2. Giorno di arrivo (qualsiasi giorno)</span>
               <input type="date" required class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5 booking-date" x-model="from" @change="updateCheckout(); quote();">
             </label>
-            <div class="text-xs text-ink-500 px-1">Check-out automatico: <span class="font-semibold text-ink-700 dark:text-ink-200" x-text="to || '—'"></span></div>
+            <div class="text-xs px-1 flex items-center gap-1.5" x-show="from">
+              <i data-lucide="calendar-check" class="size-[12px] text-emerald-600"></i>
+              <span class="text-ink-500">Partirai il <span class="font-semibold text-ink-700 dark:text-ink-200" x-text="to ? new Date(to).toLocaleDateString('it-IT') : '—'"></span></span>
+            </div>
           <?php else: ?>
           <div class="grid grid-cols-2 gap-0 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm overflow-hidden divide-x divide-ink-100 dark:divide-ink-700/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
             <label class="block px-3.5 py-2.5 cursor-pointer hover:bg-ink-50/60 dark:hover:bg-ink-900/60 transition-colors">
@@ -456,6 +463,12 @@ function bookingForm() {
       const dd = String(d.getDate()).padStart(2, '0');
       this.to = yyyy + '-' + mm + '-' + dd;
     },
+    onWeeksChange() {
+      this.updateCheckout();
+      this.quote();
+      // Sincronizza il calendario visivo
+      window.dispatchEvent(new CustomEvent('cv-weeks-change', { detail: { weeks: this.weeks } }));
+    },
     flagOf(code) {
       if (!code || code.length !== 2) return '';
       return code.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0)));
@@ -483,18 +496,26 @@ function bookingForm() {
         const saved = JSON.parse(sessionStorage.getItem('cv_book_' + this.aptId) || '{}');
         if (saved.from) this.from = saved.from;
         if (saved.to) this.to = saved.to;
+        if (saved.weeks && this.weeklyOnly) this.weeks = parseInt(saved.weeks) || 1;
       } catch (e) {}
+      // In modalità weekly-only: se ho una "from" ma non "to" (o "to" inconsistente con weeks),
+      // ricalcolo "to" subito così il quote parte coi numeri giusti.
+      if (this.weeklyOnly && this.from) {
+        this.updateCheckout();
+      }
       if (this.from && this.to) this.quote();
       this.$watch('from', () => this.persist());
       this.$watch('to', () => this.persist());
+      this.$watch('weeks', () => this.persist());
       window.addEventListener('cv-cal-pick', (e) => {
         this.from = e.detail.from || '';
         this.to = e.detail.to || '';
+        if (this.weeklyOnly && this.from) this.updateCheckout();
         if (this.from && this.to) this.quote(); else this.q = null;
       });
     },
     persist() {
-      try { sessionStorage.setItem('cv_book_' + this.aptId, JSON.stringify({ from: this.from, to: this.to })); } catch (e) {}
+      try { sessionStorage.setItem('cv_book_' + this.aptId, JSON.stringify({ from: this.from, to: this.to, weeks: this.weeks })); } catch (e) {}
     },
     async quote() {
       if (!this.from || !this.to) return;

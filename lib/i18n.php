@@ -525,11 +525,11 @@ $TRANSLATIONS = [
     'it' => 'Disponibilità', 'en' => 'Availability', 'ru' => 'Доступность', 'es' => 'Disponibilidad', 'de' => 'Verfügbarkeit',
 ],
 'apt.availability.tap' => [
-    'it' => 'Tocca le date verdi per selezionare check-in e check-out.',
-    'en' => 'Tap the green dates to pick check-in and check-out.',
-    'ru' => 'Нажмите на зелёные даты, чтобы выбрать заезд и выезд.',
-    'es' => 'Toca las fechas verdes para elegir entrada y salida.',
-    'de' => 'Tipp auf die grünen Daten, um Anreise und Abreise zu wählen.',
+    'it' => 'Tocca un giorno verde per scegliere il tuo arrivo. Il check-out viene calcolato automaticamente in base alla durata selezionata (1, 2, 3 settimane o 1 mese).',
+    'en' => 'Tap a green date to pick your arrival. The check-out is calculated automatically based on the selected stay length (1, 2, 3 weeks or 1 month).',
+    'ru' => 'Нажмите на зелёную дату — это будет ваш заезд. Дата выезда вычисляется автоматически по выбранной продолжительности (1, 2, 3 недели или 1 месяц).',
+    'es' => 'Toca una fecha verde para elegir tu llegada. La salida se calcula automáticamente según la duración (1, 2, 3 semanas o 1 mes).',
+    'de' => 'Tipp auf ein grünes Datum für deine Anreise. Die Abreise wird automatisch anhand der gewählten Dauer berechnet (1, 2, 3 Wochen oder 1 Monat).',
 ],
 'apt.rules' => [
     'it' => 'Regole della casa', 'en' => 'House rules', 'ru' => 'Правила проживания', 'es' => 'Normas de la casa', 'de' => 'Hausregeln',
