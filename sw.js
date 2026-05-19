@@ -1,7 +1,7 @@
 // Service Worker for Patrizia Mancini Casa Vacanza
 // Handles push notifications and notification clicks.
 
-const SW_VERSION = 'v3';
+const SW_VERSION = 'v4';
 const ICON = '/assets/logo-512.png?v=2';
 const BADGE = '/assets/logo-192.png?v=2';
 
@@ -46,7 +46,9 @@ self.addEventListener('push', (event) => {
     body: payload.body || 'Hai una nuova notifica',
     icon: ICON,
     badge: BADGE,
-    tag: payload.type || 'cv-notif',
+    // Tag univoco: con payload.id ogni notifica è separata (iOS le mostra tutte
+    // invece di sostituire la precedente). Fallback al type se manca l'id.
+    tag: payload.id || payload.type || ('cv-' + Date.now()),
     renotify: true,
     // requireInteraction = true: la notifica resta finché l'utente non la
     // tocca. Importante su Android perché altrimenti schermo spento + schermata
