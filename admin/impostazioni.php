@@ -9,7 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     if ($action === 'save_settings') {
         foreach (['site_name','contact_email','contact_phone','currency','language','timezone',
-                 'social_facebook','social_instagram','social_tiktok'] as $k) {
+                 'social_facebook','social_instagram','social_tiktok',
+                 'openai_api_key','chat_assistant_name','openai_model'] as $k) {
             $v = trim($_POST[$k] ?? '');
             q('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)', [$k, $v]);
         }
@@ -89,6 +90,31 @@ require __DIR__ . '/../partials/admin-shell-top.php';
             <span class="label flex items-center gap-1.5"><i data-lucide="music" class="size-[14px]"></i> TikTok</span>
             <input class="input" name="social_tiktok" placeholder="https://tiktok.com/@..." value="<?= e($settings['social_tiktok'] ?? '') ?>">
           </label>
+        </div>
+      </div>
+      <div class="pt-3 border-t border-ink-100 dark:border-ink-800/80">
+        <h3 class="font-display font-bold flex items-center gap-2 mb-3"><i data-lucide="message-circle" class="size-[18px]"></i> Chat assistente AI</h3>
+        <p class="text-xs text-ink-500 mb-3">Widget chat in basso a destra sul sito. Risponde ai clienti su appartamenti, prezzi e prenotazioni usando i dati del gestionale. Lascia vuoto per disabilitare.</p>
+        <div class="space-y-2.5">
+          <label class="block">
+            <span class="label">OpenAI API Key</span>
+            <input class="input font-mono text-xs" type="password" name="openai_api_key" placeholder="sk-..." value="<?= e($settings['openai_api_key'] ?? '') ?>" autocomplete="off">
+            <span class="text-[11px] text-ink-500 mt-1 block">Crea la chiave su <a class="underline" href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a>. Costa pochi centesimi al mese per uso normale.</span>
+          </label>
+          <div class="grid grid-cols-2 gap-2.5">
+            <label class="block">
+              <span class="label">Nome assistente</span>
+              <input class="input" name="chat_assistant_name" value="<?= e($settings['chat_assistant_name'] ?? 'Sofia') ?>" placeholder="Sofia">
+            </label>
+            <label class="block">
+              <span class="label">Modello OpenAI</span>
+              <select class="input" name="openai_model">
+                <?php $m = $settings['openai_model'] ?? 'gpt-4o-mini'; ?>
+                <option value="gpt-4o-mini" <?= $m === 'gpt-4o-mini' ? 'selected' : '' ?>>gpt-4o-mini (economico)</option>
+                <option value="gpt-4o" <?= $m === 'gpt-4o' ? 'selected' : '' ?>>gpt-4o (qualità più alta)</option>
+              </select>
+            </label>
+          </div>
         </div>
       </div>
       <button class="btn-primary"><i data-lucide="save" class="size-[16px]"></i> Salva</button>

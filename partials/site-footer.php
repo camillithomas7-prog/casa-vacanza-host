@@ -72,5 +72,6 @@
     </div>
   </div>
 </footer>
+<?php @include __DIR__ . '/chat-widget.php'; ?>
 <script>lucide.createIcons();</script>
 </body></html>
