@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../lib/db.php';
 require_once __DIR__ . '/../lib/utils.php';
+require_once __DIR__ . '/../lib/notify.php';
 
 header('Content-Type: application/json');
 
@@ -254,15 +255,14 @@ if ($escalated || ($contactName && $contactPhone)) {
     q('UPDATE chat_conversations SET status = "escalated", escalated_at = COALESCE(escalated_at, NOW()), escalation_reason = COALESCE(NULLIF(escalation_reason,""), ?) WHERE id = ?',
         [$reason, $conv['id']]);
 
-    // Notifica admin
+    // Notifica admin + push (web/iOS PWA)
     try {
-        $title = $contactPhone
-            ? 'Nuovo contatto da chat: ' . ($contactName ?: 'cliente')
-            : 'Chat richiede aiuto umano';
-        $bodyN = ($contactPhone ? 'Tel: ' . $contactPhone . ' · ' : '') . ($reason ?: 'Richiesta non gestita dall\'assistente');
-        q('INSERT INTO notifications (id, type, title, body, link) VALUES (?, ?, ?, ?, ?)',
-            [newId(), 'chat_escalation', $title, mb_substr($bodyN, 0, 240), '/admin/chat.php?id=' . $conv['id']]);
-    } catch (Throwable $e) {}
+        $titleN = $contactPhone
+            ? '📞 Nuovo contatto chat: ' . ($contactName ?: 'cliente')
+            : '⚠ Chat: serve risposta umana';
+        $bodyN = ($contactPhone ? 'Tel: ' . $contactPhone . ' · ' : '') . ($reason ?: 'Richiesta che Sofia non può gestire');
+        notify('chat_escalation', $titleN, mb_substr($bodyN, 0, 240), '/admin/chat.php?id=' . $conv['id']);
+    } catch (Throwable $e) { error_log('chat notify push: ' . $e->getMessage()); }
 }
 
 // Salva risposta assistant (pulita)
