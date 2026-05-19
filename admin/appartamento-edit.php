@@ -284,7 +284,103 @@ require __DIR__ . '/../partials/admin-shell-top.php';
           </div>
           <span class="text-[11px] text-ink-500 mt-1 block">Il totale (<?= (int)$f['beds'] ?> letto<?= (int)$f['beds'] === 1 ? '' : 'i' ?>) viene calcolato automaticamente dalla somma.</span>
         </div>
-        <label class="block"><span class="label">Servizi (separati da virgola)</span><input class="input" name="amenities" value="<?= e($amenitiesStr) ?>" placeholder="WiFi, Aria, Parcheggio"></label>
+        <div class="sm:col-span-2">
+          <span class="label">Servizi</span>
+          <?php
+            $currentAmenities = array_values(array_filter(array_map('trim', explode(',', $amenitiesStr))));
+            $presetAmenities = [
+              'WiFi a pagamento', 'WiFi gratuito',
+              'Cucina', 'Lavatrice', 'Lavastoviglie', 'Frigorifero', 'Microonde', 'Forno', 'Macchina caffè',
+              'Aria condizionata', 'TV', 'Phon', 'Ferro da stiro', 'Cassaforte',
+              'Asciugamani', 'Teli mare', 'Biancheria letti',
+              'Piscina inclusa', 'Spiaggia inclusa', 'Spiaggia a pagamento (circa 800 m)',
+              'Navetta interna al resort gratuita',
+              'Balcone', 'Terrazzo', 'Vista mare', 'Vista piscina',
+              'Parcheggio', 'Ascensore', 'Animali ammessi', 'Culla disponibile',
+            ];
+            $presetAvailable = array_values(array_diff($presetAmenities, $currentAmenities));
+          ?>
+          <input type="hidden" name="amenities" id="amenities-csv" value="<?= e(implode(', ', $currentAmenities)) ?>">
+          <div id="amenities-chips" class="flex flex-wrap gap-1.5 mt-1 p-2 min-h-[44px] bg-ink-50 dark:bg-ink-800/50 rounded-xl border border-ink-200 dark:border-ink-700/60">
+            <?php if (!$currentAmenities): ?>
+              <span id="amenities-empty" class="text-xs text-ink-400 italic px-1 self-center">Nessun servizio selezionato</span>
+            <?php endif; ?>
+            <?php foreach ($currentAmenities as $a): ?>
+              <span class="amenity-chip inline-flex items-center gap-1 bg-brand-100 dark:bg-brand-500/20 text-brand-800 dark:text-brand-200 text-xs font-medium px-2.5 py-1 rounded-full" data-name="<?= e($a) ?>">
+                <?= e($a) ?>
+                <button type="button" class="amenity-remove hover:text-red-600 ml-0.5" aria-label="Rimuovi"><i data-lucide="x" class="size-[12px]"></i></button>
+              </span>
+            <?php endforeach; ?>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-2">
+            <select id="amenity-preset" class="input flex-1 min-w-[180px] text-sm">
+              <option value="">+ Aggiungi servizio predefinito...</option>
+              <?php foreach ($presetAvailable as $p): ?>
+                <option value="<?= e($p) ?>"><?= e($p) ?></option>
+              <?php endforeach; ?>
+            </select>
+            <input type="text" id="amenity-custom" class="input flex-1 min-w-[180px] text-sm" placeholder="...oppure scrivine uno tuo">
+            <button type="button" id="amenity-add" class="btn-secondary text-sm whitespace-nowrap"><i data-lucide="plus" class="size-[14px]"></i> Aggiungi</button>
+          </div>
+          <script>
+          (function(){
+            const chipsBox = document.getElementById('amenities-chips');
+            const csv = document.getElementById('amenities-csv');
+            const preset = document.getElementById('amenity-preset');
+            const custom = document.getElementById('amenity-custom');
+            const addBtn = document.getElementById('amenity-add');
+            function sync(){
+              const names = Array.from(chipsBox.querySelectorAll('.amenity-chip')).map(c => c.dataset.name);
+              csv.value = names.join(', ');
+              const empty = document.getElementById('amenities-empty');
+              if (names.length === 0 && !empty){
+                const s = document.createElement('span');
+                s.id = 'amenities-empty';
+                s.className = 'text-xs text-ink-400 italic px-1 self-center';
+                s.textContent = 'Nessun servizio selezionato';
+                chipsBox.appendChild(s);
+              } else if (names.length > 0 && empty){
+                empty.remove();
+              }
+            }
+            function addAmenity(name){
+              name = name.trim(); if (!name) return;
+              const existing = Array.from(chipsBox.querySelectorAll('.amenity-chip')).map(c => c.dataset.name.toLowerCase());
+              if (existing.includes(name.toLowerCase())) return;
+              const span = document.createElement('span');
+              span.className = 'amenity-chip inline-flex items-center gap-1 bg-brand-100 dark:bg-brand-500/20 text-brand-800 dark:text-brand-200 text-xs font-medium px-2.5 py-1 rounded-full';
+              span.dataset.name = name;
+              span.innerHTML = name.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])) + ' <button type="button" class="amenity-remove hover:text-red-600 ml-0.5" aria-label="Rimuovi"><i data-lucide="x" class="size-[12px]"></i></button>';
+              chipsBox.appendChild(span);
+              if (window.lucide) lucide.createIcons();
+              // rimuovi opzione dal select se era un preset
+              const opt = preset.querySelector('option[value="' + CSS.escape(name) + '"]');
+              if (opt) opt.remove();
+              sync();
+            }
+            chipsBox.addEventListener('click', e => {
+              const btn = e.target.closest('.amenity-remove');
+              if (!btn) return;
+              const chip = btn.closest('.amenity-chip');
+              const name = chip.dataset.name;
+              chip.remove();
+              // rimetti l'opzione nel select se era un preset
+              const allOpts = Array.from(preset.options).map(o => o.value);
+              if (!allOpts.includes(name)) {
+                const o = document.createElement('option');
+                o.value = name; o.textContent = name;
+                preset.appendChild(o);
+              }
+              sync();
+            });
+            preset.addEventListener('change', () => {
+              if (preset.value){ addAmenity(preset.value); preset.value = ''; }
+            });
+            addBtn.addEventListener('click', () => { addAmenity(custom.value); custom.value = ''; });
+            custom.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); addBtn.click(); } });
+          })();
+          </script>
+        </div>
         <label class="block"><span class="label">Check-in</span><input class="input" type="time" name="check_in_time" value="<?= e($f['check_in_time']) ?>"></label>
         <label class="block"><span class="label">Check-out</span><input class="input" type="time" name="check_out_time" value="<?= e($f['check_out_time']) ?>"></label>
       </div>
