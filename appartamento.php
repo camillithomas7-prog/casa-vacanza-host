@@ -189,8 +189,15 @@ require __DIR__ . '/partials/site-header.php';
         <div class="flex items-baseline justify-between gap-2 mb-1">
           <div>
             <?php if (isWeeklyOnly()): ?>
-              <span class="font-display text-3xl font-bold"><?= fmtMoney(weeklyPriceOf($a)) ?></span>
-              <span class="text-sm text-ink-500">/settimana</span>
+              <div class="flex items-baseline gap-2 flex-wrap">
+                <span class="font-display text-3xl font-bold tabular-nums" x-text="fmt(currentPackagePrice())"></span>
+                <span class="text-sm text-ink-500" x-text="'/ ' + currentPackageLabel()"></span>
+              </div>
+              <template x-if="currentSavings() > 0">
+                <div class="text-xs text-emerald-600 font-semibold mt-0.5">
+                  Risparmi <span x-text="fmt(currentSavings())" class="tabular-nums"></span> rispetto al prezzo settimanale ×<span x-text="parseInt(weeks) === 4 ? '4 settimane' : weeks"></span>
+                </div>
+              </template>
             <?php else: ?>
               <span class="font-display text-3xl font-bold"><?= fmtMoney((float)$a['base_price']) ?></span>
               <span class="text-sm text-ink-500"><?= e(t('common.per_night')) ?></span>
@@ -390,6 +397,13 @@ function bookingForm() {
   return {
     aptId: <?= json_encode($a['id']) ?>,
     weeklyOnly: <?= isWeeklyOnly() ? 'true' : 'false' ?>,
+    pkgPrices: {
+      1: <?= (float)($a['weekly_price'] ?: $a['base_price'] * 7) ?>,
+      2: <?= (float)($a['biweekly_price'] ?: ($a['weekly_price'] ?: $a['base_price'] * 7) * 2) ?>,
+      3: <?= (float)($a['triweekly_price'] ?: ($a['weekly_price'] ?: $a['base_price'] * 7) * 3) ?>,
+      4: <?= (float)($a['monthly_price'] ?: ($a['weekly_price'] ?: $a['base_price'] * 7) * (30/7)) ?>,
+    },
+    pkgLabels: { 1: 'settimana', 2: '2 settimane', 3: '3 settimane', 4: '1 mese' },
     weeks: 1,
     from: '', to: '', guests: 2, coupon: '', name: '', email: '', phone: '', country: '', dial: 'IT',
     countries: <?= json_encode(countryList(currentLang())) ?>,
@@ -398,6 +412,22 @@ function bookingForm() {
     dialOpen: false, dialSearch: '',
     q: null, busy: false, done: null, err: '',
     fmt(n) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(n || 0); },
+    currentPackagePrice() {
+      const w = parseInt(this.weeks) || 1;
+      return this.pkgPrices[w] || this.pkgPrices[1];
+    },
+    currentPackageLabel() {
+      const w = parseInt(this.weeks) || 1;
+      return this.pkgLabels[w] || 'settimana';
+    },
+    currentSavings() {
+      const w = parseInt(this.weeks) || 1;
+      if (w === 1) return 0;
+      const weekly = this.pkgPrices[1] || 0;
+      const base = w === 4 ? weekly * (30/7) : weekly * w;
+      const pkg = this.pkgPrices[w] || 0;
+      return Math.max(0, Math.round((base - pkg) * 100) / 100);
+    },
     updateCheckout() {
       if (!this.weeklyOnly || !this.from) { return; }
       const w = parseInt(this.weeks) || 1;
