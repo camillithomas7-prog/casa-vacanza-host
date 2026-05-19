@@ -4,6 +4,86 @@ $chatEnabled = (bool) setting('openai_api_key', '');
 if (!$chatEnabled) return;
 $chatName = setting('chat_assistant_name', 'Sofia');
 $chatPhone = setting('contact_phone', cfg('site.phone'));
+$chatLang = function_exists('currentLang') ? currentLang() : 'it';
+
+$L = [
+    'it' => [
+        'status' => 'In linea · Risponde di solito subito',
+        'placeholder' => 'Scrivi un messaggio...',
+        'aria_open' => 'Apri chat',
+        'aria_close' => 'Chiudi',
+        'greet_morning' => 'Buongiorno',
+        'greet_day' => 'Ciao',
+        'greet_evening' => 'Buonasera',
+        'greet_intro' => "! Sono {NAME}, lavoro con Patrizia 😊\nDimmi due cose veloci e ti propongo subito 2-3 appartamenti giusti per te:\n• **Quando** vorresti venire a Sharm?\n• **In quanti** siete?",
+        'q1_label' => '📅 Giugno · 2 persone', 'q1_msg' => 'Cosa avete a giugno per 2 persone?',
+        'q2_label' => '🌊 Vista mare', 'q2_msg' => 'Avete un appartamento vista mare sotto i 400€ a settimana?',
+        'q3_label' => '👨‍👩‍👧 Famiglia', 'q3_msg' => 'Cerco qualcosa per famiglia con piscina',
+        'q4_label' => '💰 Economici', 'q4_msg' => 'Quali sono i 3 più economici?',
+        'err_conn' => 'Mi spiace, ho avuto un problema di connessione. Riprova tra poco o scrivimi su WhatsApp al ',
+    ],
+    'en' => [
+        'status' => 'Online · Usually replies right away',
+        'placeholder' => 'Type a message...',
+        'aria_open' => 'Open chat',
+        'aria_close' => 'Close',
+        'greet_morning' => 'Good morning',
+        'greet_day' => 'Hi',
+        'greet_evening' => 'Good evening',
+        'greet_intro' => "! I'm {NAME}, I work with Patrizia 😊\nTell me two quick things and I'll suggest 2-3 great apartments for you:\n• **When** would you like to come to Sharm?\n• **How many** people are you?",
+        'q1_label' => '📅 June · 2 people', 'q1_msg' => 'What do you have available in June for 2 people?',
+        'q2_label' => '🌊 Sea view', 'q2_msg' => 'Do you have a sea view apartment under €400 per week?',
+        'q3_label' => '👨‍👩‍👧 Family', 'q3_msg' => 'I am looking for a family apartment with a pool',
+        'q4_label' => '💰 Cheapest', 'q4_msg' => 'What are your 3 cheapest apartments?',
+        'err_conn' => "Sorry, I'm having a connection issue. Try again shortly or message me on WhatsApp at ",
+    ],
+    'de' => [
+        'status' => 'Online · Antwortet meist sofort',
+        'placeholder' => 'Nachricht schreiben...',
+        'aria_open' => 'Chat öffnen',
+        'aria_close' => 'Schließen',
+        'greet_morning' => 'Guten Morgen',
+        'greet_day' => 'Hallo',
+        'greet_evening' => 'Guten Abend',
+        'greet_intro' => "! Ich bin {NAME}, ich arbeite mit Patrizia 😊\nSag mir kurz zwei Dinge und ich schlage dir 2-3 passende Wohnungen vor:\n• **Wann** möchtest du nach Sharm kommen?\n• **Wie viele** Personen seid ihr?",
+        'q1_label' => '📅 Juni · 2 Personen', 'q1_msg' => 'Was habt ihr im Juni für 2 Personen verfügbar?',
+        'q2_label' => '🌊 Meerblick', 'q2_msg' => 'Habt ihr eine Wohnung mit Meerblick unter 400€ pro Woche?',
+        'q3_label' => '👨‍👩‍👧 Familie', 'q3_msg' => 'Ich suche etwas für die Familie mit Pool',
+        'q4_label' => '💰 Günstig', 'q4_msg' => 'Was sind eure 3 günstigsten Wohnungen?',
+        'err_conn' => 'Entschuldigung, ich habe ein Verbindungsproblem. Versuch es gleich noch einmal oder schreib mir auf WhatsApp unter ',
+    ],
+    'es' => [
+        'status' => 'En línea · Suele responder enseguida',
+        'placeholder' => 'Escribe un mensaje...',
+        'aria_open' => 'Abrir chat',
+        'aria_close' => 'Cerrar',
+        'greet_morning' => 'Buenos días',
+        'greet_day' => 'Hola',
+        'greet_evening' => 'Buenas tardes',
+        'greet_intro' => "! Soy {NAME}, trabajo con Patrizia 😊\nDime dos cosas rápidas y te propongo 2-3 apartamentos ideales:\n• **¿Cuándo** te gustaría venir a Sharm?\n• **¿Cuántas** personas sois?",
+        'q1_label' => '📅 Junio · 2 personas', 'q1_msg' => '¿Qué tenéis disponible en junio para 2 personas?',
+        'q2_label' => '🌊 Vista mar', 'q2_msg' => '¿Tenéis un apartamento con vistas al mar por menos de 400€ semana?',
+        'q3_label' => '👨‍👩‍👧 Familia', 'q3_msg' => 'Busco algo para familia con piscina',
+        'q4_label' => '💰 Económicos', 'q4_msg' => '¿Cuáles son los 3 más económicos?',
+        'err_conn' => 'Lo siento, tengo un problema de conexión. Inténtalo de nuevo o escríbeme por WhatsApp al ',
+    ],
+    'ru' => [
+        'status' => 'В сети · Обычно отвечает сразу',
+        'placeholder' => 'Напишите сообщение...',
+        'aria_open' => 'Открыть чат',
+        'aria_close' => 'Закрыть',
+        'greet_morning' => 'Доброе утро',
+        'greet_day' => 'Привет',
+        'greet_evening' => 'Добрый вечер',
+        'greet_intro' => "! Я {NAME}, работаю с Патрицией 😊\nСкажите быстро две вещи, и я предложу 2-3 подходящие квартиры:\n• **Когда** хотите приехать в Шарм?\n• **Сколько** вас человек?",
+        'q1_label' => '📅 Июнь · 2 чел.', 'q1_msg' => 'Что есть в июне на 2 человек?',
+        'q2_label' => '🌊 Вид на море', 'q2_msg' => 'Есть квартира с видом на море до 400€ в неделю?',
+        'q3_label' => '👨‍👩‍👧 Семья', 'q3_msg' => 'Ищу что-то для семьи с бассейном',
+        'q4_label' => '💰 Бюджетные', 'q4_msg' => 'Какие 3 самые недорогие?',
+        'err_conn' => 'Извините, проблема со связью. Попробуйте снова или напишите мне в WhatsApp: ',
+    ],
+];
+$t = $L[$chatLang] ?? $L['it'];
 ?>
 <style>
 .cv-chat-btn{position:fixed;bottom:20px;right:20px;z-index:60;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#f97316,#fb923c);box-shadow:0 10px 30px -8px rgba(249,115,22,.55);display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;border:none;transition:transform .2s}
@@ -49,7 +129,7 @@ $chatPhone = setting('contact_phone', cfg('site.phone'));
 @media (max-width:480px){.cv-chat-panel{bottom:0;right:0;width:100vw;height:100vh;max-height:100vh;border-radius:0}}
 </style>
 
-<button id="cv-chat-btn" class="cv-chat-btn" aria-label="Apri chat">
+<button id="cv-chat-btn" class="cv-chat-btn" aria-label="<?= e($t['aria_open']) ?>">
   <span class="cv-pulse"></span>
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="position:relative"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
 </button>
@@ -59,19 +139,19 @@ $chatPhone = setting('contact_phone', cfg('site.phone'));
     <div class="cv-chat-avatar"><?= e(mb_substr($chatName, 0, 1)) ?></div>
     <div>
       <div class="cv-chat-head-name"><?= e($chatName) ?></div>
-      <div class="cv-chat-head-sub">In linea · Risponde di solito subito</div>
+      <div class="cv-chat-head-sub"><?= e($t['status']) ?></div>
     </div>
-    <button class="cv-chat-close" id="cv-chat-close" aria-label="Chiudi">×</button>
+    <button class="cv-chat-close" id="cv-chat-close" aria-label="<?= e($t['aria_close']) ?>">×</button>
   </div>
   <div class="cv-chat-body" id="cv-chat-body"></div>
   <div class="cv-chat-quick" id="cv-chat-quick">
-    <button class="cv-quick-btn" data-msg="Cosa avete a giugno per 2 persone?">📅 Giugno · 2 pax</button>
-    <button class="cv-quick-btn" data-msg="Avete un appartamento vista mare sotto i 400€ a settimana?">🌊 Vista mare</button>
-    <button class="cv-quick-btn" data-msg="Cerco qualcosa per famiglia con piscina">👨‍👩‍👧 Famiglia</button>
-    <button class="cv-quick-btn" data-msg="Quali sono i 3 più economici?">💰 Economici</button>
+    <button class="cv-quick-btn" data-msg="<?= e($t['q1_msg']) ?>"><?= e($t['q1_label']) ?></button>
+    <button class="cv-quick-btn" data-msg="<?= e($t['q2_msg']) ?>"><?= e($t['q2_label']) ?></button>
+    <button class="cv-quick-btn" data-msg="<?= e($t['q3_msg']) ?>"><?= e($t['q3_label']) ?></button>
+    <button class="cv-quick-btn" data-msg="<?= e($t['q4_msg']) ?>"><?= e($t['q4_label']) ?></button>
   </div>
   <form class="cv-chat-input" id="cv-chat-form">
-    <textarea id="cv-chat-text" placeholder="Scrivi un messaggio..." rows="1"></textarea>
+    <textarea id="cv-chat-text" placeholder="<?= e($t['placeholder']) ?>" rows="1"></textarea>
     <button type="submit" class="cv-chat-send" id="cv-chat-send" aria-label="Invia">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
     </button>
@@ -89,7 +169,15 @@ $chatPhone = setting('contact_phone', cfg('site.phone'));
   const sendBtn = document.getElementById('cv-chat-send');
   const quickBox = document.getElementById('cv-chat-quick');
   const NAME = <?= json_encode($chatName) ?>;
-  const STORAGE_KEY = 'cv_chat_v1';
+  const LANG = <?= json_encode($chatLang) ?>;
+  const T = <?= json_encode([
+      'greet_morning' => $t['greet_morning'],
+      'greet_day' => $t['greet_day'],
+      'greet_evening' => $t['greet_evening'],
+      'greet_intro' => $t['greet_intro'],
+      'err_conn' => $t['err_conn'],
+  ], JSON_UNESCAPED_UNICODE) ?>;
+  const STORAGE_KEY = 'cv_chat_v1_' + LANG;
   const SESSION_KEY = 'cv_chat_session';
   function genSid(){ return 'sid-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2,12); }
   let SID = localStorage.getItem(SESSION_KEY);
@@ -134,8 +222,8 @@ $chatPhone = setting('contact_phone', cfg('site.phone'));
     body.innerHTML = '';
     if (!history.length) {
       const hour = new Date().getHours();
-      const greet = hour < 12 ? 'Buongiorno' : (hour < 19 ? 'Ciao' : 'Buonasera');
-      addMsg('assistant', `${greet}! Sono ${NAME}, lavoro con Patrizia 😊\nDimmi due cose veloci e ti propongo subito 2-3 appartamenti giusti per te:\n• **Quando** vorresti venire a Sharm?\n• **In quanti** siete?`);
+      const greet = hour < 12 ? T.greet_morning : (hour < 19 ? T.greet_day : T.greet_evening);
+      addMsg('assistant', greet + T.greet_intro.replace('{NAME}', NAME));
     } else {
       history.forEach(m => addMsg(m.role, m.content, m.cards));
     }
@@ -176,7 +264,7 @@ $chatPhone = setting('contact_phone', cfg('site.phone'));
       }
     } catch(e){
       hideTyping();
-      addMsg('assistant', 'Mi spiace, ho avuto un problema di connessione. Riprova tra poco o scrivimi su WhatsApp al <?= e($chatPhone) ?>.');
+      addMsg('assistant', T.err_conn + '<?= e($chatPhone) ?>.');
     } finally {
       sendBtn.disabled = false;
       text.focus();
