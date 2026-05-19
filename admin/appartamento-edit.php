@@ -416,15 +416,9 @@ require __DIR__ . '/../partials/admin-shell-top.php';
             <span class="text-[11px] text-ink-500 mt-1 block" id="hint-m">Lascia vuoto = settimanale × 30/7. Metti meno per generare risparmio.</span>
           </label>
         </div>
-        <div class="flex flex-wrap gap-2 pt-2">
-          <button type="button" id="apply-discounts" class="btn-secondary text-xs"><i data-lucide="zap" class="size-[14px]"></i> Applica sconti suggeriti (-5% · -10% · -15%)</button>
-        </div>
         <script>
         (function(){
           const wp = document.getElementById('wp');
-          const bwp = document.getElementById('bwp');
-          const twp = document.getElementById('twp');
-          const mp = document.getElementById('mp');
           const fmt = n => Math.round(n * 100) / 100;
           function updateHints(){
             const w = parseFloat(wp.value) || 0;
@@ -436,13 +430,6 @@ require __DIR__ . '/../partials/admin-shell-top.php';
           }
           wp.addEventListener('input', updateHints);
           updateHints();
-          document.getElementById('apply-discounts').addEventListener('click', () => {
-            const w = parseFloat(wp.value) || 0;
-            if (w <= 0) { alert('Imposta prima il prezzo settimanale.'); return; }
-            bwp.value = fmt(w * 2 * 0.95);   // -5% su 2 sett
-            twp.value = fmt(w * 3 * 0.90);   // -10% su 3 sett
-            mp.value  = fmt(w * (30/7) * 0.85); // -15% su 1 mese
-          });
         })();
         </script>
       <?php else: ?>
