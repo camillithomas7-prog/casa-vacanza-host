@@ -26,6 +26,25 @@ $apt_id = (int)$a['id'];
 $dowKeys = ['mon','tue','wed','thu','fri','sat','sun'];
 ?>
 <div x-data="calPicker(<?= $apt_id ?>)" x-init="init()">
+  <?php if (isWeeklyOnly()): ?>
+    <div class="mb-4 p-3.5 rounded-xl bg-brand-50 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/30">
+      <div class="text-[11px] font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-300 mb-1.5 flex items-center gap-1.5">
+        <i data-lucide="hourglass" class="size-[12px]"></i> Quanto vuoi restare?
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <template x-for="opt in [{v:1,l:'1 settimana'},{v:2,l:'2 settimane'},{v:3,l:'3 settimane'},{v:4,l:'1 mese'}]" :key="opt.v">
+          <button type="button"
+                  @click="setWeeks(opt.v)"
+                  :class="parseInt(weeks) === opt.v ? 'bg-brand-500 text-white border-brand-500 shadow-md' : 'bg-white dark:bg-ink-900 text-ink-700 dark:text-ink-200 border-ink-200 dark:border-ink-700/60 hover:border-brand-400'"
+                  class="text-sm font-semibold py-2 px-3 rounded-lg border transition" x-text="opt.l"></button>
+        </template>
+      </div>
+      <div class="text-[11px] text-brand-700 dark:text-brand-300 mt-2 flex items-center gap-1.5">
+        <i data-lucide="info" class="size-[11px]"></i>
+        Scegli la durata, poi tocca il giorno verde da cui vuoi iniziare. Il check-out lo calcoliamo noi.
+      </div>
+    </div>
+  <?php endif; ?>
   <div class="flex items-center justify-between mb-4">
     <a href="?slug=<?= e($a['slug']) ?>&m=<?= $prev_m ?>&lang=<?= e(currentLang()) ?>#calendar" class="h-9 w-9 rounded-xl border border-ink-200 dark:border-ink-700/80 flex items-center justify-center hover:bg-ink-50 dark:hover:bg-ink-800"><i data-lucide="chevron-left" class="size-[16px]"></i></a>
     <div class="font-display font-bold text-lg"><?= e(tMonth($cal_month)) ?> <?= $cal_year ?></div>
@@ -99,6 +118,15 @@ function calPicker(aptId) {
         if (this.from) this.recalcTo();
       });
       this.$nextTick(() => { if (window.lucide) lucide.createIcons(); });
+    },
+    setWeeks(w) {
+      this.weeks = parseInt(w) || 1;
+      if (this.from) this.recalcTo();
+      this.persist();
+      // Sincronizza il widget di prenotazione
+      window.dispatchEvent(new CustomEvent('cv-cal-pick', { detail: { from: this.from, to: this.to } }));
+      // Notifica al widget di aggiornare anche il suo dropdown
+      window.dispatchEvent(new CustomEvent('cv-cal-weeks', { detail: { weeks: this.weeks } }));
     },
     recalcTo() {
       if (!this.from) { this.to = ''; return; }

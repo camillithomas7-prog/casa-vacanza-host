@@ -528,6 +528,10 @@ function bookingForm() {
         if (this.weeklyOnly && this.from) this.updateCheckout();
         if (this.from && this.to) this.quote(); else this.q = null;
       });
+      window.addEventListener('cv-cal-weeks', (e) => {
+        this.weeks = parseInt(e.detail.weeks) || 1;
+        if (this.from) { this.updateCheckout(); this.quote(); }
+      });
     },
     persist() {
       try { sessionStorage.setItem('cv_book_' + this.aptId, JSON.stringify({ from: this.from, to: this.to, weeks: this.weeks })); } catch (e) {}
