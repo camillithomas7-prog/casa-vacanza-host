@@ -171,6 +171,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
     </div>
     <div class="flex gap-2">
       <?php if ($apt): ?>
+        <a href="/appartamento.php?slug=<?= e($apt['slug']) ?>" target="_blank" rel="noopener" class="btn-outline" title="Apri pagina pubblica in nuova scheda"><i data-lucide="external-link" class="size-[18px]"></i> Vedi sul sito</a>
         <button name="action" value="delete" type="submit" onclick="return confirm('Eliminare appartamento?')" class="btn-danger"><i data-lucide="trash-2" class="size-[18px]"></i> Elimina</button>
       <?php endif; ?>
       <button name="action" value="save" type="submit" class="btn-primary"><i data-lucide="save" class="size-[18px]"></i> Salva</button>
