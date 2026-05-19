@@ -14,6 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $v = trim($_POST[$k] ?? '');
             q('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)', [$k, $v]);
         }
+        // Toggle booleano weekly only mode
+        $wo = isset($_POST['weekly_only_mode']) ? '1' : '0';
+        q('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)', ['weekly_only_mode', $wo]);
         $msg = 'Impostazioni salvate';
     }
     if ($action === 'save_features') {
@@ -91,6 +94,16 @@ require __DIR__ . '/../partials/admin-shell-top.php';
             <input class="input" name="social_tiktok" placeholder="https://tiktok.com/@..." value="<?= e($settings['social_tiktok'] ?? '') ?>">
           </label>
         </div>
+      </div>
+      <div class="pt-3 border-t border-ink-100 dark:border-ink-800/80">
+        <h3 class="font-display font-bold flex items-center gap-2 mb-3"><i data-lucide="calendar-check" class="size-[18px]"></i> Modalità prenotazioni</h3>
+        <label class="flex items-start gap-3 p-3 rounded-xl bg-brand-50 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/30 cursor-pointer">
+          <input type="checkbox" name="weekly_only_mode" value="1" class="mt-0.5" <?= ($settings['weekly_only_mode'] ?? '1') === '1' ? 'checked' : '' ?>>
+          <div>
+            <div class="font-semibold text-sm">Solo prenotazioni settimanali</div>
+            <div class="text-xs text-ink-500 mt-0.5">Disabilita prenotazioni per singola notte e weekend. Sul sito vengono mostrati solo i pacchetti <b>1 settimana, 2 settimane, 3 settimane, 1 mese</b>. Il prezzo visualizzato diventa €/settimana. Nell'edit appartamento vengono nascosti i campi "Per notte" e "Weekend".</div>
+          </div>
+        </label>
       </div>
       <div class="pt-3 border-t border-ink-100 dark:border-ink-800/80">
         <h3 class="font-display font-bold flex items-center gap-2 mb-3"><i data-lucide="message-circle" class="size-[18px]"></i> Chat assistente AI</h3>

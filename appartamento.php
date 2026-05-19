@@ -188,8 +188,13 @@ require __DIR__ . '/partials/site-header.php';
       <div class="card-elev p-6 shadow-card">
         <div class="flex items-baseline justify-between gap-2 mb-1">
           <div>
-            <span class="font-display text-3xl font-bold"><?= fmtMoney((float)$a['base_price']) ?></span>
-            <span class="text-sm text-ink-500"><?= e(t('common.per_night')) ?></span>
+            <?php if (isWeeklyOnly()): ?>
+              <span class="font-display text-3xl font-bold"><?= fmtMoney(weeklyPriceOf($a)) ?></span>
+              <span class="text-sm text-ink-500">/settimana</span>
+            <?php else: ?>
+              <span class="font-display text-3xl font-bold"><?= fmtMoney((float)$a['base_price']) ?></span>
+              <span class="text-sm text-ink-500"><?= e(t('common.per_night')) ?></span>
+            <?php endif; ?>
           </div>
           <?php if ($rating): ?><div class="text-sm flex items-center gap-1"><i data-lucide="star" class="size-[14px] fill-amber-400 text-amber-400"></i> <strong><?= number_format($rating, 1) ?></strong></div><?php endif; ?>
         </div>
@@ -206,6 +211,22 @@ require __DIR__ . '/partials/site-header.php';
         </template>
 
         <form x-show="!done" @submit.prevent="submit" class="space-y-2.5">
+          <?php if (isWeeklyOnly()): ?>
+            <label class="block px-3.5 py-2.5 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm cursor-pointer hover:bg-ink-50/40 dark:hover:bg-ink-900/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400">Durata soggiorno</span>
+              <select class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5" x-model.number="weeks" @change="updateCheckout(); quote();">
+                <option value="1">1 settimana (7 notti)</option>
+                <option value="2">2 settimane (14 notti)</option>
+                <option value="3">3 settimane (21 notti)</option>
+                <option value="4">1 mese (30 notti)</option>
+              </select>
+            </label>
+            <label class="block px-3.5 py-2.5 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm cursor-pointer hover:bg-ink-50/40 dark:hover:bg-ink-900/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('apt.checkin')) ?> · giorno di arrivo</span>
+              <input type="date" required class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5 booking-date" x-model="from" @change="updateCheckout(); quote();">
+            </label>
+            <div class="text-xs text-ink-500 px-1">Check-out automatico: <span class="font-semibold text-ink-700 dark:text-ink-200" x-text="to || '—'"></span></div>
+          <?php else: ?>
           <div class="grid grid-cols-2 gap-0 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm overflow-hidden divide-x divide-ink-100 dark:divide-ink-700/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
             <label class="block px-3.5 py-2.5 cursor-pointer hover:bg-ink-50/60 dark:hover:bg-ink-900/60 transition-colors">
               <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('apt.checkin')) ?></span>
@@ -216,6 +237,7 @@ require __DIR__ . '/partials/site-header.php';
               <input type="date" required class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5 booking-date" x-model="to" @change="quote()">
             </label>
           </div>
+          <?php endif; ?>
           <label class="block px-3.5 py-2.5 rounded-2xl border border-ink-100 dark:border-ink-700/60 bg-white dark:bg-ink-900/40 shadow-sm cursor-pointer hover:bg-ink-50/40 dark:hover:bg-ink-900/60 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15 transition-all">
             <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400"><?= e(t('apt.guests_max', ['n' => (int)$a['guests']])) ?></span>
             <input type="number" min="1" max="<?= (int)$a['guests'] ?>" class="w-full bg-transparent outline-none text-[15px] font-medium text-ink-800 dark:text-ink-100 mt-0.5" x-model.number="guests" @input="quote()">
@@ -352,6 +374,8 @@ require __DIR__ . '/partials/site-header.php';
 function bookingForm() {
   return {
     aptId: <?= json_encode($a['id']) ?>,
+    weeklyOnly: <?= isWeeklyOnly() ? 'true' : 'false' ?>,
+    weeks: 1,
     from: '', to: '', guests: 2, coupon: '', name: '', email: '', phone: '', country: '', dial: 'IT',
     countries: <?= json_encode(countryList(currentLang())) ?>,
     phoneCountries: <?= json_encode(phoneCountryList(currentLang())) ?>,
@@ -359,6 +383,18 @@ function bookingForm() {
     dialOpen: false, dialSearch: '',
     q: null, busy: false, done: null, err: '',
     fmt(n) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(n || 0); },
+    updateCheckout() {
+      if (!this.weeklyOnly || !this.from) { return; }
+      const w = parseInt(this.weeks) || 1;
+      const nights = w === 4 ? 30 : w * 7;
+      const d = new Date(this.from + 'T00:00:00');
+      if (isNaN(d.getTime())) return;
+      d.setDate(d.getDate() + nights);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      this.to = yyyy + '-' + mm + '-' + dd;
+    },
     flagOf(code) {
       if (!code || code.length !== 2) return '';
       return code.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0)));

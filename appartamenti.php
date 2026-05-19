@@ -111,8 +111,13 @@ require __DIR__ . '/partials/site-header.php';
             <span class="flex items-center gap-1"><i data-lucide="bath" class="size-[14px]"></i> <?= (int)$a['bathrooms'] ?></span>
           </div>
           <div class="text-right">
-            <span class="font-display font-bold text-lg"><?= fmtMoney((float)$a['base_price']) ?></span>
-            <span class="text-xs text-ink-500"><?= e(t('common.per_night')) ?></span>
+            <?php if (isWeeklyOnly()): ?>
+              <span class="font-display font-bold text-lg"><?= fmtMoney(weeklyPriceOf($a)) ?></span>
+              <span class="text-xs text-ink-500">/settimana</span>
+            <?php else: ?>
+              <span class="font-display font-bold text-lg"><?= fmtMoney((float)$a['base_price']) ?></span>
+              <span class="text-xs text-ink-500"><?= e(t('common.per_night')) ?></span>
+            <?php endif; ?>
           </div>
         </div>
       </a>

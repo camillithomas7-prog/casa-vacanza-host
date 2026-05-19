@@ -30,6 +30,15 @@ function setting(string $key, ?string $default = null): ?string {
     return $cache[$key] ?? $default;
 }
 
+function isWeeklyOnly(): bool {
+    return setting('weekly_only_mode', '1') === '1';
+}
+
+function weeklyPriceOf(array $apt): float {
+    if (!empty($apt['weekly_price'])) return (float)$apt['weekly_price'];
+    return (float)$apt['base_price'] * 7;
+}
+
 function fmtMoney(float $amount, ?string $cur = null): string {
     $cur = $cur ?: cfg('site.currency') ?: 'EUR';
     $f = new NumberFormatter('it_IT', NumberFormatter::CURRENCY);

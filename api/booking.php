@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../lib/db.php';
+require_once __DIR__ . '/../lib/utils.php';
 require_once __DIR__ . '/../lib/pricing.php';
 require_once __DIR__ . '/../lib/notify.php';
 
@@ -14,6 +15,15 @@ if (!$apt) { http_response_code(404); echo json_encode(['error' => 'Appartamento
 
 $from = $body['from']; $to = $body['to'];
 if (strtotime($to) <= strtotime($from)) { http_response_code(400); echo json_encode(['error' => 'Date non valide']); exit; }
+
+if (isWeeklyOnly()) {
+    $nights = (int)round((strtotime($to) - strtotime($from)) / 86400);
+    if (!in_array($nights, [7, 14, 21, 30], true)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Prenotazioni disponibili solo per 7, 14, 21 notti o 1 mese (30 notti).']);
+        exit;
+    }
+}
 
 $overlap = (int)val('SELECT COUNT(*) FROM bookings WHERE apartment_id = ? AND status != "cancelled" AND check_in < ? AND check_out > ?', [$apt['id'], $to, $from]);
 $blocked = (int)val('SELECT COUNT(*) FROM date_blocks WHERE apartment_id = ? AND start_date < ? AND end_date > ?', [$apt['id'], $to, $from]);

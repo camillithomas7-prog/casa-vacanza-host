@@ -389,6 +389,19 @@ require __DIR__ . '/../partials/admin-shell-top.php';
 
     <div class="card p-4 sm:p-5 space-y-3">
       <h3 class="font-display font-bold">Prezzi</h3>
+      <?php if (isWeeklyOnly()): ?>
+        <div class="p-3 rounded-xl bg-brand-50 dark:bg-brand-500/10 border border-brand-200 text-xs text-brand-800 dark:text-brand-200">
+          <b>Modalità solo settimanali attiva.</b> I clienti possono prenotare solo per 1, 2, 3 settimane o 1 mese. I campi "Per notte" e "Weekend" sono nascosti. Per disattivarla vai in <a href="/admin/impostazioni.php" class="underline">Impostazioni</a>.
+        </div>
+        <input type="hidden" name="base_price" value="<?= e((string)$f['base_price']) ?>">
+        <input type="hidden" name="weekend_price" value="<?= e((string)$f['weekend_price']) ?>">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label class="block"><span class="label">Settimanale (€ totale)</span><input class="input" type="number" step="0.01" name="weekly_price" value="<?= e((string)$f['weekly_price']) ?>" required></label>
+          <label class="block"><span class="label">2 settimane (€ totale)</span><input class="input" type="number" step="0.01" name="biweekly_price" value="<?= e((string)$f['biweekly_price']) ?>"></label>
+          <label class="block"><span class="label">3 settimane (€ totale)</span><input class="input" type="number" step="0.01" name="triweekly_price" value="<?= e((string)$f['triweekly_price']) ?>"></label>
+          <label class="block"><span class="label">1 mese (€ totale)</span><input class="input" type="number" step="0.01" name="monthly_price" value="<?= e((string)$f['monthly_price']) ?>"></label>
+        </div>
+      <?php else: ?>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Per notte (€)</span><input class="input" type="number" step="0.01" name="base_price" value="<?= e((string)$f['base_price']) ?>" required></label>
         <label class="block"><span class="label">Weekend (opz.)</span><input class="input" type="number" step="0.01" name="weekend_price" value="<?= e((string)$f['weekend_price']) ?>"></label>
@@ -397,6 +410,7 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         <label class="block"><span class="label">3 settimane (totale)</span><input class="input" type="number" step="0.01" name="triweekly_price" value="<?= e((string)$f['triweekly_price']) ?>"></label>
         <label class="block"><span class="label">Mensile</span><input class="input" type="number" step="0.01" name="monthly_price" value="<?= e((string)$f['monthly_price']) ?>"></label>
       </div>
+      <?php endif; ?>
       <h3 class="font-display font-bold pt-2">Sconti automatici %</h3>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <label class="block"><span class="label">>7 notti</span><input class="input" type="number" name="long_stay_discount_7" value="<?= e((string)$f['long_stay_discount_7']) ?>"></label>
