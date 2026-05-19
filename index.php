@@ -16,8 +16,13 @@ $apartments = rows('SELECT a.* FROM apartments a WHERE a.active = 1 ORDER BY a.c
 
 // Carica zone dalla tabella admin (con fallback a derivazione automatica dagli appartamenti se la tabella non esiste o è vuota)
 $zones = [];
+/* Mostra solo le zone con almeno 1 appartamento attivo */
 try {
-    $zones = rows('SELECT * FROM zones WHERE active = 1 ORDER BY position ASC, name ASC');
+    $zones = rows("SELECT z.*, (SELECT COUNT(*) FROM apartments a WHERE a.city = z.name AND a.active = 1) AS apt_count
+                   FROM zones z
+                   WHERE z.active = 1
+                   HAVING apt_count > 0
+                   ORDER BY z.position ASC, z.name ASC");
 } catch (Throwable $e) {}
 if (!$zones) {
     $cityNames = array_filter(array_unique(array_column($apartments, 'city')));
