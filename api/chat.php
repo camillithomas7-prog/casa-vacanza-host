@@ -153,9 +153,21 @@ Se ti viene fatta una domanda CHE NON SAI rispondere coi dati che hai (es. richi
 2. ALLA FINE della tua risposta aggiungi su una nuova riga ESATTAMENTE questo marker (l'utente non lo vedrà, lo userà il sistema): `[ESCALATE: motivo breve della domanda]`. Esempio: `[ESCALATE: chiede se ammettiamo cani nell'appartamento Atelier 2]`
 
 ═══════ RACCOLTA CONTATTO ═══════
-" . ($hasContact ? "Il contatto del cliente è già stato salvato (nome: {$conv['customer_name']}, tel: {$conv['customer_phone']}). NON richiederlo di nuovo." : "Se il cliente ti fornisce nome+telefono in un messaggio (anche fuori dal contesto escalation, es. dopo che ha visto un appartamento che gli piace), TU:
-1. Conferma con calore: 'Perfetto {nome}, ti ho segnato! Ti contatto io su WhatsApp entro pochi minuti per chiudere tutto. Intanto se vuoi guardare meglio l'appartamento questo è il link [...]'
-2. ALLA FINE della tua risposta aggiungi su una nuova riga ESATTAMENTE: `[CONTATTO: nome=Mario Rossi | tel=+39 333 1234567 | motivo=motivo breve]`. Il sistema lo userà per notificare Patrizia.") . "
+" . ($hasContact ? "Il contatto del cliente è già stato salvato (nome: {$conv['customer_name']}, tel: {$conv['customer_phone']}). NON richiederlo di nuovo." : "Quando il cliente ti fornisce un numero di telefono SEGUI QUESTA PROCEDURA SCRUPOLOSAMENTE:
+
+A) **VERIFICA IL PREFISSO INTERNAZIONALE**
+Per richiamarlo su WhatsApp serve il prefisso internazionale (es. +39 per Italia, +49 Germania, +44 UK, +34 Spagna, +33 Francia, +7 Russia, +1 USA/Canada, +20 Egitto, ecc).
+- Se il numero CONTIENE già il prefisso (inizia con + o con 00 o ha 11+ cifre tipo 39333...): OK, procedi al punto B.
+- Se il numero è SOLO il numero locale (es. '3889365986' o '348 1234567', tipico italiano di 9-10 cifre senza +39): NON SALVARLO ancora. Chiedi gentilmente: 'Grazie! Solo un dettaglio per il WhatsApp: da quale Paese mi scrivi? Così aggiungo il prefisso corretto.' oppure 'Mi confermi il prefisso internazionale? (es. +39 se sei dall'Italia) Così te lo memorizzo giusto.'
+- Se non hai NEMMENO il nome, chiedi anche il nome insieme al prefisso.
+
+B) **SALVATAGGIO** (solo quando hai NOME + PREFISSO + NUMERO):
+1. Conferma con calore: 'Perfetto {nome}, ti ho segnato! Ti scrivo io su WhatsApp entro pochi minuti con la risposta precisa 😊'
+2. ALLA FINE della tua risposta, su una nuova riga, scrivi ESATTAMENTE questo marker (non lo vede l'utente):
+`[CONTATTO: nome=Mario Rossi | tel=+39 333 1234567 | motivo=motivo breve]`
+Il telefono nel marker DEVE iniziare con '+' seguito dal prefisso paese.
+
+NOTA: se il cliente è italiano e te lo conferma esplicitamente ('sono da Roma', 'scrivo dall'Italia', ecc.) puoi assumere +39 senza richiedere ulteriore conferma.") . "
 
 ═══════ FORMATO LINK ═══════
 Quando suggerisci un appartamento, scrivi il nome come link markdown: [nome](/appartamento.php?slug=SLUG). Sotto al tuo messaggio appariranno automaticamente card con foto. Max 4 appartamenti per messaggio.
@@ -223,6 +235,11 @@ if (preg_match('/\[CONTATTO:\s*nome=([^|]+?)\s*\|\s*tel=([^|]+?)\s*\|\s*motivo=(
     $contactPhone = trim($m[2]);
     $contactReason = trim($m[3]);
     $reply = trim(str_replace($m[0], '', $reply));
+    // Validazione: il telefono deve avere prefisso internazionale (+ seguito da 1-3 cifre)
+    if (!preg_match('/^\+\d{1,4}[\s\-]?\d{6,}/', $contactPhone)) {
+        // Numero senza prefisso: non lo salviamo come "completo", non escaliamo per WhatsApp
+        $contactPhone = '';
+    }
 }
 
 // Aggiorna conversation se contatto raccolto
