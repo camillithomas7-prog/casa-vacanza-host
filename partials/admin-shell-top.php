@@ -91,11 +91,68 @@ $pageMeta = $titles[$path] ?? ['Admin', ''];
         <div class="text-[10px] sm:text-xs text-ink-500 truncate"><?= e($pageMeta[1]) ?></div>
         <div class="font-display font-bold text-sm sm:text-base leading-tight truncate"><?= e($pageMeta[0]) ?></div>
       </div>
-      <div class="flex-1 max-w-md ml-auto relative hidden md:block">
-        <i data-lucide="search" class="size-[16px] absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400"></i>
-        <input placeholder="Cerca prenotazioni, clienti, appartamenti…" class="input pl-10 pr-12 bg-ink-50/50 dark:bg-ink-900/40 border-transparent focus:bg-white dark:focus:bg-ink-900">
-        <kbd class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono bg-white dark:bg-ink-800 border border-ink-200 dark:border-ink-700 rounded px-1.5 py-0.5 text-ink-500">⌘K</kbd>
+      <div class="flex-1 max-w-md ml-auto relative hidden md:block" id="admin-search-wrap">
+        <i data-lucide="search" class="size-[16px] absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none"></i>
+        <input id="admin-search-input" autocomplete="off" placeholder="Cerca prenotazioni, clienti, appartamenti…" class="input pl-10 pr-12 bg-ink-50/50 dark:bg-ink-900/40 border-transparent focus:bg-white dark:focus:bg-ink-900">
+        <kbd class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono bg-white dark:bg-ink-800 border border-ink-200 dark:border-ink-700 rounded px-1.5 py-0.5 text-ink-500 pointer-events-none">⌘K</kbd>
+        <div id="admin-search-results" class="hidden absolute left-0 right-0 mt-2 bg-white dark:bg-ink-900 border border-ink-200 dark:border-ink-700 rounded-xl shadow-xl max-h-[480px] overflow-auto z-50"></div>
       </div>
+      <script>
+      (function(){
+        const inp = document.getElementById('admin-search-input');
+        const box = document.getElementById('admin-search-results');
+        const wrap = document.getElementById('admin-search-wrap');
+        if (!inp || !box) return;
+        let t = null, lastQ = '', sel = -1, items = [];
+        const labels = { apartment: 'Appartamento', customer: 'Cliente', booking: 'Prenotazione' };
+        const colors = { apartment: 'text-orange-600 bg-orange-50', customer: 'text-sky-600 bg-sky-50', booking: 'text-emerald-600 bg-emerald-50' };
+
+        function render(results){
+          items = results || [];
+          if (!items.length) {
+            box.innerHTML = '<div class="p-4 text-sm text-ink-400 text-center">Nessun risultato</div>';
+          } else {
+            box.innerHTML = items.map((r, i) => `
+              <a href="${r.url}" data-i="${i}" class="result-row flex items-center gap-3 px-3 py-2.5 hover:bg-ink-50 dark:hover:bg-ink-800 border-b border-ink-100 dark:border-ink-800 last:border-b-0">
+                ${r.cover ? `<img src="${r.cover}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0">` : `<div class="w-10 h-10 rounded-lg ${colors[r.type] || 'bg-ink-100'} flex items-center justify-center flex-shrink-0 text-xs font-bold">${(labels[r.type]||'?')[0]}</div>`}
+                <div class="min-w-0 flex-1">
+                  <div class="text-sm font-medium truncate">${escapeHtml(r.label)}</div>
+                  <div class="text-xs text-ink-500 truncate">${escapeHtml(r.sub || '')}</div>
+                </div>
+                <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-400 flex-shrink-0">${labels[r.type] || r.type}</span>
+              </a>
+            `).join('');
+          }
+          box.classList.remove('hidden');
+          sel = -1;
+        }
+        function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function doSearch(){
+          const q = inp.value.trim();
+          if (q.length < 2) { box.classList.add('hidden'); return; }
+          if (q === lastQ) return;
+          lastQ = q;
+          fetch('/api/admin-search.php?q=' + encodeURIComponent(q))
+            .then(r => r.json())
+            .then(d => render(d.results || []))
+            .catch(() => { box.innerHTML = '<div class="p-4 text-sm text-red-500 text-center">Errore di ricerca</div>'; box.classList.remove('hidden'); });
+        }
+        inp.addEventListener('input', () => { clearTimeout(t); t = setTimeout(doSearch, 220); });
+        inp.addEventListener('focus', () => { if (inp.value.trim().length >= 2) box.classList.remove('hidden'); });
+        inp.addEventListener('keydown', e => {
+          const rows = box.querySelectorAll('.result-row');
+          if (e.key === 'ArrowDown' && rows.length) { e.preventDefault(); sel = Math.min(sel + 1, rows.length - 1); rows.forEach((r,i) => r.classList.toggle('bg-ink-100', i===sel)); rows[sel] && rows[sel].scrollIntoView({block:'nearest'}); }
+          else if (e.key === 'ArrowUp' && rows.length) { e.preventDefault(); sel = Math.max(sel - 1, 0); rows.forEach((r,i) => r.classList.toggle('bg-ink-100', i===sel)); rows[sel] && rows[sel].scrollIntoView({block:'nearest'}); }
+          else if (e.key === 'Enter' && sel >= 0 && rows[sel]) { e.preventDefault(); window.location.href = rows[sel].getAttribute('href'); }
+          else if (e.key === 'Escape') { box.classList.add('hidden'); inp.blur(); }
+        });
+        document.addEventListener('click', e => { if (!wrap.contains(e.target)) box.classList.add('hidden'); });
+        // Shortcut ⌘K / Ctrl+K
+        document.addEventListener('keydown', e => {
+          if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); inp.focus(); inp.select(); }
+        });
+      })();
+      </script>
       <button onclick="toggleTheme()" class="h-10 w-10 shrink-0 rounded-xl flex items-center justify-center hover:bg-ink-100 dark:hover:bg-ink-800 text-ink-600 dark:text-ink-300 transition">
         <i data-lucide="moon" class="size-[18px] dark:hidden"></i>
         <i data-lucide="sun" class="size-[18px] hidden dark:inline"></i>
