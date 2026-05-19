@@ -309,7 +309,7 @@ require __DIR__ . '/partials/site-header.php';
                       <i data-lucide="lock" class="size-[14px] text-brand-600 mt-0.5 shrink-0"></i>
                       <div>
                         <div class="text-ink-700 dark:text-ink-200 text-xs font-medium">Caparra per confermare la prenotazione</div>
-                        <div class="text-[10px] text-ink-500">Versa solo questa cifra ora per bloccare le date · il saldo lo paghi all'arrivo</div>
+                        <div class="text-[10px] text-ink-500">Versa solo questa cifra ora per riservare la tua casa a Sharm</div>
                       </div>
                     </div>
                     <span class="tabular-nums text-sm font-bold text-brand-700 dark:text-brand-300" x-text="fmt(q.securityDeposit)"></span>
