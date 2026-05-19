@@ -26,7 +26,7 @@ $today = date('Y-m-d');
 $tomorrow = date('Y-m-d', strtotime('+1 day'));
 $weekEnd = date('Y-m-d', strtotime('+7 days'));
 
-$sessions = rows("SELECT s.*, a.name AS apartment_name, a.address AS apartment_address, a.block_number,
+$sessions = rows("SELECT s.*, a.name AS apartment_name, a.address AS apartment_address, a.city AS apartment_city, a.block_number,
                   (SELECT COUNT(*) FROM cleaning_session_items WHERE session_id = s.id) AS total_items,
                   (SELECT COUNT(*) FROM cleaning_session_items WHERE session_id = s.id AND checked = 1) AS done_items
                   FROM cleaning_sessions s
@@ -110,6 +110,11 @@ require __DIR__ . '/partials/head.php';
               <a href="/pulizia.php?t=<?= e($token) ?>&id=<?= e($s['id']) ?>" class="block card card-hover p-4 <?= $sec[4] ?>">
                 <div class="flex items-start justify-between gap-2">
                   <div class="min-w-0 flex-1">
+                    <?php if (!empty($s['apartment_city'])): ?>
+                      <div class="inline-flex items-center gap-1 bg-orange-100 text-orange-800 dark:bg-orange-500/15 dark:text-orange-300 text-[11px] font-bold px-2 py-0.5 rounded-full mb-1.5">
+                        <i data-lucide="map-pin" class="size-[10px]"></i> <?= e($s['apartment_city']) ?>
+                      </div>
+                    <?php endif; ?>
                     <div class="flex items-center gap-2 flex-wrap">
                       <div class="font-display font-bold text-base sm:text-lg truncate"><?= e($s['apartment_name']) ?></div>
                       <?php if (!empty($s['block_number'])): ?>

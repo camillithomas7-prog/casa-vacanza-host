@@ -8,7 +8,7 @@ $valid = $token && hash_equals(cleanerToken(), $token);
 if (!$valid) { http_response_code(401); echo 'Link non valido'; exit; }
 
 $sid = $_GET['id'] ?? '';
-$s = row("SELECT s.*, a.name AS apartment_name, a.address AS apartment_address, a.check_out_time, a.rules,
+$s = row("SELECT s.*, a.name AS apartment_name, a.address AS apartment_address, a.city AS apartment_city, a.check_out_time, a.rules,
           a.block_number, a.cleaner_directions, a.gmaps_code, a.gmaps_resolved,
           b.code AS booking_code, b.check_in, b.check_out, b.guests, c.name AS customer_name
           FROM cleaning_sessions s
@@ -68,7 +68,14 @@ require __DIR__ . '/partials/head.php';
       <a href="/pulizie.php?t=<?= e($token) ?>" class="btn-ghost p-2 -ml-2"><i data-lucide="chevron-left" class="size-[20px]"></i></a>
       <div class="flex-1 min-w-0">
         <div class="font-display font-bold leading-tight truncate"><?= e($s['apartment_name']) ?></div>
-        <div class="text-xs text-ink-500 mt-0.5"><?= fmtDate($s['scheduled_date']) ?></div>
+        <div class="flex items-center gap-2 mt-1 flex-wrap">
+          <?php if (!empty($s['apartment_city'])): ?>
+            <span class="inline-flex items-center gap-1 bg-orange-100 text-orange-800 dark:bg-orange-500/15 dark:text-orange-300 text-[11px] font-bold px-2 py-0.5 rounded-full">
+              <i data-lucide="map-pin" class="size-[11px]"></i> <?= e($s['apartment_city']) ?>
+            </span>
+          <?php endif; ?>
+          <span class="text-xs text-ink-500"><?= fmtDate($s['scheduled_date']) ?></span>
+        </div>
       </div>
     </div>
   </header>
