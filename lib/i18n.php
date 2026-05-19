@@ -577,11 +577,11 @@ $TRANSLATIONS = [
     'it' => 'Richiedi prenotazione', 'en' => 'Request booking', 'ru' => 'Запросить бронирование', 'es' => 'Solicitar reserva', 'de' => 'Buchung anfragen',
 ],
 'apt.no_charge' => [
-    'it' => 'Per confermare la prenotazione è richiesto un acconto. Il saldo si paga all\'arrivo, direttamente alla signora Patrizia Mancini.',
-    'en' => 'A deposit is required to confirm the booking. The balance is paid on arrival, directly to Mrs. Patrizia Mancini.',
-    'ru' => 'Для подтверждения брони требуется задаток. Остаток оплачивается по приезде, лично госпоже Патриции Манчини.',
-    'es' => 'Para confirmar la reserva se requiere un anticipo. El resto se paga a la llegada, directamente a la Sra. Patrizia Mancini.',
-    'de' => 'Zur Bestätigung der Buchung ist eine Anzahlung erforderlich. Der Restbetrag wird bei Ankunft direkt an Frau Patrizia Mancini gezahlt.',
+    'it' => 'Per confermare la prenotazione è richiesto un acconto. Il saldo si paga all\'arrivo in contanti al nostro incaricato.',
+    'en' => 'A deposit is required to confirm the booking. The balance is paid in cash to our representative upon arrival.',
+    'ru' => 'Для подтверждения брони требуется задаток. Остаток оплачивается наличными нашему представителю по приезде.',
+    'es' => 'Para confirmar la reserva se requiere un anticipo. El resto se paga en efectivo a nuestro encargado al llegar.',
+    'de' => 'Zur Bestätigung der Buchung ist eine Anzahlung erforderlich. Der Restbetrag wird bei Ankunft in bar an unseren Mitarbeiter gezahlt.',
 ],
 'apt.req_sent' => [
     'it' => 'Richiesta inviata!', 'en' => 'Request sent!', 'ru' => 'Заявка отправлена!', 'es' => '¡Solicitud enviada!', 'de' => 'Anfrage gesendet!',
