@@ -14,9 +14,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? 'save';
 
     if ($action === 'delete' && $apt) {
-        q('DELETE FROM apartments WHERE id = ?', [$apt['id']]);
-        logActivity('delete', 'apartment', $apt['id'], $apt['name']);
-        flash('Appartamento eliminato');
+        try {
+            db()->beginTransaction();
+            // Elimina prenotazioni (cascade su payments/documents)
+            $bk = (int)val('SELECT COUNT(*) FROM bookings WHERE apartment_id = ?', [$apt['id']]);
+            if ($bk > 0) {
+                q('DELETE FROM bookings WHERE apartment_id = ?', [$apt['id']]);
+            }
+            q('DELETE FROM apartments WHERE id = ?', [$apt['id']]);
+            db()->commit();
+            logActivity('delete', 'apartment', $apt['id'], $apt['name']);
+            flash('Appartamento eliminato' . ($bk > 0 ? " (+ $bk prenotazion" . ($bk === 1 ? 'e' : 'i') . " collegate)" : ''));
+        } catch (Throwable $e) {
+            if (db()->inTransaction()) db()->rollBack();
+            flash('Errore eliminazione: ' . $e->getMessage(), 'error');
+            redirect('/admin/appartamento-edit.php?id=' . $apt['id']);
+        }
         redirect('/admin/appartamenti.php');
     }
 
