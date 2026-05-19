@@ -395,12 +395,56 @@ require __DIR__ . '/../partials/admin-shell-top.php';
         </div>
         <input type="hidden" name="base_price" value="<?= e((string)$f['base_price']) ?>">
         <input type="hidden" name="weekend_price" value="<?= e((string)$f['weekend_price']) ?>">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <label class="block"><span class="label">Settimanale (€ totale)</span><input class="input" type="number" step="0.01" name="weekly_price" value="<?= e((string)$f['weekly_price']) ?>" required></label>
-          <label class="block"><span class="label">2 settimane (€ totale)</span><input class="input" type="number" step="0.01" name="biweekly_price" value="<?= e((string)$f['biweekly_price']) ?>"></label>
-          <label class="block"><span class="label">3 settimane (€ totale)</span><input class="input" type="number" step="0.01" name="triweekly_price" value="<?= e((string)$f['triweekly_price']) ?>"></label>
-          <label class="block"><span class="label">1 mese (€ totale)</span><input class="input" type="number" step="0.01" name="monthly_price" value="<?= e((string)$f['monthly_price']) ?>"></label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="prezzi-pacchetto">
+          <label class="block">
+            <span class="label">Settimanale (€ totale)</span>
+            <input class="input" type="number" step="0.01" name="weekly_price" id="wp" value="<?= e((string)$f['weekly_price']) ?>" required>
+          </label>
+          <label class="block">
+            <span class="label">2 settimane (€ totale)</span>
+            <input class="input" type="number" step="0.01" name="biweekly_price" id="bwp" value="<?= e((string)$f['biweekly_price']) ?>">
+            <span class="text-[11px] text-ink-500 mt-1 block" id="hint-bw">Lascia vuoto = settimanale × 2. Metti meno per generare risparmio visibile.</span>
+          </label>
+          <label class="block">
+            <span class="label">3 settimane (€ totale)</span>
+            <input class="input" type="number" step="0.01" name="triweekly_price" id="twp" value="<?= e((string)$f['triweekly_price']) ?>">
+            <span class="text-[11px] text-ink-500 mt-1 block" id="hint-tw">Lascia vuoto = settimanale × 3. Metti meno per generare risparmio.</span>
+          </label>
+          <label class="block">
+            <span class="label">1 mese (€ totale)</span>
+            <input class="input" type="number" step="0.01" name="monthly_price" id="mp" value="<?= e((string)$f['monthly_price']) ?>">
+            <span class="text-[11px] text-ink-500 mt-1 block" id="hint-m">Lascia vuoto = settimanale × 30/7. Metti meno per generare risparmio.</span>
+          </label>
         </div>
+        <div class="flex flex-wrap gap-2 pt-2">
+          <button type="button" id="apply-discounts" class="btn-secondary text-xs"><i data-lucide="zap" class="size-[14px]"></i> Applica sconti suggeriti (-5% · -10% · -15%)</button>
+        </div>
+        <script>
+        (function(){
+          const wp = document.getElementById('wp');
+          const bwp = document.getElementById('bwp');
+          const twp = document.getElementById('twp');
+          const mp = document.getElementById('mp');
+          const fmt = n => Math.round(n * 100) / 100;
+          function updateHints(){
+            const w = parseFloat(wp.value) || 0;
+            if (w > 0) {
+              document.getElementById('hint-bw').innerHTML = 'Pieno proporzionale: <b>€' + fmt(w*2) + '</b>. Metti meno per generare risparmio visibile al cliente.';
+              document.getElementById('hint-tw').innerHTML = 'Pieno proporzionale: <b>€' + fmt(w*3) + '</b>. Metti meno per generare risparmio.';
+              document.getElementById('hint-m').innerHTML = 'Pieno proporzionale: <b>€' + fmt(w*30/7) + '</b>. Metti meno per generare risparmio.';
+            }
+          }
+          wp.addEventListener('input', updateHints);
+          updateHints();
+          document.getElementById('apply-discounts').addEventListener('click', () => {
+            const w = parseFloat(wp.value) || 0;
+            if (w <= 0) { alert('Imposta prima il prezzo settimanale.'); return; }
+            bwp.value = fmt(w * 2 * 0.95);   // -5% su 2 sett
+            twp.value = fmt(w * 3 * 0.90);   // -10% su 3 sett
+            mp.value  = fmt(w * (30/7) * 0.85); // -15% su 1 mese
+          });
+        })();
+        </script>
       <?php else: ?>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label class="block"><span class="label">Per notte (€)</span><input class="input" type="number" step="0.01" name="base_price" value="<?= e((string)$f['base_price']) ?>" required></label>
