@@ -161,8 +161,8 @@ $_lp = currentLang() !== 'it' ? '?lang=' . urlencode(currentLang()) : '';
     </div>
     <a href="/appartamenti.php<?= $_lp ?>" class="hidden sm:inline-flex text-sm text-brand-600 font-medium hover:underline"><?= e(t('common.see_all_arrow')) ?></a>
   </div>
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <?php foreach (array_slice($zones, 0, 4) as $z):
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <?php foreach ($zones as $z):
       $zCover = $z['image'] ?? null;
       if (!$zCover) {
         // Fallback: prima foto di un appartamento in quella città

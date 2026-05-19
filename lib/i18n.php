@@ -142,7 +142,7 @@ $TRANSLATIONS = [
     'it' => 'vacanza', 'en' => 'getaway', 'ru' => 'отпуск', 'es' => 'vacaciones', 'de' => 'Urlaub',
 ],
 'hero.title.line3' => [
-    'it' => 'inizia qui.', 'en' => 'starts here.', 'ru' => 'начинается здесь.', 'es' => 'empieza aquí.', 'de' => 'beginnt hier.',
+    'it' => 'a Sharm El Sheikh.', 'en' => 'in Sharm El Sheikh.', 'ru' => 'в Шарм-эль-Шейхе.', 'es' => 'en Sharm El Sheikh.', 'de' => 'in Sharm El Sheikh.',
 ],
 'hero.subtitle' => [
     'it' => 'Appartamenti selezionati personalmente a Sharm El Sheikh: Naama Bay, Hadaba, Nabq, Sharks Bay e Old Market. Check-in fluido, assistenza in italiano, ospitalità che si sente.',
