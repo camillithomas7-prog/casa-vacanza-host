@@ -10,6 +10,8 @@ function navItem($href, $icon, $label, $current) {
     echo '<a href="' . e($href) . '" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ' . $cls . '"><i data-lucide="' . e($icon) . '" class="size-[18px] shrink-0"></i> ' . e($label) . '</a>';
 }
 $unreadNotifs = (int)val('SELECT COUNT(*) FROM notifications WHERE is_read = 0');
+$chatPending = 0;
+try { $chatPending = (int)val("SELECT COUNT(*) FROM chat_conversations WHERE status = 'escalated'"); } catch (Throwable $e) {}
 $initials = $current ? mb_strtoupper(mb_substr($current['name'] ?: $current['email'], 0, 1) . mb_substr($current['email'], 1, 1)) : 'A';
 
 $titles = [
@@ -36,6 +38,7 @@ $titles = [
   '/admin/servizio-edit.php' => ['Servizio', 'Modifica scheda'],
   '/admin/servizi-prenotazioni.php' => ['Prenotazioni servizi', 'Veicoli, escursioni, transfer'],
   '/admin/servizi-prenotazione.php' => ['Prenotazione servizio', 'Dettaglio'],
+  '/admin/chat.php' => ['Chat clienti', 'Conversazioni dal widget del sito'],
 ];
 $pageMeta = $titles[$path] ?? ['Admin', ''];
 ?>
@@ -63,6 +66,16 @@ $pageMeta = $titles[$path] ?? ['Admin', ''];
     <?php navItem('/admin/spese.php', 'receipt', 'Spese & bilancio', $path); ?>
     <?php navItem('/admin/coupon.php', 'tag', 'Coupon', $path); ?>
     <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 px-3 pb-1.5 pt-4">Comunicazione</div>
+    <?php
+      // Voce Chat con badge se ci sono escalation pendenti
+      $isActive = strpos($path, '/admin/chat.php') !== false;
+      $cls = $isActive
+        ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-[0_4px_12px_-4px_rgba(240,78,0,.45)]'
+        : 'text-ink-600 dark:text-ink-300 hover:bg-ink-100 dark:hover:bg-ink-800/60';
+      echo '<a href="/admin/chat.php" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ' . $cls . '"><i data-lucide="message-circle" class="size-[18px] shrink-0"></i> Chat clienti';
+      if ($chatPending > 0) echo ' <span class="ml-auto h-5 min-w-5 px-1.5 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">' . $chatPending . '</span>';
+      echo '</a>';
+    ?>
     <?php navItem('/admin/template.php', 'message-square', 'Template', $path); ?>
     <?php navItem('/admin/recensioni.php', 'star', 'Recensioni', $path); ?>
     <div class="text-[11px] font-semibold uppercase tracking-wider text-ink-400 px-3 pb-1.5 pt-4">Sistema</div>

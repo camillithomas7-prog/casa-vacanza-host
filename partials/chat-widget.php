@@ -90,6 +90,10 @@ $chatPhone = setting('contact_phone', cfg('site.phone'));
   const quickBox = document.getElementById('cv-chat-quick');
   const NAME = <?= json_encode($chatName) ?>;
   const STORAGE_KEY = 'cv_chat_v1';
+  const SESSION_KEY = 'cv_chat_session';
+  function genSid(){ return 'sid-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2,12); }
+  let SID = localStorage.getItem(SESSION_KEY);
+  if (!SID || !/^sid-[a-z0-9\-]{10,}$/.test(SID)) { SID = genSid(); localStorage.setItem(SESSION_KEY, SID); }
 
   function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function md(s){
@@ -160,7 +164,7 @@ $chatPhone = setting('contact_phone', cfg('site.phone'));
       const r = await fetch('/api/chat.php', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({history: history.slice(-12), lang: document.documentElement.lang || 'it'})
+        body: JSON.stringify({history: history.slice(-12), session_id: SID, lang: document.documentElement.lang || 'it'})
       });
       const d = await r.json();
       hideTyping();

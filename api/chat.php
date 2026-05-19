@@ -4,24 +4,53 @@ require_once __DIR__ . '/../lib/utils.php';
 
 header('Content-Type: application/json');
 
+// ──────── Schema idempotente per chat ────────
+try {
+    db()->exec("CREATE TABLE IF NOT EXISTS chat_conversations (
+      id VARCHAR(32) PRIMARY KEY,
+      session_id VARCHAR(64) NOT NULL UNIQUE,
+      customer_name VARCHAR(120) DEFAULT '',
+      customer_phone VARCHAR(60) DEFAULT '',
+      status VARCHAR(20) NOT NULL DEFAULT 'active',
+      escalated_at DATETIME NULL,
+      escalation_reason TEXT,
+      handled_by_admin TINYINT(1) NOT NULL DEFAULT 0,
+      message_count INT NOT NULL DEFAULT 0,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      INDEX idx_status (status),
+      INDEX idx_updated (updated_at DESC)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    db()->exec("CREATE TABLE IF NOT EXISTS chat_messages (
+      id VARCHAR(32) PRIMARY KEY,
+      conversation_id VARCHAR(32) NOT NULL,
+      role VARCHAR(20) NOT NULL,
+      content TEXT NOT NULL,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE,
+      INDEX idx_conv (conversation_id, created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+} catch (Throwable $e) { error_log('chat schema: ' . $e->getMessage()); }
+
 $apiKey = setting('openai_api_key', '');
 if (!$apiKey) {
-    echo json_encode(['error' => 'Chat momentaneamente non disponibile. Scrivimi su WhatsApp al ' . setting('contact_phone', cfg('site.phone'))]);
+    echo json_encode(['error' => 'Chat non configurata. Riprova più tardi.']);
     exit;
 }
 
 $body = json_decode(file_get_contents('php://input'), true) ?: [];
 $history = $body['history'] ?? [];
+$sessionId = trim((string)($body['session_id'] ?? ''));
 $lang = $body['lang'] ?? 'it';
-if (!is_array($history) || empty($history)) {
-    echo json_encode(['error' => 'Messaggio vuoto']);
+if (!is_array($history) || empty($history) || !$sessionId || !preg_match('/^[a-zA-Z0-9\-_]{8,64}$/', $sessionId)) {
+    echo json_encode(['error' => 'Richiesta non valida']);
     exit;
 }
 
-// Rate limit semplice per IP: max 30 msg ogni 10 min
+// Rate limit per IP
 $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+if (session_status() === PHP_SESSION_NONE) session_start();
 $rlKey = 'rl_chat_' . md5($ip);
-session_start();
 $now = time();
 $bucket = $_SESSION[$rlKey] ?? [];
 $bucket = array_filter($bucket, fn($t) => $t > $now - 600);
@@ -32,25 +61,49 @@ if (count($bucket) >= 30) {
 $bucket[] = $now;
 $_SESSION[$rlKey] = $bucket;
 
-// Costruisci context: lista appartamenti
+// Trova/crea conversation
+$conv = row('SELECT * FROM chat_conversations WHERE session_id = ?', [$sessionId]);
+if (!$conv) {
+    $convId = newId();
+    q('INSERT INTO chat_conversations (id, session_id, status) VALUES (?, ?, ?)', [$convId, $sessionId, 'active']);
+    $conv = ['id' => $convId, 'status' => 'active', 'customer_name' => '', 'customer_phone' => ''];
+}
+
+// Salva messaggio user più recente
+$lastUserMsg = '';
+foreach (array_reverse($history) as $m) {
+    if (($m['role'] ?? '') === 'user') { $lastUserMsg = trim((string)($m['content'] ?? '')); break; }
+}
+if ($lastUserMsg !== '') {
+    q('INSERT INTO chat_messages (id, conversation_id, role, content) VALUES (?, ?, ?, ?)',
+        [newId(), $conv['id'], 'user', mb_substr($lastUserMsg, 0, 4000)]);
+    q('UPDATE chat_conversations SET message_count = message_count + 1, updated_at = NOW() WHERE id = ?', [$conv['id']]);
+}
+
+// Context appartamenti
 $apts = rows("SELECT a.name, a.slug, a.city, a.bedrooms, a.bathrooms, a.guests, a.base_price, a.weekly_price, a.description, a.cover_image,
               (SELECT url FROM photos WHERE apartment_id = a.id ORDER BY position ASC LIMIT 1) AS first_photo
               FROM apartments a WHERE active = 1 ORDER BY a.city ASC, a.base_price ASC");
-
 $aptCtx = [];
 foreach ($apts as $a) {
     $desc = trim(preg_replace('/\s+/', ' ', (string)$a['description']));
     if (mb_strlen($desc) > 220) $desc = mb_substr($desc, 0, 220) . '…';
+    // Pulisci riferimenti al brand Domina anche nel context
+    $cityClean = preg_replace('/\s*\(?\s*domina[^)]*\)?\s*/i', '', (string)$a['city']);
+    $cityClean = trim($cityClean) ?: $a['city'];
+    $descClean = preg_replace('/\bdomina\b/i', 'resort', $desc);
+    $nameClean = preg_replace('/\bdomina\b/i', '', $a['name']);
+    $nameClean = preg_replace('/\s+/', ' ', $nameClean);
     $aptCtx[] = [
-        'name' => $a['name'],
+        'name' => trim($nameClean),
         'url' => '/appartamento.php?slug=' . $a['slug'],
-        'zona' => $a['city'],
+        'zona' => $cityClean,
         'camere' => (int)$a['bedrooms'],
         'bagni' => (int)$a['bathrooms'],
         'ospiti' => (int)$a['guests'],
         'prezzo_notte_eur' => (float)$a['base_price'],
         'prezzo_settimana_eur' => $a['weekly_price'] ? (float)$a['weekly_price'] : null,
-        'descrizione' => $desc,
+        'descrizione' => $descClean,
         'foto' => $a['cover_image'] ?: $a['first_photo'],
     ];
 }
@@ -59,63 +112,60 @@ $siteName = setting('site_name', cfg('site.name'));
 $phone = setting('contact_phone', cfg('site.phone'));
 $email = setting('contact_email', cfg('site.email'));
 $chatName = setting('chat_assistant_name', 'Sofia');
+$hasContact = !empty($conv['customer_phone']);
 
-$systemPrompt = "Sei {$chatName}, lavori da anni con Patrizia Mancini, property manager di una collezione di appartamenti in affitto a Sharm El Sheikh. Gestisci le richieste dei clienti come una vera receptionist/venditrice: conosci tutti gli appartamenti uno per uno, sai consigliarli, e CHIUDI TU la richiesta — non rimbalzi mai il cliente altrove.
+$systemPrompt = "Sei {$chatName}, lavori da anni con Patrizia Mancini, property manager di una collezione di appartamenti in affitto a Sharm El Sheikh. Sei una vera receptionist/venditrice: conosci ogni appartamento, sai consigliare, e CHIUDI TU le richieste — non rimbalzi mai il cliente altrove.
 
 ═══════ CHI SEI ═══════
 - Sei una persona reale. NON dire MAI di essere AI/bot/chatbot/GPT/ChatGPT/OpenAI/assistente virtuale/modello linguistico/intelligenza artificiale.
-- Se ti chiedono 'sei un robot?' rispondi tipo: 'Ahah no, sono {$chatName}, lavoro con Patrizia da un po' 😊 Dimmi pure, cosa cerchi?' e SUBITO continui aiutando.
-- Tono: caldo, sicuro, professionale ma colloquiale. Frasi corte. Emoji discrete (😊 🌊 ✨). Mai paroloni, mai linguaggio da brochure.
+- Se ti chiedono 'sei un robot?' rispondi tipo: 'Ahah no, sono {$chatName}, lavoro con Patrizia da un po' 😊 Dimmi, cosa cerchi?' e CONTINUI subito ad aiutare.
+- Tono: caldo, sicuro, professionale ma colloquiale. Frasi corte. Emoji discrete (😊 🌊 ✨). Mai paroloni.
 - Rispondi sempre nella lingua del cliente (it/en/de/es/ru).
 
-═══════ COME VENDI (REGOLA D'ORO) ═══════
-Il cliente è già sul sito: se ti scrive vuole una RISPOSTA CONCRETA, non un rimbalzo. Tu sei la sua scorciatoia.
+═══════ REGOLA SUI NOMI BRAND ═══════ (IMPORTANTISSIMA)
+- **NON scrivere MAI la parola 'Domina'** nelle tue risposte. È un marchio che non possiamo usare nei materiali pubblici.
+- Se il CLIENTE dice 'Domina', tu CAPISCI che si riferisce alla zona di **Coral Bay** (il resort Domina Coral Bay è dentro Coral Bay). Tu nella risposta scrivi solo 'Coral Bay'.
+- Esempio:
+  - Cliente: 'Avete qualcosa al Domina?'
+  - Tu: 'Sì, a Coral Bay abbiamo diversi appartamenti. Te ne consiglio 2-3 bellissimi: [...]'
+- Se nei dati di un appartamento c'è scritto 'Domina', tu nel testo riscrivilo come 'Coral Bay' o ometti il dettaglio brand.
 
-❌ NON DIRE MAI cose come:
+═══════ COME VENDI ═══════
+Il cliente è già sul sito: se ti scrive vuole UNA RISPOSTA SUBITO. Tu sei la sua scorciatoia.
+
+❌ NON DIRE MAI:
 - 'visita la pagina dell'appartamento'
 - 'clicca Prenota per vedere il calendario'
 - 'scrivi su WhatsApp a Patrizia'
 - 'ti consiglio di contattare...'
 - 'per maggiori informazioni vai su...'
-Tutto questo fa scappare il cliente. È IL TUO MESTIERE rispondere tu.
 
 ✅ DEVI:
-1. **Proporre subito appartamenti concreti** quando il cliente chiede 'cosa avete' o simili. Tira fuori 2-3 nomi con prezzo e zona, mai 'ne abbiamo tanti'. Esempio: 'Allora, per giugno con 2 persone questi sono i 3 più belli che abbiamo: [Eccellente bilocale al piano terra](/appartamento.php?slug=...) ad Atelier Residence a €350/sett, [Monolocale Coral Bay vista mare](...) a €300/sett, ed un...'
-2. **Fare domande di qualificazione una alla volta** (mai tutte insieme, sembra un form):
-   - Quando vorresti venire? (date approssimative)
-   - In quanti siete? Famiglia, coppia, gruppo amici?
-   - Zona preferita? (spiega brevemente: 'Coral Bay è vista mare diretta, Naama Bay è la zona della movida, Atelier Residence è più tranquilla con piscine grandi, Sunny Lakes economica, Hadaba autentica...')
-   - Ti serve la cucina? Piscina? Terrazzo vista mare?
-   - Budget orientativo? (opzionale, solo se utile)
-3. **Dare info dettagliate** sugli appartamenti che hai nella lista: nome, zona, camere, bagni, ospiti, prezzo. Descrivili a parole tue, non incollare brochure.
-4. **Chiudere**: quando il cliente sembra interessato a uno specifico, dì 'Te lo blocco io adesso, hai bisogno solo di darmi nome, cognome, email e te lo confermo entro 1h via email.' (in realtà non blocchi niente: questa parte la perfezioneremo, per ora non chiedere dati personali — invitalo a cliccare il link dell'appartamento che ho passato dove può chiudere lui la prenotazione).
+1. **Proporre subito appartamenti concreti** con nome (link markdown), zona, camere, prezzo. Mai 'ne abbiamo tanti, dipende'.
+2. **Fare domande di qualificazione UNA PER VOLTA** (mai tutte insieme): date → quanti siete → zona preferita → cucina/piscina → budget.
+3. **Conoscere le zone**: Coral Bay (lusso vista mare, piscine resort), Naama Bay (movida, bar, ristoranti), Atelier Residence/Hadaba (tranquillo, piscina, family), Sunny Lakes (economico, piscine), Delta Sharm (medio centrale), Sharks Bay (diving, vicino aeroporto), Nabq (tranquillo, lontano), Old Market (autentico), Montaza (villa esclusive).
+4. **Disponibilità date**: NON dire 'non ho il calendario'. Proponi gli appartamenti dicendo 'in quel periodo questi sono i 3 che ti consiglio'. Solo se il cliente è già pronto a chiudere su uno specifico, dì che gli confermi la data esatta in pochi minuti.
 
-═══════ DISPONIBILITÀ DATE ═══════
-NON dire 'non ho il calendario'. Non rimbalzare al sito. Rispondi così:
-- Se chiedono per un mese ('giugno'): proponi 3 appartamenti realistici dalla lista, dicendo 'a giugno questi sono quelli che ti consiglio di più' (l'assunzione è che a giugno tutti sono disponibili — in alta stagione li valuteremo caso per caso). NON dire 'verifico'.
-- Se chiedono date specifiche ('dal 12 al 19 luglio'): proponi 2-3 appartamenti dicendo 'In quel periodo abbiamo [questi] disponibili, qual è la zona che preferisci?'. Se sembrano davvero pronti a chiudere e devono sapere la disponibilità ESATTA al giorno, allora — solo allora — di': 'Bene, dammi qualche minuto che ti confermo io le date precise. Quale di questi tre preferisci?'
+═══════ ESCALATION A UMANO ═══════
+Se ti viene fatta una domanda CHE NON SAI rispondere coi dati che hai (es. richieste molto specifiche su un servizio extra, su un dettaglio operativo non documentato, condizioni complesse di pagamento, domanda fuori dal tuo scope, conferma di disponibilità in alta stagione su date strette), NON inventare. Usa questa procedura:
+
+1. Rispondi in modo professionale tipo: 'Su questo specifico punto ti dico la verità: preferisco verificare con il mio collega che segue questa parte per non darti un'informazione approssimativa. Ti rispondo io in pochi minuti — per non perderti, mi lasci il tuo nome e numero di telefono? Ti scrivo io su WhatsApp con la risposta precisa.'
+2. ALLA FINE della tua risposta aggiungi su una nuova riga ESATTAMENTE questo marker (l'utente non lo vedrà, lo userà il sistema): `[ESCALATE: motivo breve della domanda]`. Esempio: `[ESCALATE: chiede se ammettiamo cani nell'appartamento Atelier 2]`
+
+═══════ RACCOLTA CONTATTO ═══════
+" . ($hasContact ? "Il contatto del cliente è già stato salvato (nome: {$conv['customer_name']}, tel: {$conv['customer_phone']}). NON richiederlo di nuovo." : "Se il cliente ti fornisce nome+telefono in un messaggio (anche fuori dal contesto escalation, es. dopo che ha visto un appartamento che gli piace), TU:
+1. Conferma con calore: 'Perfetto {nome}, ti ho segnato! Ti contatto io su WhatsApp entro pochi minuti per chiudere tutto. Intanto se vuoi guardare meglio l'appartamento questo è il link [...]'
+2. ALLA FINE della tua risposta aggiungi su una nuova riga ESATTAMENTE: `[CONTATTO: nome=Mario Rossi | tel=+39 333 1234567 | motivo=motivo breve]`. Il sistema lo userà per notificare Patrizia.") . "
 
 ═══════ FORMATO LINK ═══════
-Quando suggerisci un appartamento, scrivi sempre il nome come link markdown: [nome appartamento](/appartamento.php?slug=SLUG). Sotto al tuo messaggio compariranno automaticamente delle card cliccabili con foto. Suggerisci max 3-4 appartamenti per messaggio.
-
-═══════ CONOSCENZA ZONE (USA QUESTA) ═══════
-- **Coral Bay (Domina Coral Bay)**: lusso, vista mare diretta, piscine grandi, spa, ristoranti dentro al resort. Prezzi più alti.
-- **Naama Bay**: cuore della movida, ristoranti, bar, vicinanza spiaggia. Buono per coppie giovani.
-- **Atelier Residence (El Hadaba)**: residence tranquillo con piscina, ottimo rapporto qualità/prezzo, per famiglie.
-- **Sunny Lakes**: economico, tranquillo, piscine, vicino Naama Bay.
-- **Delta Sharm**: residence con servizi, posizione centrale, prezzi medi.
-- **Sharks Bay**: zona diving, vicino aeroporto, mare bellissimo.
-- **Nabq**: lontano dal centro, più tranquillo, prezzi bassi.
-- **Old Market**: zona autentica egiziana, vivace, ristoranti tipici.
-- **Montaza**: villa esclusive, spiaggia privata.
+Quando suggerisci un appartamento, scrivi il nome come link markdown: [nome](/appartamento.php?slug=SLUG). Sotto al tuo messaggio appariranno automaticamente card con foto. Max 4 appartamenti per messaggio.
 
 ═══════ CONTATTI EMERGENZA ═══════
-Usa il telefono di Patrizia SOLO se il cliente insiste a voler parlare con una persona dopo che hai già provato due volte ad aiutarlo: WhatsApp/Tel {$phone}. Email {$email}. Mai come prima opzione.
+SOLO se il cliente insiste a voler parlare con una persona DOPO che hai provato due volte: WhatsApp {$phone}.
 
-═══════ LISTA APPARTAMENTI (dati reali) ═══════
+═══════ LISTA APPARTAMENTI ═══════
 " . json_encode($aptCtx, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-// Costruisci messaggi per OpenAI
 $messages = [['role' => 'system', 'content' => $systemPrompt]];
 foreach ($history as $m) {
     $role = ($m['role'] ?? '') === 'user' ? 'user' : 'assistant';
@@ -125,7 +175,6 @@ foreach ($history as $m) {
     $messages[] = ['role' => $role, 'content' => $content];
 }
 
-// Chiamata OpenAI
 $ch = curl_init('https://api.openai.com/v1/chat/completions');
 curl_setopt_array($ch, [
     CURLOPT_POST => true,
@@ -148,19 +197,62 @@ $err = curl_error($ch);
 curl_close($ch);
 
 if ($err || $httpCode !== 200) {
-    error_log("OpenAI chat error: HTTP $httpCode · curl=$err · resp=" . substr((string)$resp, 0, 500));
-    echo json_encode(['error' => 'Mi spiace, ho un piccolo problema in questo momento. Riprova tra poco oppure scrivimi su WhatsApp al ' . $phone . ' 🙏']);
+    error_log("OpenAI error: HTTP $httpCode · $err · " . substr((string)$resp, 0, 300));
+    echo json_encode(['error' => 'Mi spiace, ho un piccolo problema in questo momento. Riprova tra poco. 🙏']);
     exit;
 }
 
 $data = json_decode($resp, true);
 $reply = trim((string)($data['choices'][0]['message']['content'] ?? ''));
-if (!$reply) {
-    echo json_encode(['error' => 'Risposta vuota dal sistema. Riprova.']);
-    exit;
+if (!$reply) { echo json_encode(['error' => 'Risposta vuota.']); exit; }
+
+// Parsing marker
+$escalated = false;
+$escalationReason = '';
+$contactName = '';
+$contactPhone = '';
+$contactReason = '';
+
+if (preg_match('/\[ESCALATE:\s*(.+?)\]/s', $reply, $m)) {
+    $escalated = true;
+    $escalationReason = trim($m[1]);
+    $reply = trim(str_replace($m[0], '', $reply));
+}
+if (preg_match('/\[CONTATTO:\s*nome=([^|]+?)\s*\|\s*tel=([^|]+?)\s*\|\s*motivo=(.+?)\]/s', $reply, $m)) {
+    $contactName = trim($m[1]);
+    $contactPhone = trim($m[2]);
+    $contactReason = trim($m[3]);
+    $reply = trim(str_replace($m[0], '', $reply));
 }
 
-// Estrai card: cerca link ad appartamenti nel reply
+// Aggiorna conversation se contatto raccolto
+if ($contactName || $contactPhone) {
+    q('UPDATE chat_conversations SET customer_name = ?, customer_phone = ?, escalation_reason = COALESCE(NULLIF(escalation_reason,""), ?), updated_at = NOW() WHERE id = ?',
+        [$contactName, $contactPhone, $contactReason, $conv['id']]);
+}
+
+// Escalation
+if ($escalated || ($contactName && $contactPhone)) {
+    $reason = $escalationReason ?: $contactReason;
+    q('UPDATE chat_conversations SET status = "escalated", escalated_at = COALESCE(escalated_at, NOW()), escalation_reason = COALESCE(NULLIF(escalation_reason,""), ?) WHERE id = ?',
+        [$reason, $conv['id']]);
+
+    // Notifica admin
+    try {
+        $title = $contactPhone
+            ? 'Nuovo contatto da chat: ' . ($contactName ?: 'cliente')
+            : 'Chat richiede aiuto umano';
+        $bodyN = ($contactPhone ? 'Tel: ' . $contactPhone . ' · ' : '') . ($reason ?: 'Richiesta non gestita dall\'assistente');
+        q('INSERT INTO notifications (id, type, title, body, link) VALUES (?, ?, ?, ?, ?)',
+            [newId(), 'chat_escalation', $title, mb_substr($bodyN, 0, 240), '/admin/chat.php?id=' . $conv['id']]);
+    } catch (Throwable $e) {}
+}
+
+// Salva risposta assistant (pulita)
+q('INSERT INTO chat_messages (id, conversation_id, role, content) VALUES (?, ?, ?, ?)',
+    [newId(), $conv['id'], 'assistant', mb_substr($reply, 0, 4000)]);
+
+// Estrai card dai link
 $cards = [];
 $slugIndex = [];
 foreach ($apts as $a) $slugIndex[$a['slug']] = $a;
@@ -170,9 +262,11 @@ if (preg_match_all('#/appartamento\.php\?slug=([a-z0-9\-]+)#i', $reply, $mm)) {
         if (isset($seen[$slug]) || !isset($slugIndex[$slug])) continue;
         $seen[$slug] = true;
         $a = $slugIndex[$slug];
-        $meta = ($a['city'] ? $a['city'] . ' · ' : '') . (int)$a['bedrooms'] . ' camer' . ((int)$a['bedrooms'] === 1 ? 'a' : 'e') . ' · €' . (int)$a['base_price'] . '/notte';
+        $cityClean = preg_replace('/\s*\(?\s*domina[^)]*\)?\s*/i', '', (string)$a['city']);
+        $cityClean = trim($cityClean) ?: $a['city'];
+        $meta = ($cityClean ? $cityClean . ' · ' : '') . (int)$a['bedrooms'] . ' camer' . ((int)$a['bedrooms'] === 1 ? 'a' : 'e') . ' · €' . (int)$a['base_price'] . '/notte';
         $cards[] = [
-            'title' => $a['name'],
+            'title' => preg_replace('/\s+/', ' ', preg_replace('/\bdomina\b/i', '', $a['name'])),
             'url' => '/appartamento.php?slug=' . $a['slug'],
             'image' => $a['cover_image'] ?: $a['first_photo'],
             'meta' => $meta,
@@ -181,4 +275,4 @@ if (preg_match_all('#/appartamento\.php\?slug=([a-z0-9\-]+)#i', $reply, $mm)) {
     }
 }
 
-echo json_encode(['reply' => $reply, 'cards' => $cards]);
+echo json_encode(['reply' => $reply, 'cards' => $cards, 'escalated' => $escalated]);
